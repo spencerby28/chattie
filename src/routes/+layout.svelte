@@ -15,6 +15,8 @@
 	export const notificationPrefs = writable<NotificationPreferences>({});
 	let unsubscribe: (() => void) | undefined;
 
+	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/register';
+
 	onMount(async () => {
 		// Initialize global realtime connection
 		if (typeof window !== 'undefined') {
@@ -47,6 +49,10 @@
 </svelte:head>
 
 <Toaster richColors closeButton position="top-right" />
-<AppShell>
+{#if !isAuthRoute}
+	<AppShell>
+		<slot />
+	</AppShell>
+{:else}
 	<slot />
-</AppShell>
+{/if}

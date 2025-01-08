@@ -4,8 +4,10 @@ import { error } from '@sveltejs/kit';
 
 export const load = (async ({ locals, ...event }) => {
 	if (!locals.user) {
+		
 		return {
 			workspaces: []
+
 		};
 	}
 
