@@ -656,3 +656,810 @@ Traceback (most recent call last):
 appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
 2025-01-07 17:53:53,927 [INFO] Workspace creation completed. Personas: 0, Channels: 0
 2025-01-07 17:53:53,929 [INFO] ::1 [07/Jan/2025:17:53:03 -0600] "GET /?workspace_id=677dbe5e003a55d70208&description=skiing%20or%20snowboarding HTTP/1.1" 200 288 "-" "node"
+2025-01-07 19:03:37,687 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-07 19:03:37,688 [INFO] Appwrite admin client initialized
+2025-01-07 19:05:15,053 [INFO] Starting workspace creation for ID: 677dcf4a00235b6dcce5
+2025-01-07 19:05:15,057 [INFO] Workspace description: What
+2025-01-07 19:05:15,057 [INFO] Creating AI user for workspace: 677dcf4a00235b6dcce5
+2025-01-07 19:05:15,057 [INFO] Attempting to create AI user with email: ai.677dcf4a00235b6dcce5@chattie.local
+2025-01-07 19:05:15,307 [INFO] Successfully created AI user: ai-677dcf4a00235b6dcce5
+2025-01-07 19:05:15,307 [INFO] AI user created/retrieved: ai-677dcf4a00235b6dcce5
+2025-01-07 19:05:15,307 [INFO] Generating personas with Deepseek
+2025-01-07 19:05:37,759 [INFO] Generated 5 personas
+2025-01-07 19:05:37,762 [INFO] Processing persona 1/5: Dr. Inquiry
+2025-01-07 19:05:37,762 [INFO] Storing persona in Appwrite: Dr. Inquiry
+2025-01-07 19:05:37,894 [ERROR] Failed to store persona Dr. Inquiry: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:37,894 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:37,898 [INFO] Processing persona 2/5: Visionary Vera
+2025-01-07 19:05:37,899 [INFO] Storing persona in Appwrite: Visionary Vera
+2025-01-07 19:05:38,029 [ERROR] Failed to store persona Visionary Vera: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,030 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,030 [INFO] Processing persona 3/5: Analyst Andy
+2025-01-07 19:05:38,030 [INFO] Storing persona in Appwrite: Analyst Andy
+2025-01-07 19:05:38,170 [ERROR] Failed to store persona Analyst Andy: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,170 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,171 [INFO] Processing persona 4/5: Practical Penny
+2025-01-07 19:05:38,171 [INFO] Storing persona in Appwrite: Practical Penny
+2025-01-07 19:05:38,299 [ERROR] Failed to store persona Practical Penny: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,299 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,299 [INFO] Processing persona 5/5: Philosophical Phil
+2025-01-07 19:05:38,300 [INFO] Storing persona in Appwrite: Philosophical Phil
+2025-01-07 19:05:38,438 [ERROR] Failed to store persona Philosophical Phil: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,438 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:38,439 [INFO] Generating channels with Deepseek
+2025-01-07 19:05:54,251 [INFO] Generated 8 channels
+2025-01-07 19:05:54,252 [INFO] Processing channel 1/8: what-definition
+2025-01-07 19:05:54,252 [INFO] Storing channel in Appwrite: what-definition
+2025-01-07 19:05:54,387 [ERROR] Failed to store channel what-definition: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,387 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,387 [INFO] Processing channel 2/8: what-applications
+2025-01-07 19:05:54,388 [INFO] Storing channel in Appwrite: what-applications
+2025-01-07 19:05:54,519 [ERROR] Failed to store channel what-applications: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,519 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,519 [INFO] Processing channel 3/8: what-future
+2025-01-07 19:05:54,519 [INFO] Storing channel in Appwrite: what-future
+2025-01-07 19:05:54,662 [ERROR] Failed to store channel what-future: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,663 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,664 [INFO] Processing channel 4/8: what-ethics
+2025-01-07 19:05:54,664 [INFO] Storing channel in Appwrite: what-ethics
+2025-01-07 19:05:54,806 [ERROR] Failed to store channel what-ethics: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,806 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,806 [INFO] Processing channel 5/8: what-technology
+2025-01-07 19:05:54,807 [INFO] Storing channel in Appwrite: what-technology
+2025-01-07 19:05:54,944 [ERROR] Failed to store channel what-technology: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,944 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:54,945 [INFO] Processing channel 6/8: what-culture
+2025-01-07 19:05:54,945 [INFO] Storing channel in Appwrite: what-culture
+2025-01-07 19:05:55,082 [ERROR] Failed to store channel what-culture: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:55,082 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:55,083 [INFO] Processing channel 7/8: what-education
+2025-01-07 19:05:55,083 [INFO] Storing channel in Appwrite: what-education
+2025-01-07 19:05:55,214 [ERROR] Failed to store channel what-education: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:55,214 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:55,214 [INFO] Processing channel 8/8: what-collaboration
+2025-01-07 19:05:55,214 [INFO] Storing channel in Appwrite: what-collaboration
+2025-01-07 19:05:55,345 [ERROR] Failed to store channel what-collaboration: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:55,345 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 19:05:55,346 [INFO] Workspace creation completed. Personas: 0, Channels: 0
+2025-01-07 19:05:55,346 [INFO] ::1 [07/Jan/2025:19:05:15 -0600] "GET /?workspace_id=677dcf4a00235b6dcce5&description=What HTTP/1.1" 200 270 "-" "node"
+2025-01-07 19:29:53,220 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-07 19:29:53,220 [INFO] Appwrite admin client initialized
+2025-01-07 19:30:26,895 [INFO] Starting workspace creation for ID: 677dd5320018f76e9160
+2025-01-07 19:30:26,899 [INFO] Workspace description: When is an avocado most ripe?
+2025-01-07 19:30:26,899 [INFO] Creating AI user for workspace: 677dd5320018f76e9160
+2025-01-07 19:30:26,900 [INFO] Attempting to create AI user with email: ai.677dd5320018f76e9160@chattie.local
+2025-01-07 19:30:27,153 [INFO] Successfully created AI user: ai-677dd5320018f76e9160
+2025-01-07 19:30:27,153 [INFO] AI user created/retrieved: ai-677dd5320018f76e9160
+2025-01-07 19:30:27,154 [INFO] Generating personas with Deepseek
+2025-01-07 19:30:54,407 [INFO] Generated 5 personas
+2025-01-07 19:30:54,407 [INFO] Processing persona 1/5: Ava Ripehart
+2025-01-07 19:30:54,407 [INFO] Storing persona in Appwrite: Ava Ripehart
+2025-01-07 19:30:54,545 [ERROR] Failed to store persona Ava Ripehart: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,545 [ERROR] Invalid document structure: Unknown attribute: "ai_user_id"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 237, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,550 [INFO] Processing persona 2/5: GuacMaster99
+2025-01-07 19:30:54,550 [INFO] Storing persona in Appwrite: GuacMaster99
+2025-01-07 19:30:54,685 [ERROR] Failed to store persona GuacMaster99: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,685 [ERROR] Invalid document structure: Unknown attribute: "ai_user_id"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 237, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,686 [INFO] Processing persona 3/5: Dr. Greenstone
+2025-01-07 19:30:54,686 [INFO] Storing persona in Appwrite: Dr. Greenstone
+2025-01-07 19:30:54,825 [ERROR] Failed to store persona Dr. Greenstone: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,826 [ERROR] Invalid document structure: Unknown attribute: "ai_user_id"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 237, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,827 [INFO] Processing persona 4/5: Chef Al Dente
+2025-01-07 19:30:54,827 [INFO] Storing persona in Appwrite: Chef Al Dente
+2025-01-07 19:30:54,965 [ERROR] Failed to store persona Chef Al Dente: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,966 [ERROR] Invalid document structure: Unknown attribute: "ai_user_id"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 237, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:54,967 [INFO] Processing persona 5/5: EcoAvo
+2025-01-07 19:30:54,968 [INFO] Storing persona in Appwrite: EcoAvo
+2025-01-07 19:30:55,126 [ERROR] Failed to store persona EcoAvo: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:55,126 [ERROR] Invalid document structure: Unknown attribute: "ai_user_id"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 237, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "ai_user_id"
+2025-01-07 19:30:55,128 [INFO] Generating channels with Deepseek
+2025-01-07 19:31:06,417 [INFO] Generated 5 channels
+2025-01-07 19:31:06,418 [INFO] Processing channel 1/5: avocado-ripeness-indicators
+2025-01-07 19:31:06,418 [INFO] Storing channel in Appwrite: avocado-ripeness-indicators
+2025-01-07 19:31:06,553 [ERROR] Failed to store channel avocado-ripeness-indicators: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,553 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,554 [INFO] Processing channel 2/5: storage-and-ripening-tips
+2025-01-07 19:31:06,554 [INFO] Storing channel in Appwrite: storage-and-ripening-tips
+2025-01-07 19:31:06,697 [ERROR] Failed to store channel storage-and-ripening-tips: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,698 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,699 [INFO] Processing channel 3/5: avocado-varieties-ripeness
+2025-01-07 19:31:06,699 [INFO] Storing channel in Appwrite: avocado-varieties-ripeness
+2025-01-07 19:31:06,836 [ERROR] Failed to store channel avocado-varieties-ripeness: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,836 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,837 [INFO] Processing channel 4/5: culinary-uses-ripe-avocados
+2025-01-07 19:31:06,837 [INFO] Storing channel in Appwrite: culinary-uses-ripe-avocados
+2025-01-07 19:31:06,971 [ERROR] Failed to store channel culinary-uses-ripe-avocados: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,971 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:06,972 [INFO] Processing channel 5/5: health-benefits-ripe-avocados
+2025-01-07 19:31:06,972 [INFO] Storing channel in Appwrite: health-benefits-ripe-avocados
+2025-01-07 19:31:07,102 [ERROR] Failed to store channel health-benefits-ripe-avocados: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:07,102 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:31:07,103 [INFO] Workspace creation completed. Personas: 0, Channels: 0
+2025-01-07 19:31:07,103 [INFO] ::1 [07/Jan/2025:19:30:26 -0600] "GET /?workspace_id=677dd5320018f76e9160&description=When%20is%20an%20avocado%20most%20ripe%3F HTTP/1.1" 200 295 "-" "node"
+2025-01-07 19:33:33,090 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-07 19:33:33,091 [INFO] Appwrite admin client initialized
+2025-01-07 19:33:50,181 [INFO] Starting workspace creation for ID: 677dd5fd002d6f1e66e9
+2025-01-07 19:33:50,185 [INFO] Workspace description: Wheres the best place to travel in january
+2025-01-07 19:33:50,186 [INFO] Creating AI user for workspace: 677dd5fd002d6f1e66e9
+2025-01-07 19:33:50,186 [INFO] Attempting to create AI user with email: ai.677dd5fd002d6f1e66e9@chattie.local
+2025-01-07 19:33:50,438 [INFO] Successfully created AI user: ai-677dd5fd002d6f1e66e9
+2025-01-07 19:33:50,439 [INFO] AI user created/retrieved: ai-677dd5fd002d6f1e66e9
+2025-01-07 19:33:50,439 [INFO] Generating personas with Deepseek
+2025-01-07 19:34:12,684 [INFO] Generated 5 personas
+2025-01-07 19:34:12,686 [INFO] Processing persona 1/5: GlobeTrotterGina
+2025-01-07 19:34:12,686 [INFO] Storing persona in Appwrite: GlobeTrotterGina
+2025-01-07 19:34:12,831 [INFO] Successfully stored persona: GlobeTrotterGina with ID: 677dd614001b0b5c0540
+2025-01-07 19:34:12,832 [INFO] Processing persona 2/5: HistorianHank
+2025-01-07 19:34:12,832 [INFO] Storing persona in Appwrite: HistorianHank
+2025-01-07 19:34:12,969 [INFO] Successfully stored persona: HistorianHank with ID: 677dd614000bb10f0dfa
+2025-01-07 19:34:12,969 [INFO] Processing persona 3/5: SnowSeekerSamantha
+2025-01-07 19:34:12,969 [INFO] Storing persona in Appwrite: SnowSeekerSamantha
+2025-01-07 19:34:13,119 [INFO] Successfully stored persona: SnowSeekerSamantha with ID: 677dd6140001ad99cb44
+2025-01-07 19:34:13,119 [INFO] Processing persona 4/5: LuxuryLuna
+2025-01-07 19:34:13,119 [INFO] Storing persona in Appwrite: LuxuryLuna
+2025-01-07 19:34:13,274 [INFO] Successfully stored persona: LuxuryLuna with ID: 677dd6150007a31338e8
+2025-01-07 19:34:13,275 [INFO] Processing persona 5/5: BudgetBryan
+2025-01-07 19:34:13,275 [INFO] Storing persona in Appwrite: BudgetBryan
+2025-01-07 19:34:13,417 [INFO] Successfully stored persona: BudgetBryan with ID: 677dd6150034a8f369b0
+2025-01-07 19:34:13,417 [INFO] Generating channels with Deepseek
+2025-01-07 19:34:31,378 [INFO] Generated 10 channels
+2025-01-07 19:34:31,379 [INFO] Processing channel 1/10: january-destinations
+2025-01-07 19:34:31,380 [INFO] Storing channel in Appwrite: january-destinations
+2025-01-07 19:34:31,517 [ERROR] Failed to store channel january-destinations: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,517 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,521 [INFO] Processing channel 2/10: budget-travel-january
+2025-01-07 19:34:31,521 [INFO] Storing channel in Appwrite: budget-travel-january
+2025-01-07 19:34:31,649 [ERROR] Failed to store channel budget-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,649 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,650 [INFO] Processing channel 3/10: luxury-travel-january
+2025-01-07 19:34:31,650 [INFO] Storing channel in Appwrite: luxury-travel-january
+2025-01-07 19:34:31,792 [ERROR] Failed to store channel luxury-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,793 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,793 [INFO] Processing channel 4/10: family-travel-january
+2025-01-07 19:34:31,794 [INFO] Storing channel in Appwrite: family-travel-january
+2025-01-07 19:34:31,930 [ERROR] Failed to store channel family-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,930 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:31,931 [INFO] Processing channel 5/10: adventure-travel-january
+2025-01-07 19:34:31,932 [INFO] Storing channel in Appwrite: adventure-travel-january
+2025-01-07 19:34:32,072 [ERROR] Failed to store channel adventure-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,072 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,073 [INFO] Processing channel 6/10: solo-travel-january
+2025-01-07 19:34:32,073 [INFO] Storing channel in Appwrite: solo-travel-january
+2025-01-07 19:34:32,211 [ERROR] Failed to store channel solo-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,212 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,213 [INFO] Processing channel 7/10: cultural-travel-january
+2025-01-07 19:34:32,213 [INFO] Storing channel in Appwrite: cultural-travel-january
+2025-01-07 19:34:32,353 [ERROR] Failed to store channel cultural-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,353 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,355 [INFO] Processing channel 8/10: food-travel-january
+2025-01-07 19:34:32,355 [INFO] Storing channel in Appwrite: food-travel-january
+2025-01-07 19:34:32,487 [ERROR] Failed to store channel food-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,488 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,488 [INFO] Processing channel 9/10: eco-travel-january
+2025-01-07 19:34:32,488 [INFO] Storing channel in Appwrite: eco-travel-january
+2025-01-07 19:34:32,626 [ERROR] Failed to store channel eco-travel-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,626 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,627 [INFO] Processing channel 10/10: travel-deals-january
+2025-01-07 19:34:32,627 [INFO] Storing channel in Appwrite: travel-deals-january
+2025-01-07 19:34:32,761 [ERROR] Failed to store channel travel-deals-january: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,762 [ERROR] Invalid document structure: Unknown attribute: "primary_personas"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Unknown attribute: "primary_personas"
+2025-01-07 19:34:32,762 [INFO] Workspace creation completed. Personas: 5, Channels: 0
+2025-01-07 19:34:32,764 [INFO] ::1 [07/Jan/2025:19:33:50 -0600] "GET /?workspace_id=677dd5fd002d6f1e66e9&description=Wheres%20the%20best%20place%20to%20travel%20in%20january HTTP/1.1" 200 8637 "-" "node"
+2025-01-07 19:39:13,982 [INFO] Starting workspace creation for ID: 677dd741002027a66550
+2025-01-07 19:39:13,985 [INFO] Workspace description: what is the best soda
+2025-01-07 19:39:13,985 [INFO] Creating AI user for workspace: 677dd741002027a66550
+2025-01-07 19:39:13,986 [INFO] Attempting to create AI user with email: ai.677dd741002027a66550@chattie.local
+2025-01-07 19:39:14,230 [INFO] Successfully created AI user: ai-677dd741002027a66550
+2025-01-07 19:39:14,231 [INFO] AI user created/retrieved: ai-677dd741002027a66550
+2025-01-07 19:39:14,231 [INFO] Generating personas with Deepseek
+2025-01-07 19:39:36,691 [INFO] Generated 5 personas
+2025-01-07 19:39:36,693 [INFO] Processing persona 1/5: FizzMaster3000
+2025-01-07 19:39:36,693 [INFO] Storing persona in Appwrite: FizzMaster3000
+2025-01-07 19:39:36,834 [INFO] Successfully stored persona: FizzMaster3000 with ID: 677dd758001e6818d965
+2025-01-07 19:39:36,835 [INFO] Processing persona 2/5: Dr. SweetTooth
+2025-01-07 19:39:36,835 [INFO] Storing persona in Appwrite: Dr. SweetTooth
+2025-01-07 19:39:36,981 [INFO] Successfully stored persona: Dr. SweetTooth with ID: 677dd75800129102824f
+2025-01-07 19:39:36,982 [INFO] Processing persona 3/5: BevvyGuru
+2025-01-07 19:39:36,982 [INFO] Storing persona in Appwrite: BevvyGuru
+2025-01-07 19:39:37,128 [INFO] Successfully stored persona: BevvyGuru with ID: 677dd758003182391fcd
+2025-01-07 19:39:37,128 [INFO] Processing persona 4/5: ColaCrusader
+2025-01-07 19:39:37,128 [INFO] Storing persona in Appwrite: ColaCrusader
+2025-01-07 19:39:37,267 [INFO] Successfully stored persona: ColaCrusader with ID: 677dd759003ab616bf0d
+2025-01-07 19:39:37,267 [INFO] Processing persona 5/5: ZeroCalZen
+2025-01-07 19:39:37,267 [INFO] Storing persona in Appwrite: ZeroCalZen
+2025-01-07 19:39:37,417 [INFO] Successfully stored persona: ZeroCalZen with ID: 677dd759000394a11ab7
+2025-01-07 19:39:37,417 [INFO] Generating channels with Deepseek
+2025-01-07 19:39:56,387 [INFO] Generated 10 channels
+2025-01-07 19:39:56,389 [INFO] Processing channel 1/10: soda-flavor-debates
+2025-01-07 19:39:56,390 [INFO] Storing channel in Appwrite: soda-flavor-debates
+2025-01-07 19:39:56,528 [INFO] Successfully stored channel: soda-flavor-debates with ID: 677dd76c000659b8ef2c
+2025-01-07 19:39:56,530 [INFO] Processing channel 2/10: health-impact-analysis
+2025-01-07 19:39:56,530 [INFO] Storing channel in Appwrite: health-impact-analysis
+2025-01-07 19:39:56,680 [INFO] Successfully stored channel: health-impact-analysis with ID: 677dd76c001a2cc079d4
+2025-01-07 19:39:56,681 [INFO] Processing channel 3/10: brand-loyalty-stories
+2025-01-07 19:39:56,681 [INFO] Storing channel in Appwrite: brand-loyalty-stories
+2025-01-07 19:39:56,831 [INFO] Successfully stored channel: brand-loyalty-stories with ID: 677dd76c002536fcd61f
+2025-01-07 19:39:56,832 [INFO] Processing channel 4/10: soda-innovation-lab
+2025-01-07 19:39:56,832 [INFO] Storing channel in Appwrite: soda-innovation-lab
+2025-01-07 19:39:56,982 [INFO] Successfully stored channel: soda-innovation-lab with ID: 677dd76c0024585c3f6f
+2025-01-07 19:39:56,983 [INFO] Processing channel 5/10: soda-history-lessons
+2025-01-07 19:39:56,983 [INFO] Storing channel in Appwrite: soda-history-lessons
+2025-01-07 19:39:57,132 [INFO] Successfully stored channel: soda-history-lessons with ID: 677dd76c000ecd7233ec
+2025-01-07 19:39:57,132 [INFO] Processing channel 6/10: soda-taste-tests
+2025-01-07 19:39:57,132 [INFO] Storing channel in Appwrite: soda-taste-tests
+2025-01-07 19:39:57,280 [INFO] Successfully stored channel: soda-taste-tests with ID: 677dd76d00051e1b1e53
+2025-01-07 19:39:57,281 [INFO] Processing channel 7/10: soda-culture-around-the-world
+2025-01-07 19:39:57,281 [INFO] Storing channel in Appwrite: soda-culture-around-the-world
+2025-01-07 19:39:57,427 [INFO] Successfully stored channel: soda-culture-around-the-world with ID: 677dd76d00169ed460f5
+2025-01-07 19:39:57,427 [INFO] Processing channel 8/10: soda-sustainability-efforts
+2025-01-07 19:39:57,427 [INFO] Storing channel in Appwrite: soda-sustainability-efforts
+2025-01-07 19:39:57,562 [INFO] Successfully stored channel: soda-sustainability-efforts with ID: 677dd76d001cb5a51f85
+2025-01-07 19:39:57,562 [INFO] Processing channel 9/10: soda-mixology
+2025-01-07 19:39:57,563 [INFO] Storing channel in Appwrite: soda-mixology
+2025-01-07 19:39:57,709 [INFO] Successfully stored channel: soda-mixology with ID: 677dd76d00060548fe50
+2025-01-07 19:39:57,710 [INFO] Processing channel 10/10: soda-industry-news
+2025-01-07 19:39:57,710 [INFO] Storing channel in Appwrite: soda-industry-news
+2025-01-07 19:39:57,856 [INFO] Successfully stored channel: soda-industry-news with ID: 677dd76d0014de351b87
+2025-01-07 19:39:57,856 [INFO] Workspace creation completed. Personas: 5, Channels: 10
+2025-01-07 19:39:57,858 [INFO] ::1 [07/Jan/2025:19:39:13 -0600] "GET /?workspace_id=677dd741002027a66550&description=what%20is%20the%20best%20soda HTTP/1.1" 200 19495 "-" "node"

@@ -10,6 +10,8 @@ from appwrite.client import Client
 from appwrite.services.databases import Databases
 from appwrite.services.users import Users
 from appwrite.id import ID
+from appwrite.permission import Permission
+from appwrite.role import Role
 import secrets
 import string
 import logging
@@ -238,10 +240,11 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
                 document_id=ID.unique(),
                 data=persona_data,
                 permissions=[
-                    "read('users')",
-                    f"write('user:{ai_user_id}')",
-                    f"update('user:{ai_user_id}')",
-                    f"delete('user:{workspace_id}')"
+                    Permission.read(Role.users()),
+                    Permission.write(Role.user(ai_user_id)),
+                    Permission.update(Role.user(ai_user_id)),
+                    Permission.delete(Role.user(workspace_id)),
+                    Permission.read(Label.user(ai_user_id))
                 ]
             )
             
@@ -294,11 +297,11 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
                 document_id=ID.unique(),
                 data=channel_data,
                 permissions=[
-                    "read('users')",
-                    "write('users')",
-                    f"write('user:{ai_user_id}')",
-                    f"update('user:{workspace_id}')",
-                    f"delete('user:{workspace_id}')"
+                    Permission.read(Role.users()),
+                    Permission.write(Role.users()),
+                    Permission.write(Role.user(ai_user_id)),
+                    Permission.update(Role.user(workspace_id)),
+                    Permission.delete(Role.user(workspace_id))
                 ]
             )
             

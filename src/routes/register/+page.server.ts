@@ -66,9 +66,6 @@ export const actions = {
                 path: '/',
                 httpOnly: true
             });
-
-            // Redirect to workspaces after successful registration
-            throw redirect(303, '/workspaces');
         } catch (error: any) {
             console.error('Registration error:', error);
             // Check if the error is due to email already existing
@@ -85,5 +82,6 @@ export const actions = {
                 name: name
             });
         }
+        throw redirect(303, '/');
     }
 } satisfies Actions; 

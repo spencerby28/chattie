@@ -51,7 +51,7 @@ export const actions = {
             });
 
             // Redirect to workspaces after successful login
-            throw redirect(303, '/workspaces');
+            
         } catch (error: any) {
             console.error('Login error:', error);
             return fail(400, {
@@ -59,5 +59,6 @@ export const actions = {
                 email: email || ''
             });
         }
+        throw redirect(303, '/');
     }
 } satisfies Actions; 
