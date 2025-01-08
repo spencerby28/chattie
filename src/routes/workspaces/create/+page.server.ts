@@ -3,6 +3,7 @@ import type { Actions } from './$types';
 import { createAdminClient } from '$lib/appwrite/appwrite-server';
 import { ID, Permission, Role } from 'appwrite';
 import type { Channel } from '$lib/types';
+import { dev } from '$app/environment';
 
 export const actions: Actions = {
 	default: async ({ request, locals }) => {
@@ -77,16 +78,17 @@ export const actions: Actions = {
                 [...(account.labels || []), ...channelIds]
             );
 
-            // Send request to Python server
-            try {
-                const response = await fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`);
-                if (!response.ok) {
-                    console.error('Error from Python server:', await response.text());
+            // Send request to Python server in dev mode only
+            if (dev) {
+                try {
+                    const response = await fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`);
+                    if (!response.ok) {
+                        console.error('Error from Python server:', await response.text());
+                    }
+                } catch (e) {
+                    console.error('Failed to connect to Python server:', e);
                 }
-            } catch (e) {
-                console.error('Failed to connect to Python server:', e);
             }
-            
 		} catch (e) {
 			console.error('Error creating workspace:', e);
 			throw error(500, 'Failed to create workspace');

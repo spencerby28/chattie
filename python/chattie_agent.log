@@ -1,2 +1,658 @@
 2025-01-07 17:46:49,432 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
 2025-01-07 17:46:49,432 [INFO] Appwrite client initialized
+2025-01-07 17:47:18,255 [INFO] Starting workspace creation for ID: 677dbd05003174562bbf
+2025-01-07 17:47:18,259 [INFO] Workspace description: Is water wet?
+2025-01-07 17:47:18,259 [INFO] Creating AI user for workspace: 677dbd05003174562bbf
+2025-01-07 17:47:18,259 [INFO] Attempting to create AI user with email: ai.677dbd05003174562bbf@chattie.local
+2025-01-07 17:47:18,527 [INFO] Successfully created AI user: ai-677dbd05003174562bbf
+2025-01-07 17:47:18,527 [INFO] AI user created/retrieved: ai-677dbd05003174562bbf
+2025-01-07 17:47:18,527 [INFO] Generating personas with Deepseek
+2025-01-07 17:47:43,736 [INFO] Generated 5 personas
+2025-01-07 17:47:43,737 [INFO] Processing persona 1/5: Dr. Marina Aqua
+2025-01-07 17:47:43,737 [INFO] Storing persona in Appwrite: Dr. Marina Aqua
+2025-01-07 17:47:43,874 [ERROR] Failed to store persona Dr. Marina Aqua: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:43,874 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:43,877 [INFO] Processing persona 2/5: Professor Splash
+2025-01-07 17:47:43,877 [INFO] Storing persona in Appwrite: Professor Splash
+2025-01-07 17:47:44,010 [ERROR] Failed to store persona Professor Splash: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,010 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,011 [INFO] Processing persona 3/5: AquaLogic
+2025-01-07 17:47:44,011 [INFO] Storing persona in Appwrite: AquaLogic
+2025-01-07 17:47:44,144 [ERROR] Failed to store persona AquaLogic: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,144 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,145 [INFO] Processing persona 4/5: Wavy Waters
+2025-01-07 17:47:44,145 [INFO] Storing persona in Appwrite: Wavy Waters
+2025-01-07 17:47:44,275 [ERROR] Failed to store persona Wavy Waters: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,275 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,275 [INFO] Processing persona 5/5: Captain Hydro
+2025-01-07 17:47:44,275 [INFO] Storing persona in Appwrite: Captain Hydro
+2025-01-07 17:47:44,409 [ERROR] Failed to store persona Captain Hydro: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,409 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:47:44,409 [INFO] Generating channels with Deepseek
+2025-01-07 17:48:06,228 [INFO] Generated 10 channels
+2025-01-07 17:48:06,228 [INFO] Processing channel 1/10: water-wet-debate
+2025-01-07 17:48:06,228 [INFO] Storing channel in Appwrite: water-wet-debate
+2025-01-07 17:48:06,373 [ERROR] Failed to store channel water-wet-debate: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,373 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,374 [INFO] Processing channel 2/10: scientific-analysis
+2025-01-07 17:48:06,374 [INFO] Storing channel in Appwrite: scientific-analysis
+2025-01-07 17:48:06,506 [ERROR] Failed to store channel scientific-analysis: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,506 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,507 [INFO] Processing channel 3/10: linguistic-perspectives
+2025-01-07 17:48:06,507 [INFO] Storing channel in Appwrite: linguistic-perspectives
+2025-01-07 17:48:06,638 [ERROR] Failed to store channel linguistic-perspectives: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,638 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,639 [INFO] Processing channel 4/10: philosophical-inquiry
+2025-01-07 17:48:06,639 [INFO] Storing channel in Appwrite: philosophical-inquiry
+2025-01-07 17:48:06,775 [ERROR] Failed to store channel philosophical-inquiry: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,775 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,777 [INFO] Processing channel 5/10: everyday-experiences
+2025-01-07 17:48:06,777 [INFO] Storing channel in Appwrite: everyday-experiences
+2025-01-07 17:48:06,917 [ERROR] Failed to store channel everyday-experiences: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,917 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:06,918 [INFO] Processing channel 6/10: historical-context
+2025-01-07 17:48:06,918 [INFO] Storing channel in Appwrite: historical-context
+2025-01-07 17:48:07,057 [ERROR] Failed to store channel historical-context: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,057 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,058 [INFO] Processing channel 7/10: artistic-expressions
+2025-01-07 17:48:07,058 [INFO] Storing channel in Appwrite: artistic-expressions
+2025-01-07 17:48:07,199 [ERROR] Failed to store channel artistic-expressions: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,200 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,201 [INFO] Processing channel 8/10: educational-resources
+2025-01-07 17:48:07,202 [INFO] Storing channel in Appwrite: educational-resources
+2025-01-07 17:48:07,333 [ERROR] Failed to store channel educational-resources: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,333 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,334 [INFO] Processing channel 9/10: humor-and-memes
+2025-01-07 17:48:07,334 [INFO] Storing channel in Appwrite: humor-and-memes
+2025-01-07 17:48:07,466 [ERROR] Failed to store channel humor-and-memes: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,466 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,467 [INFO] Processing channel 10/10: future-implications
+2025-01-07 17:48:07,467 [INFO] Storing channel in Appwrite: future-implications
+2025-01-07 17:48:07,602 [ERROR] Failed to store channel future-implications: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,603 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:48:07,604 [INFO] Workspace creation completed. Personas: 0, Channels: 0
+2025-01-07 17:48:07,605 [INFO] ::1 [07/Jan/2025:17:47:18 -0600] "GET /?workspace_id=677dbd05003174562bbf&description=Is%20water%20wet%3F HTTP/1.1" 200 279 "-" "node"
+2025-01-07 17:50:54,544 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-07 17:50:54,544 [INFO] Appwrite admin client initialized
+2025-01-07 17:53:03,406 [INFO] Starting workspace creation for ID: 677dbe5e003a55d70208
+2025-01-07 17:53:03,408 [INFO] Workspace description: skiing or snowboarding
+2025-01-07 17:53:03,408 [INFO] Creating AI user for workspace: 677dbe5e003a55d70208
+2025-01-07 17:53:03,408 [INFO] Attempting to create AI user with email: ai.677dbe5e003a55d70208@chattie.local
+2025-01-07 17:53:03,656 [INFO] Successfully created AI user: ai-677dbe5e003a55d70208
+2025-01-07 17:53:03,657 [INFO] AI user created/retrieved: ai-677dbe5e003a55d70208
+2025-01-07 17:53:03,657 [INFO] Generating personas with Deepseek
+2025-01-07 17:53:28,673 [INFO] Generated 5 personas
+2025-01-07 17:53:28,675 [INFO] Processing persona 1/5: PowderPioneer
+2025-01-07 17:53:28,675 [INFO] Storing persona in Appwrite: PowderPioneer
+2025-01-07 17:53:28,810 [ERROR] Failed to store persona PowderPioneer: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:28,810 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:28,814 [INFO] Processing persona 2/5: ShredMaster
+2025-01-07 17:53:28,814 [INFO] Storing persona in Appwrite: ShredMaster
+2025-01-07 17:53:28,951 [ERROR] Failed to store persona ShredMaster: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:28,951 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:28,952 [INFO] Processing persona 3/5: AlpineAficionado
+2025-01-07 17:53:28,952 [INFO] Storing persona in Appwrite: AlpineAficionado
+2025-01-07 17:53:29,086 [ERROR] Failed to store persona AlpineAficionado: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:29,086 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:29,087 [INFO] Processing persona 4/5: SnowSensei
+2025-01-07 17:53:29,087 [INFO] Storing persona in Appwrite: SnowSensei
+2025-01-07 17:53:29,221 [ERROR] Failed to store persona SnowSensei: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:29,221 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:29,221 [INFO] Processing persona 5/5: GearGuru
+2025-01-07 17:53:29,221 [INFO] Storing persona in Appwrite: GearGuru
+2025-01-07 17:53:29,348 [ERROR] Failed to store persona GearGuru: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:29,348 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/ai_personas/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 235, in create_workspace
+    stored_persona = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:29,349 [INFO] Generating channels with Deepseek
+2025-01-07 17:53:52,496 [INFO] Generated 10 channels
+2025-01-07 17:53:52,498 [INFO] Processing channel 1/10: gear-talk
+2025-01-07 17:53:52,498 [INFO] Storing channel in Appwrite: gear-talk
+2025-01-07 17:53:52,642 [ERROR] Failed to store channel gear-talk: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:52,642 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:52,644 [INFO] Processing channel 2/10: trail-reports
+2025-01-07 17:53:52,644 [INFO] Storing channel in Appwrite: trail-reports
+2025-01-07 17:53:52,782 [ERROR] Failed to store channel trail-reports: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:52,782 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:52,783 [INFO] Processing channel 3/10: technique-tips
+2025-01-07 17:53:52,783 [INFO] Storing channel in Appwrite: technique-tips
+2025-01-07 17:53:52,918 [ERROR] Failed to store channel technique-tips: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:52,918 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:52,919 [INFO] Processing channel 4/10: safety-first
+2025-01-07 17:53:52,919 [INFO] Storing channel in Appwrite: safety-first
+2025-01-07 17:53:53,058 [ERROR] Failed to store channel safety-first: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,059 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,059 [INFO] Processing channel 5/10: events-meetups
+2025-01-07 17:53:53,060 [INFO] Storing channel in Appwrite: events-meetups
+2025-01-07 17:53:53,221 [ERROR] Failed to store channel events-meetups: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,221 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,222 [INFO] Processing channel 6/10: eco-friendly-riding
+2025-01-07 17:53:53,222 [INFO] Storing channel in Appwrite: eco-friendly-riding
+2025-01-07 17:53:53,372 [ERROR] Failed to store channel eco-friendly-riding: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,372 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,373 [INFO] Processing channel 7/10: backcountry-adventures
+2025-01-07 17:53:53,373 [INFO] Storing channel in Appwrite: backcountry-adventures
+2025-01-07 17:53:53,510 [ERROR] Failed to store channel backcountry-adventures: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,510 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,511 [INFO] Processing channel 8/10: resort-reviews
+2025-01-07 17:53:53,511 [INFO] Storing channel in Appwrite: resort-reviews
+2025-01-07 17:53:53,647 [ERROR] Failed to store channel resort-reviews: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,647 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,648 [INFO] Processing channel 9/10: competitive-riding
+2025-01-07 17:53:53,648 [INFO] Storing channel in Appwrite: competitive-riding
+2025-01-07 17:53:53,781 [ERROR] Failed to store channel competitive-riding: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,782 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,783 [INFO] Processing channel 10/10: family-riding
+2025-01-07 17:53:53,784 [INFO] Storing channel in Appwrite: family-riding
+2025-01-07 17:53:53,925 [ERROR] Failed to store channel family-riding: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,926 [ERROR] Invalid `permissions` param: Invalid permission string format: "read('users')".
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/channels/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 291, in create_workspace
+    stored_channel = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid `permissions` param: Invalid permission string format: "read('users')".
+2025-01-07 17:53:53,927 [INFO] Workspace creation completed. Personas: 0, Channels: 0
+2025-01-07 17:53:53,929 [INFO] ::1 [07/Jan/2025:17:53:03 -0600] "GET /?workspace_id=677dbe5e003a55d70208&description=skiing%20or%20snowboarding HTTP/1.1" 200 288 "-" "node"

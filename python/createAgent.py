@@ -33,12 +33,12 @@ logger.info("Environment loaded. Endpoint: %s, Project: %s",
             os.getenv('PUBLIC_APPWRITE_ENDPOINT'), 
             os.getenv('APPWRITE_PROJECT_ID'))
 
-# Initialize Appwrite Client
+# Initialize Appwrite Admin Client
 client = Client()
 client.set_endpoint(os.getenv('PUBLIC_APPWRITE_ENDPOINT'))
 client.set_project(os.getenv('APPWRITE_PROJECT_ID'))
 client.set_key(os.getenv('APPWRITE_API_KEY'))
-logger.info("Appwrite client initialized")
+logger.info("Appwrite admin client initialized")
 
 # Initialize Database and Users services
 databases = Databases(client)
@@ -105,7 +105,7 @@ async def create_ai_user(workspace_id: str):
         name = f"AI Assistant - {workspace_id}"
         
         logger.info("Attempting to create AI user with email: %s", email)
-        # Create the user in Appwrite
+        # Create the user in Appwrite using admin client
         ai_user = users.create(
             user_id=f"ai-{workspace_id}",
             email=email,
@@ -231,7 +231,7 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
             }
             
             logger.info("Storing persona in Appwrite: %s", persona['name'])
-            # Create or update the persona in Appwrite
+            # Create or update the persona in Appwrite using admin client
             stored_persona = databases.create_document(
                 database_id=DATABASE_ID,
                 collection_id=AI_PERSONAS_COLLECTION,
@@ -287,7 +287,7 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
             }
             
             logger.info("Storing channel in Appwrite: %s", channel_data['name'])
-            # Create channel in Appwrite with proper permissions
+            # Create channel in Appwrite using admin client
             stored_channel = databases.create_document(
                 database_id=DATABASE_ID,
                 collection_id=CHANNELS_COLLECTION,

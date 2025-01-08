@@ -8,21 +8,12 @@
 	let loading = false;
 	let success = false;
 
-	// Generate random user data
-	const randomString = (length: number) => Math.random().toString(36).substring(2, length + 2);
-	const randomEmail = () => `${randomString(8)}@${randomString(6)}.com`;
-	const randomName = () => `Test User ${randomString(4)}`;
-	const randomPassword = () => randomString(12);
 
-	const defaultValues = {
-		name: randomName(),
-		email: randomEmail(),
-		password: randomPassword()
-	};
 </script>
 
 <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
 	<div class="max-w-md w-full space-y-8">
+		<img class="mx-auto h-40 w-auto" src="/images/logo.png" alt="Chattie Logo" />
 		<div>
 			<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
 			<p class="mt-2 text-center text-sm text-gray-600">
@@ -54,7 +45,7 @@
 					name="name"
 					label="Full name"
 					required
-					value={form?.name ?? defaultValues.name}
+					value={form?.name ?? ''}
 					error={form?.error}
 					disabled={loading}
 				/>
@@ -63,7 +54,7 @@
 					name="email"
 					label="Email address"
 					required
-					value={form?.email ?? defaultValues.email}
+					value={form?.email ?? ''}
 					error={form?.error}
 					disabled={loading}
 				/>
@@ -72,7 +63,7 @@
 					name="password"
 					label="Password"
 					required
-					value={defaultValues.password}
+					value={''}
 					disabled={loading}
 				/>
 			</div>
