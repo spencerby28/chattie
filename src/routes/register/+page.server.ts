@@ -52,12 +52,13 @@ export const actions = {
             // Create the Appwrite client
             const { account } = createAdminClient();
 
-            // Create the account
+            // Create the user account
             await account.create(ID.unique(), email, password, name);
-   
+
+            // Create a session for the new user
             const session = await account.createEmailPasswordSession(email, password);
-   
-            // Set the session cookie with the secret
+
+            // Set the session cookie
             cookies.set(SESSION_COOKIE, session.secret, {
                 sameSite: 'strict',
                 expires: new Date(session.expire),
@@ -65,16 +66,24 @@ export const actions = {
                 path: '/',
                 httpOnly: true
             });
+
+            // Redirect to workspaces after successful registration
+            throw redirect(303, '/workspaces');
         } catch (error: any) {
             console.error('Registration error:', error);
+            // Check if the error is due to email already existing
+            if (error.type === 'user_already_exists') {
+                return fail(400, {
+                    error: 'Email already exists',
+                    email: email,
+                    name: name
+                });
+            }
             return fail(400, {
-                error: error.response?.message || 'Failed to create account. Please try again.',
+                error: 'Registration failed',
                 email: email,
                 name: name
             });
         }
-        
-        
-        return redirect(302, '/');
     }
 } satisfies Actions; 

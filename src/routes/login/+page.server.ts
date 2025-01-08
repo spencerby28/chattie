@@ -49,15 +49,15 @@ export const actions = {
                 path: '/',
                 httpOnly: true
             });
-        } catch (error) {
+
+            // Redirect to workspaces after successful login
+            throw redirect(303, '/workspaces');
+        } catch (error: any) {
             console.error('Login error:', error);
             return fail(400, {
                 error: 'Invalid email or password',
-                email: email
+                email: email || ''
             });
         }
-
-
-        return redirect(302, '/');
     }
 } satisfies Actions; 
