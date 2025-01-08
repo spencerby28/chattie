@@ -8,6 +8,30 @@
 	export let form: ActionData;
 	let loading = false;
 	let success = false;
+
+	function generateDemoCredentials() {
+		const randomHex = Math.random().toString(16).substring(2, 8);
+		return {
+			name: `Demo User ${randomHex.toUpperCase()}`,
+			email: `demo-${randomHex}@demo.com`,
+			password: 'demodemo'
+		};
+	}
+
+	function createDemoUser() {
+		const credentials = generateDemoCredentials();
+		const nameInput = document.querySelector<HTMLInputElement>('#name');
+		const emailInput = document.querySelector<HTMLInputElement>('#email');
+		const passwordInput = document.querySelector<HTMLInputElement>('#password');
+		const form = document.querySelector<HTMLFormElement>('form');
+		
+		if (nameInput && emailInput && passwordInput && form) {
+			nameInput.value = credentials.name;
+			emailInput.value = credentials.email;
+			passwordInput.value = credentials.password;
+			form.requestSubmit();
+		}
+	}
 </script>
 
 <div class="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
@@ -99,14 +123,13 @@
 		</form>
 
 		<div class="flex gap-4">
-			<a href="/login" class="flex-1">
-				<Button 
-					disabled={loading}
-					class="flex-1 bg-inherit text-white boder-2 border-white"
-				>
-					Try Demo Account
-				</Button>
-			</a>
+			<Button 
+				on:click={createDemoUser}
+				disabled={loading}
+				class="flex-1 border-2 bg-transparent border-gray-300 dark:border-white !text-gray-700 dark:!text-white hover:border-transparent hover:!text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-600 transition-all duration-200"
+			>
+				Try Demo Account
+			</Button>
 		</div>
 	</div>
 </div>

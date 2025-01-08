@@ -7,17 +7,6 @@
 	export let form: ActionData;
 	let loading = false;
 	let success = false;
-
-	function fillDemoAccount(alt = false) {
-		const email = document.querySelector<HTMLInputElement>('#email');
-		const password = document.querySelector<HTMLInputElement>('#password');
-		if (email && password) {
-			email.value = alt ? 'demo2@demo.com' : 'demo@demo.com';
-			password.value = 'demodemo';
-			const form = document.querySelector<HTMLFormElement>('form');
-			form?.requestSubmit();
-		}
-	}
 </script>
 
 <div class="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
@@ -91,22 +80,13 @@
 				<p class="text-center text-sm text-red-600 dark:text-red-400">{form.error}</p>
 			{/if}
 		</form>
-
 		<div class="flex gap-4">
 			<Button 
-				on:click={() => fillDemoAccount(false)}
+				on:click={() => window.location.href = '/register'}
 				disabled={loading}
-				class="flex-1 bg-inherit text-white boder-2 border-white"
+				class="flex-1 border-2 bg-transparent border-gray-300 dark:border-white !text-gray-700 dark:!text-white hover:border-transparent hover:!text-white hover:bg-gradient-to-r hover:from-blue-400 hover:to-purple-600 transition-all duration-200"
 			>
-				Try Demo Account 1
-			</Button>
-
-			<Button
-				on:click={() => fillDemoAccount(true)}
-				disabled={loading}
-				class="flex-1 bg-inherit text-white boder-2 border-white"
-			>
-				Try Demo Account 2
+				Try Demo Account
 			</Button>
 		</div>
 	</div>
