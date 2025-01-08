@@ -7,9 +7,6 @@
 
 	// Only initialize channel store once when the workspace first loads
 	onMount(() => {
-		if ($page.data.workspace?.channels) {
-			channelStore.set($page.data.workspace.channels);
-		}
 
 		// Check if we need to reinitialize the realtime connection
 		const searchParams = new URLSearchParams($page.url.search);

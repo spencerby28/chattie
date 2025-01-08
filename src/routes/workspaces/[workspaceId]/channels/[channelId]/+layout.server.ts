@@ -6,26 +6,38 @@ import { error } from '@sveltejs/kit';
 export const load = (async ({ locals, params, ...event }) => {
   if (!locals.user) {
     return {
-      messages: []
+      messages: [],
+      channels: []
     };
   }
 
   try {
     const client = createSessionClient(event);
-    const response = await client.databases.listDocuments(
-      'main',
+
+    // Get messages for this channel
+    const messagesResponse = await client.databases.listDocuments(
+      'main', 
       'messages',
       [
         Query.equal('channel_id', params.channelId)
       ]
     );
- //   console.log('[LayoutServerLoad] messages', response.documents);
+
+    // Get workspace document to get channels
+    const workspace = await client.databases.getDocument('main', 'workspaces', params.workspaceId);
+
+    // Filter channels based on type and membership like in workspace layout
+    const filteredChannels = workspace.channels?.filter((channel: any) => {
+      if (channel.type === 'public') return true;
+      return channel.members.includes(locals.user!.$id);
+    }) || [];
 
     return {
-      messages: response.documents
+      messages: messagesResponse.documents,
+      channels: filteredChannels
     };
+
   } catch (e) {
-    throw error(500, 'Failed to load messages ' + e);
+    throw error(500, 'Failed to load messages and channels: ' + e);
   }
 }) satisfies LayoutServerLoad;
-

@@ -62,7 +62,7 @@
 		try {
 			loading = true;
 			const channelType = isPrivate ? 'private' : 'public';
-			console.log('Creating channel:', channelName, channelType, workspaceId);
+			
 			const response = await fetch('/api/channel/create', {
 				method: 'POST',
 				headers: {
@@ -76,22 +76,25 @@
 			});
 
 			const data = await response.json();
-			console.log('Channel creation response:', data);
-
+			
 			if (!response.ok) {
 				throw new Error(data.message || 'Failed to create channel');
 			}
 
-			// Reset form
+			// Reset form first
 			channelName = '';
 			isPrivate = false;
 			dialogOpen = false;
-
-			//channelStore.addChannel(data.channel);
-
-		//	await invalidateAll();
 			
-			await goto(`/workspaces/${workspaceId}/channels/${data.channel.$id}`);
+			
+			channelStore.addChannel(data.channel);
+			
+
+			// Navigate with a flag to trigger a server reload
+			await goto(
+				`/workspaces/${workspaceId}/channels/${data.channel.$id}?reload=true`, 
+				{ replaceState: true }
+			);
 		} catch (error) {
 			console.error('Error creating channel:', error);
 			toast.error(error instanceof Error ? error.message : 'Failed to create channel');

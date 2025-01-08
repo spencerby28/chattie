@@ -10,6 +10,7 @@ function createChannelStore() {
         update,
         addChannel: (channel: Channel) => {
             update(channels => {
+                // Check if channel already exists
                 const exists = channels.some(c => c.$id === channel.$id);
                 if (exists) {
                     return channels;

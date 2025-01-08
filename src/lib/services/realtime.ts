@@ -93,17 +93,17 @@ export class RealtimeService {
 	}
 
 	private async handleMessageEvent(eventType: string, payload: Message) {
-		console.log('Handling message event:', eventType, payload);
+		//console.log('Handling message event:', eventType, payload);
 
 		// Update stores
 		if (eventType === 'create') {
-			console.log('Adding new message to store:', payload);
+		//	console.log('Adding new message to store:', payload);
 			messageStore.addMessage(payload);
 
 			// Update unread count for channel
 			this.notificationState.update((state) => {
 				const count = (state.unreadMessages[payload.channel_id] || 0) + 1;
-				console.log('Updating unread count for channel', payload.channel_id, 'to', count);
+		//		console.log('Updating unread count for channel', payload.channel_id, 'to', count);
 				return {
 					...state,
 					unreadMessages: {

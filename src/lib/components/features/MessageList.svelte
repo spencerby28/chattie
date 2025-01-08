@@ -42,7 +42,7 @@
 
 	onMount(() => {
 		scrollToBottom('auto');
-		console.log('Initial messages:', messages);
+	//	console.log('Initial messages:', messages);
 		
 		// Add scroll listener
 		container?.addEventListener('scroll', handleScroll);

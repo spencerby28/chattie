@@ -1,6 +1,9 @@
 <script lang="ts">
     export let data;
     let channels = data.workspace.channels || [];
+    import { onMount } from 'svelte';
+
+
     
     function joinChannel(channelId: string) {
         console.log(`Joining channel: ${channelId}`);

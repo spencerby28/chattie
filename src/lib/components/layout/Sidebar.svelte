@@ -19,12 +19,16 @@
   $: workspaces = $page.data.workspaces;
   $: memberWorkspaces = workspaces.filter((ws: Workspace) => ws.members?.includes($page.data.user?.$id));
 
-  // Initialize channelStore when workspace changes
-  /*
+
+  
   $: if (workspace?.channels) {
-    channelStore.set(workspace.channels);
+    if ($channelStore.length === 0 || $channelStore[0]?.workspace_id !== workspace.$id) {
+        channelStore.set(workspace.channels);
+    }
   }
-  */
+  
+  
+
 
   let showChannels = true;
   let showDirectMessages = true;
@@ -67,7 +71,9 @@
           <DropdownMenu.Separator />
           {#each memberWorkspaces as ws}
             <DropdownMenu.Item 
-              on:click={() => goto(`/workspaces/${ws.$id}`)}
+              on:click={() => {
+                goto(`/workspaces/${ws.$id}`);
+              }}
               class={workspace?.$id === ws.$id ? 'bg-blue-100 dark:bg-blue-950' : ''}
             >
               {ws.name}

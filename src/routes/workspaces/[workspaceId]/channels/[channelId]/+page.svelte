@@ -13,6 +13,7 @@
 		messageStore.set($page.data.messages);
 	}
 
+
 	$: currentChannel = $channelStore.find(channel => channel.$id === $page.params.channelId);
 </script>
 
