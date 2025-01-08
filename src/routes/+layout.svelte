@@ -46,6 +46,7 @@
 	<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+	<script defer src="https://cloud.umami.is/script.js" data-website-id="e6467774-8839-424f-a021-0be22565ff94"></script>
 </svelte:head>
 
 <Toaster richColors closeButton position="top-right" />
