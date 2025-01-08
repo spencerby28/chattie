@@ -31,7 +31,7 @@
 		if (!channelToUpdate) return;
 
 		const element = document.querySelector(`a[href="/workspaces/${workspaceId}/channels/${channelToUpdate.$id}"]`);
-		if (element) element.classList.add('animate-pulse', 'bg-gray-100');
+		if (element) element.classList.add('animate-pulse', 'bg-gray-100', 'dark:bg-gray-800');
 
 		try {
 			const response = await fetch('/api/channel/update', {
@@ -53,7 +53,7 @@
 		} catch (err) {
 			console.error('Error updating channel:', err);
 		} finally {
-			if (element) element.classList.remove('animate-pulse', 'bg-gray-100');
+			if (element) element.classList.remove('animate-pulse', 'bg-gray-100', 'dark:bg-gray-800');
 			channelToUpdate = null;
 		}
 	}
@@ -66,10 +66,10 @@
 		if (!channelToDelete) return;
 
 		const element = document.querySelector(`a[href="/workspaces/${workspaceId}/channels/${channelToDelete.$id}"]`);
-		if (element) element.classList.add('animate-pulse', 'bg-gray-100');
+		if (element) element.classList.add('animate-pulse', 'bg-gray-100', 'dark:bg-gray-800');
 
 		try {
-			const response = await fetch('/api/channel/delete', {
+			const response = await fetch('/api/channel/update', {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json'
@@ -86,7 +86,7 @@
 		} catch (err) {
 			console.error('Error deleting channel:', err);
 		} finally {
-			if (element) element.classList.remove('animate-pulse', 'bg-gray-100');
+			if (element) element.classList.remove('animate-pulse', 'bg-gray-100', 'dark:bg-gray-800');
 			channelToDelete = null;
 		}
 	}
@@ -96,7 +96,7 @@
 	<!-- Public Channels -->
 	<div class="mt-2">
 		<div class="flex items-center justify-between mb-2">
-			<h3 class="text-xs font-semibold text-gray-500 uppercase">Public</h3>
+			<h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Public</h3>
 		</div>
 
 		<div class="space-y-1">
@@ -105,10 +105,10 @@
 					<ContextMenu.Trigger>
 						<a
 							href="/workspaces/{workspaceId}/channels/{channel.$id}"
-							class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
-							class:bg-gray-100={channel.$id === currentChannelId}
+							class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+							class:bg-accent={channel.$id === currentChannelId}
 						>
-							<span class="text-gray-500">#</span>
+							<span class="text-gray-500 dark:text-gray-400">#</span>
 							<span class="text-sm">{channel.name}</span>
 						</a>
 					</ContextMenu.Trigger>
@@ -117,7 +117,7 @@
 							Update Channel
 						</ContextMenu.Item>
 						<ContextMenu.Separator />
-						<ContextMenu.Item class="text-red-600" on:click={() => handleDelete(channel)}>
+						<ContextMenu.Item class="text-red-600 dark:text-red-400" on:click={() => handleDelete(channel)}>
 							Delete Channel
 						</ContextMenu.Item>
 					</ContextMenu.Content>
@@ -130,7 +130,7 @@
 	{#if privateChannels.length > 0}
 		<div>
 			<div class="flex items-center justify-between mb-2">
-				<h3 class="text-xs font-semibold text-gray-500 uppercase">Private</h3>
+				<h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Private</h3>
 			</div>
 
 			<div class="space-y-1">
@@ -139,10 +139,10 @@
 						<ContextMenu.Trigger>
 							<a
 								href="/workspaces/{workspaceId}/channels/{channel.$id}"
-								class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
-								class:bg-gray-100={channel.$id === currentChannelId}
+								class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+								class:bg-accent={channel.$id === currentChannelId}
 							>
-								<span class="text-gray-500">🔒</span>
+								<span class="text-gray-500 dark:text-gray-400">🔒</span>
 								<span class="text-sm">{channel.name}</span>
 							</a>
 						</ContextMenu.Trigger>
@@ -151,7 +151,7 @@
 								Update Channel
 							</ContextMenu.Item>
 							<ContextMenu.Separator />
-							<ContextMenu.Item class="text-red-600" on:click={() => handleDelete(channel)}>
+							<ContextMenu.Item class="text-red-600 dark:text-red-400" on:click={() => handleDelete(channel)}>
 								Delete Channel
 							</ContextMenu.Item>
 						</ContextMenu.Content>
@@ -181,7 +181,7 @@
 				<input
 					id="name"
 					bind:value={updatedName}
-					class="col-span-3 flex h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+					class="col-span-3 flex h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm dark:border-gray-700"
 				/>
 			</div>
 			<div class="grid grid-cols-4 items-center gap-4">
@@ -189,7 +189,7 @@
 				<select
 					id="type"
 					bind:value={updatedType}
-					class="col-span-3 flex h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm"
+					class="col-span-3 flex h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm dark:border-gray-700"
 				>
 					<option value={ChannelType.Public}>Public</option>
 					<option value={ChannelType.Private}>Private</option>
@@ -215,7 +215,7 @@
 
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel on:click={() => channelToDelete = null}>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action class="bg-red-600 hover:bg-red-700" on:click={confirmDelete}>Delete</AlertDialog.Action>
+			<AlertDialog.Action class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white" on:click={confirmDelete}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

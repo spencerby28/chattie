@@ -6,6 +6,7 @@
 </script>
 
 <Sonner
+
 	class="toaster group"
 	toastOptions={{
 		classes: {

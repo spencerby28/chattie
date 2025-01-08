@@ -16,9 +16,9 @@
 	$: currentChannel = $channelStore.find(channel => channel.$id === $page.params.channelId);
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full bg-white dark:bg-gray-950">
 	<!-- Channel Header -->
-	<div class="p-4 border-b bg-white">
+	<div class="p-4 border-b bg-white dark:bg-gray-950">
 		<h1 class="text-xl font-semibold">#{currentChannel?.name || ''}</h1>
 	</div>
 
@@ -28,7 +28,7 @@
 	</div>
 
 	<!-- Message Composer - Fixed height at bottom -->
-	<div class="p-4 border-t bg-white">
+	<div class="p-4 border-t bg-white dark:bg-gray-950">
 		<MessageComposer />
 		<ReplyBox />
 	</div>

@@ -219,7 +219,7 @@
 		<!-- svelte-ignore a11y_consider_explicit_label -->
 		<div class="fixed bottom-24 right-8 z-50">
 			<button
-				class="bg-primary text-white rounded-full p-2 shadow-lg hover:bg-primary/90 transition-all"
+				class="bg-primary text-primary-foreground rounded-full p-2 shadow-lg hover:bg-primary/90 transition-all"
 				on:click|stopPropagation={() => scrollToBottom()}
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,13 +231,16 @@
 
 	<div class="space-y-4 py-4">
 		{#if !messages?.length}
-			<div class="text-center text-gray-500">No messages yet</div>
+			<div class="text-center text-gray-500 space-y-2 pt-12">
+				<div class="text-6xl">😴</div>
+				<div class="text-2xl">It's awfully quiet...</div>
+			</div>
 		{/if}
 
 		{#each messages?.filter((m) => m?.$id) || [] as message (message.$id)}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div 
-				class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200 hover:bg-gray-100"
+				class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200"
 				on:mouseenter={() => hoveredMessageId = message.$id}
 				on:mouseleave={() => hoveredMessageId = null}
 			>
@@ -261,12 +264,12 @@
 									<div class="flex flex-wrap gap-1">
 										{#each message.reactions as reaction}
 											<button 
-												class="px-2 py-0.5 bg-gray-100 rounded text-sm hover:bg-gray-200 transition-colors cursor-pointer {reaction.userIds?.includes(user.$id) ? 'bg-gray-200' : ''}"
+												class="px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer {reaction.userIds?.includes(user.$id) ? 'bg-accent' : ''}"
 												on:click={() => handleReactionClick(reaction, message)}
 											>
 												<span class="inline-flex items-center gap-1">
 													{reaction.emoji}
-													<span class="font-medium text-gray-600">{reaction.userIds?.length || 1}</span>
+													<span class="font-medium text-accent-foreground">{reaction.userIds?.length || 1}</span>
 												</span>
 											</button>
 										{/each}
@@ -274,11 +277,11 @@
 								</ContextMenu.Trigger>
 								<ContextMenu.Content class="w-48">
 									{#each message.reactions as reaction}
-										<div class="p-2 border-b border-gray-100 last:border-0">
+										<div class="p-2 border-b border-accent last:border-0">
 											<div class="flex items-center justify-between">
 												<div class="flex items-center gap-2">
 													<span class="text-lg">{reaction.emoji}</span>
-													<span class="text-sm text-gray-600">{reaction.userIds?.length || 1}</span>
+													<span class="text-sm text-accent-foreground">{reaction.userIds?.length || 1}</span>
 												</div>
 												{#if reaction.userIds?.includes(user.$id)}
 													<button 
@@ -290,7 +293,7 @@
 												{/if}
 											</div>
 											{#if reaction.userIds?.length}
-												<div class="mt-1 text-sm text-gray-600">
+												<div class="mt-1 text-sm text-accent-foreground">
 													{#if reaction.userIds.includes(user.$id)}
 														You
 														{#if reaction.userIds.length > 1}
@@ -310,14 +313,14 @@
 
 					<!--DEBUG MESSAGE DETAILS
 					<button
-						class="text-sm text-gray-500 mt-1 hover:text-gray-700"
+						class="text-sm text-accent-foreground mt-1 hover:text-accent"
 						on:click={() => toggleMessageDetails(message.$id)}
 					>
 						{expandedMessages.has(message.$id) ? 'Hide Details' : 'Show Details'}
 					</button>
 
 					{#if expandedMessages.has(message.$id)}
-						<pre class="mt-2 p-2 bg-gray-100 rounded text-xs overflow-x-auto">
+						<pre class="mt-2 p-2 bg-accent rounded text-xs overflow-x-auto">
 							{JSON.stringify(message, null, 2)}
 						</pre>
 					{/if}
@@ -325,7 +328,7 @@
 				</div>
 
 				<div class="absolute right-2 top-2 flex flex-col items-end gap-1">
-					<div class="{isDropdownOpen && activeMessageId === message.$id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity">
+					<div class="{isDropdownOpen && activeMessageId === message.$id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity hover:bg-accent rounded-lg">
 						<MessageActions
 							{message}
 							{user}
@@ -338,7 +341,7 @@
 							on:startChannel={handleMessageAction}
 						/>
 					</div>
-					<div class="text-sm text-gray-500 pr-2">
+					<div class="text-sm text-accent-foreground pr-2">
 						{#if getRelativeTime(message.$createdAt) === new Date(message.$createdAt).toLocaleTimeString()}
 							<span class="w-[80px] text-right inline-block">
 								{getRelativeTime(message.$createdAt)}

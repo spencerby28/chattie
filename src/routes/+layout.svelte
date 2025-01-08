@@ -15,21 +15,21 @@
 	export const notificationPrefs = writable<NotificationPreferences>({});
 	let unsubscribe: (() => void) | undefined;
 
-	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/register';
+	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/register' || $page.url.pathname === '/welcome';
 
 	onMount(async () => {
-		// Initialize global realtime connection
-		if (typeof window !== 'undefined') {
+		// Only initialize if we're logged in and in the browser
+		if (typeof window !== 'undefined' && !isAuthRoute) {
 			unsubscribe = RealtimeService.getInstance().initialize();
-		}
 
-		// Load notification preferences
-		const { account } = createBrowserClient();
-		try {
-			const prefs = await account.getPrefs();
-			notificationPrefs.set(prefs || {});
-		} catch (error) {
-			console.error('Error loading notification preferences:', error);
+			// Load notification preferences
+			const { account } = createBrowserClient();
+			try {
+				const prefs = await account.getPrefs();
+				notificationPrefs.set(prefs || {});
+			} catch (error) {
+				console.error('Error loading notification preferences:', error);
+			}
 		}
 	});
 

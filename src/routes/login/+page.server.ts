@@ -10,6 +10,8 @@ export const actions = {
         const password = form.get('password')?.toString();
 
         try {
+            const { account } = createAdminClient();
+
             // Validate inputs
             if (!email || !password) {
                 return fail(400, {
@@ -26,17 +28,6 @@ export const actions = {
                     email: email
                 });
             }
-        } catch (error: any) {
-            console.error('Validation error:', error);
-            return fail(400, {
-                error: 'Validation failed',
-                email: email || ''
-            });
-        }
-
-        try {
-            // Create the Appwrite client
-            const { account } = createAdminClient();
 
             // Create the session using the client
             const session = await account.createEmailPasswordSession(email, password);
@@ -49,10 +40,8 @@ export const actions = {
                 path: '/',
                 httpOnly: true
             });
-
-            // Redirect to workspaces after successful login
-            
         } catch (error: any) {
+            if (error instanceof Response) throw error; // For redirects
             console.error('Login error:', error);
             return fail(400, {
                 error: 'Invalid email or password',
@@ -61,4 +50,4 @@ export const actions = {
         }
         throw redirect(303, '/');
     }
-} satisfies Actions; 
+} satisfies Actions;

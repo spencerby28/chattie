@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'chattie';
-  src: url('/font/yoy-bc.woff') format('woff');
+  src: url('/font/yoyo-bc.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -12,7 +12,7 @@
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 0 0% 3.9%;
  
     --muted: 0 0% 96.1%;
@@ -45,7 +45,7 @@
   }
  
   .dark {
-    --background: 0 0% 3.9%;
+    --background: 224 71% 4%;
     --foreground: 0 0% 98%;
  
     --muted: 0 0% 14.9%;

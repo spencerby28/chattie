@@ -1,22 +1,33 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/Button.svelte';
-	import Input from '$lib/components/ui/Input.svelte';
 	import type { ActionData } from './$types';
 	import { enhance } from '$app/forms';
 
 	export let form: ActionData;
 	let loading = false;
 	let success = false;
+
+	function fillDemoAccount(alt = false) {
+		const email = document.querySelector<HTMLInputElement>('#email');
+		const password = document.querySelector<HTMLInputElement>('#password');
+		if (email && password) {
+			email.value = alt ? 'demo2@demo.com' : 'demo@demo.com';
+			password.value = 'demodemo';
+			const form = document.querySelector<HTMLFormElement>('form');
+			form?.requestSubmit();
+		}
+	}
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
 	<div class="max-w-md w-full space-y-8">
 		<div>
-			<img class="mx-auto h-40 w-auto" src="/images/logo.png" alt="Chattie Logo" />
-			<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-			<p class="mt-2 text-center text-sm text-gray-600">
+			<h1 class="text-8xl font-chattie tracking-wider text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"><a href="/welcome">Chattie</a></h1>
+			<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">Sign in to your account</h2>
+			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
 				Or
-				<a href="/register" class="font-medium text-blue-600 hover:text-blue-500"> create a new account </a>
+				<a href="/register" class="font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"> create a new account </a>
 			</p>
 		</div>
 		<form
@@ -36,25 +47,37 @@
 			}}
 		>
 			<div class="space-y-4">
-				<Input
-					type="email"
-					name="email"
-					label="Email address"
-					required
-					error={form?.error}
-					value={form?.email ?? ''}
-					disabled={loading}
-				/>
-				<Input
-					type="password"
-					name="password"
-					label="Password"
-					required
-					disabled={loading}
-				/>
+				<div class="space-y-2">
+					<label for="email" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Email address
+					</label>
+					<Input
+						type="email"
+						id="email"
+						name="email"
+						required
+						disabled={loading}
+						value={form?.email ?? ''}
+						class={form?.error ? "border-red-500" : ""}
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<label for="password" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Password
+					</label>
+					<Input
+						type="password"
+						id="password" 
+						name="password"
+						required
+						disabled={loading}
+						class={form?.error ? "border-red-500" : ""}
+					/>
+				</div>
 			</div>
 
-			<Button type="submit" disabled={loading}>
+			<Button type="submit" disabled={loading} class="bg-gradient-to-r from-blue-400 to-purple-600 text-white">
 				{#if success}
 					Success!
 				{:else if loading}
@@ -65,8 +88,26 @@
 			</Button>
 
 			{#if form?.error}
-				<p class="text-center text-sm text-red-600">{form.error}</p>
+				<p class="text-center text-sm text-red-600 dark:text-red-400">{form.error}</p>
 			{/if}
 		</form>
+
+		<div class="flex gap-4">
+			<Button 
+				on:click={() => fillDemoAccount(false)}
+				disabled={loading}
+				class="flex-1 bg-inherit text-white boder-2 border-white"
+			>
+				Try Demo Account 1
+			</Button>
+
+			<Button
+				on:click={() => fillDemoAccount(true)}
+				disabled={loading}
+				class="flex-1 bg-inherit text-white boder-2 border-white"
+			>
+				Try Demo Account 2
+			</Button>
+		</div>
 	</div>
 </div>

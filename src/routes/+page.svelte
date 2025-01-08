@@ -6,13 +6,19 @@
     import { onMount } from 'svelte';
     import { Cog, Bell } from "lucide-svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import { Input } from "$lib/components/ui/input";
+    import { Label } from "$lib/components/ui/label";
     import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
+    import { goto } from '$app/navigation';
 
     interface NotificationPreferences {
         [key: string]: boolean;
     }
 
     let notificationPrefs: NotificationPreferences = {};
+    let loading = false;
+    let workspaceDialogOpen = false;
 
     onMount(async () => {
         if (data.user) {
@@ -45,6 +51,42 @@
         }
     }
 
+    async function handleCreateWorkspace(event: SubmitEvent) {
+        event.preventDefault();
+        loading = true;
+
+        const formData = new FormData(event.target as HTMLFormElement);
+        const name = formData.get('workspace_name') as string;
+        const description = formData.get('workspace_description') as string;
+        const visibility = formData.get('visibility') as string;
+        console.log(name, description, visibility);
+        try {
+            const response = await fetch('/api/workspaces/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name,
+                    description,
+                    visibility
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create workspace');
+            }
+
+            const { workspaceId } = await response.json();
+            workspaceDialogOpen = false;
+            await goto(`/workspaces/${workspaceId}`);
+        } catch (error) {
+            console.error('Error creating workspace:', error);
+        } finally {
+            loading = false;
+        }
+    }
+
     onMount(async () => {
         const session = await fetch('/api/session').then(res => res.json());
         if (session.session) {
@@ -58,7 +100,10 @@
 </script>
 
 <div class="container mx-auto px-4 py-8 space-y-8">
-    <h1 class="text-4xl font-bold tracking-tight">Available Workspaces</h1>
+    <div class="flex justify-between items-center">
+        <h1 class="text-4xl font-bold tracking-tight">Available Workspaces</h1>
+        <Button variant="default" on:click={() => workspaceDialogOpen = true}>Create New Workspace</Button>
+    </div>
     
     {#if data.workspaces.length === 0}
         <p class="text-muted-foreground">No workspaces available. Create one to get started!</p>
@@ -204,10 +249,73 @@
             {/each}
         </div>
     {/if}
-    
-    <Button variant="default">
-        <a href="/workspaces/create">
-            Create New Workspace
-        </a>
-    </Button>
 </div>
+
+<AlertDialog.Root open={workspaceDialogOpen} onOpenChange={open => workspaceDialogOpen = open}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Create New Workspace</AlertDialog.Title>
+            <AlertDialog.Description>
+                Fill in the details below to create a new workspace.
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+
+        <form on:submit={handleCreateWorkspace} class="space-y-6">
+            <div class="space-y-2">
+                <Label for="name">Workspace Name</Label>
+                <Input
+                    type="text"
+                    id="workspace_name"
+                    name="workspace_name"
+                    required
+                    placeholder="Enter workspace name"
+                />
+            </div>
+
+            <div class="space-y-2">
+                <Label for="description">Description</Label>
+                <textarea
+                    id="workspace_description"
+                    name="workspace_description"
+                    rows="3"
+                    class="w-full px-3 py-2 border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 dark:border-gray-700"
+                    placeholder="Enter workspace description"
+                ></textarea>
+            </div>
+
+            <div class="space-y-2">
+                <Label>Visibility</Label>
+                <div class="flex gap-4">
+                    <label class="flex items-center text-foreground">
+                        <input
+                            type="radio"
+                            name="visibility"
+                            value="public"
+                            class="mr-2 accent-foreground"
+                            checked
+                        />
+                        Public
+                    </label>
+                    <label class="flex items-center text-foreground">
+                        <input
+                            type="radio"
+                            name="visibility"
+                            value="private"
+                            class="mr-2 accent-foreground"
+                        />
+                        Private
+                    </label>
+                </div>
+            </div>
+
+            <AlertDialog.Footer>
+                <AlertDialog.Cancel asChild>
+                    <Button type="button" variant="outline" on:click={() => workspaceDialogOpen = false}>Cancel</Button>
+                </AlertDialog.Cancel>
+                <Button type="submit" disabled={loading}>
+                    {loading ? 'Creating...' : 'Create Workspace'}
+                </Button>
+            </AlertDialog.Footer>
+        </form>
+    </AlertDialog.Content>
+</AlertDialog.Root>

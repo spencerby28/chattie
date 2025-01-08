@@ -16,12 +16,12 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     // Protected routes - redirect to login if not authenticated
-    const publicPaths = ['/login', '/register'];
+    const publicPaths = ['/login', '/register', '/welcome'];
     const isPublicPath = publicPaths.some(path => event.url.pathname.startsWith(path));
 
     // If user is logged in and trying to access login/register, redirect to workspaces
     if (event.locals.user && isPublicPath) {
-        throw redirect(303, '/workspaces');
+        throw redirect(303, '/');
     }
 
     // If user is not logged in and trying to access protected routes, redirect to login

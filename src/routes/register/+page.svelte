@@ -1,24 +1,23 @@
 <script lang="ts">
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import Button from '$lib/components/ui/Button.svelte';
-	import Input from '$lib/components/ui/Input.svelte';
 	import type { ActionData } from './$types';
 	import { enhance } from '$app/forms';
 
 	export let form: ActionData;
 	let loading = false;
 	let success = false;
-
-
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
 	<div class="max-w-md w-full space-y-8">
-		<img class="mx-auto h-40 w-auto" src="/images/logo.png" alt="Chattie Logo" />
 		<div>
-			<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>
-			<p class="mt-2 text-center text-sm text-gray-600">
+			<h1 class="text-8xl font-chattie tracking-wider text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"><a href="/welcome">Chattie</a></h1>
+			<h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">Create your account</h2>
+			<p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
 				Or
-				<a href="/login" class="font-medium text-blue-600 hover:text-blue-500">
+				<a href="/login" class="font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300">
 					sign in to your existing account
 				</a>
 			</p>
@@ -40,35 +39,51 @@
 			}}
 		>
 			<div class="space-y-4">
-				<Input
-					type="text"
-					name="name"
-					label="Full name"
-					required
-					value={form?.name ?? ''}
-					error={form?.error}
-					disabled={loading}
-				/>
-				<Input
-					type="email"
-					name="email"
-					label="Email address"
-					required
-					value={form?.email ?? ''}
-					error={form?.error}
-					disabled={loading}
-				/>
-				<Input
-					type="password"
-					name="password"
-					label="Password"
-					required
-					value={''}
-					disabled={loading}
-				/>
+				<div class="space-y-2">
+					<Label for="name" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Full name
+					</Label>
+					<Input
+						type="text"
+						id="name"
+						name="name"
+						required
+						value={form?.name ?? ''}
+						disabled={loading}
+						class={form?.error ? "border-red-500" : ""}
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<Label for="email" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Email address
+					</Label>
+					<Input
+						type="email"
+						id="email"
+						name="email"
+						required
+						value={form?.email ?? ''}
+						disabled={loading}
+						class={form?.error ? "border-red-500" : ""}
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<Label for="password" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Password
+					</Label>
+					<Input
+						type="password"
+						id="password"
+						name="password"
+						required
+						disabled={loading}
+					/>
+				</div>
 			</div>
 
-			<Button type="submit" disabled={loading}>
+			<Button type="submit" disabled={loading} class="bg-gradient-to-r from-blue-400 to-purple-600 text-white">
 				{#if success}
 					Success!
 				{:else if loading}
@@ -79,8 +94,19 @@
 			</Button>
 
 			{#if form?.error}
-				<p class="text-center text-sm text-red-600">{form.error}</p>
+				<p class="text-center text-sm text-red-600 dark:text-red-400">{form.error}</p>
 			{/if}
 		</form>
+
+		<div class="flex gap-4">
+			<a href="/login" class="flex-1">
+				<Button 
+					disabled={loading}
+					class="flex-1 bg-inherit text-white boder-2 border-white"
+				>
+					Try Demo Account
+				</Button>
+			</a>
+		</div>
 	</div>
 </div>

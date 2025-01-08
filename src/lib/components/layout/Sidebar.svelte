@@ -9,6 +9,7 @@
   import { channelStore } from '$lib/stores/channels';
   import { Settings } from 'lucide-svelte';
 
+  import {announceFeature} from '$lib/utils/toast';
   $: workspace = $page.data.workspace;
   $: workspaces = $page.data.workspaces;
   $: memberWorkspaces = workspaces.filter((ws: Workspace) => ws.members?.includes($page.data.user?.$id));
@@ -23,24 +24,27 @@
   let showChannels = true;
   let showDirectMessages = true;
 </script>
-<aside class="w-60 border-r flex flex-col bg-gray-50">
-  <div class="p-4 border-b">
+<aside class="w-60 border-r flex flex-col bg-gray-50 dark:bg-gray-950">
+  <div class="p-4 border-b dark:border-gray-800">
     <div class="flex items-center justify-between mb-2">
-      <h1 class="text-sm font-semibold text-gray-500 uppercase">Workspaces</h1>
+      <h1 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Workspaces</h1>
       <Button 
         variant="ghost" 
         size="icon" 
         class="h-8 w-8"
-        on:click={() => goto(`/workspaces/${workspace.$id}/settings`)}
+        on:click={() => {
+          announceFeature('Workspace Settings');
+          
+        }}
       >
         <Settings class="h-4 w-4" />
       </Button>
     </div>
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild let:builder>
-        <Button variant="outline" builders={[builder]} class="w-full flex items-center justify-between bg-white hover:bg-gray-50">
+        <Button variant="outline" builders={[builder]} class="w-full flex items-center justify-between bg-white hover:bg-accent dark:bg-gray-950 dark:hover:bg-accent">
           <span class="font-medium truncate">{workspace?.name || 'Select Workspace'}</span>
-          <img src="/svg/carrot.svg" alt="Dropdown" class="ml-2 w-4 h-4 opacity-70" />
+          <img src="/svg/carrot.svg" alt="Dropdown" class="ml-2 w-4 h-4 opacity-70 invert-0 dark:invert" />
         </Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content class="w-56">
@@ -70,11 +74,11 @@
         class="w-full flex items-center justify-between text-sm text-gray-500 uppercase font-semibold"
         on:click={() => showChannels = !showChannels}
       >
-        <span>Channels</span>
+        <span class="text-gray-500 dark:text-gray-400">Channels</span>
         <img 
           src="/svg/carrot.svg" 
           alt="Toggle channels" 
-          class="w-4 h-4 transition-transform" 
+          class="w-4 h-4 opacity-70 invert-0 dark:invert transition-transform" 
           class:rotate-180={!showChannels}
         />
       </button>
@@ -90,11 +94,11 @@
         class="w-full flex items-center justify-between text-sm text-gray-500 uppercase font-semibold"
         on:click={() => showDirectMessages = !showDirectMessages}
       >
-        <span>Direct Messages</span>
+        <span class="text-gray-500 dark:text-gray-400">Direct Messages</span>
         <img 
           src="/svg/carrot.svg" 
           alt="Toggle direct messages" 
-          class="w-4 h-4 transition-transform"
+          class="w-4 h-4 opacity-70 invert-0 dark:invert transition-transform"
           class:rotate-180={!showDirectMessages}
         />
       </button>
