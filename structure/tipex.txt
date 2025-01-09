@@ -1,0 +1,3035 @@
+Directory structure:
+└── friendofsvelte-tipex/
+    ├── README.md
+    ├── package.json
+    ├── playwright.config.ts
+    ├── postcss.config.cjs
+    ├── svelte.config.js
+    ├── tailwind.config.cjs
+    ├── tsconfig.json
+    ├── vite.config.ts
+    ├── .eslintignore
+    ├── .eslintrc.cjs
+    ├── .npmrc
+    ├── .prettierignore
+    ├── .prettierrc
+    ├── src/
+    │   ├── app.d.ts
+    │   ├── app.html
+    │   ├── app.postcss
+    │   ├── hooks.server.ts
+    │   ├── index.test.ts
+    │   ├── root.css
+    │   ├── fonts/
+    │   │   ├── work-sans.css
+    │   │   └── work-sans/
+    │   │       ├── WorkSans-Black.ttf
+    │   │       ├── WorkSans-BlackItalic.ttf
+    │   │       ├── WorkSans-Bold.ttf
+    │   │       ├── WorkSans-BoldItalic.ttf
+    │   │       ├── WorkSans-ExtraBold.ttf
+    │   │       ├── WorkSans-ExtraBoldItalic.ttf
+    │   │       ├── WorkSans-ExtraLight.ttf
+    │   │       ├── WorkSans-ExtraLightItalic.ttf
+    │   │       ├── WorkSans-Italic.ttf
+    │   │       ├── WorkSans-Light.ttf
+    │   │       ├── WorkSans-LightItalic.ttf
+    │   │       ├── WorkSans-Medium.ttf
+    │   │       ├── WorkSans-MediumItalic.ttf
+    │   │       ├── WorkSans-Regular.ttf
+    │   │       ├── WorkSans-SemiBold.ttf
+    │   │       ├── WorkSans-SemiBoldItalic.ttf
+    │   │       ├── WorkSans-Thin.ttf
+    │   │       └── WorkSans-ThinItalic.ttf
+    │   ├── item/
+    │   │   ├── Footer.svelte
+    │   │   ├── ParamSpan.svelte
+    │   │   ├── PropsTable.svelte
+    │   │   ├── SlotPropsTable.svelte
+    │   │   ├── ThemeToggle.svelte
+    │   │   └── codes/
+    │   │       ├── advanceCodes.ts
+    │   │       └── index.ts
+    │   ├── lib/
+    │   │   ├── index.ts
+    │   │   └── tipex/
+    │   │       ├── Controls.svelte
+    │   │       ├── Tipex.svelte
+    │   │       ├── Utility.svelte
+    │   │       ├── default.ts
+    │   │       ├── prepare.ts
+    │   │       ├── icons/
+    │   │       │   ├── Fa6SolidArrowUpRightFromSquare.svelte
+    │   │       │   ├── Fa6SolidBold.svelte
+    │   │       │   ├── Fa6SolidCheck.svelte
+    │   │       │   ├── Fa6SolidCode.svelte
+    │   │       │   ├── Fa6SolidCopy.svelte
+    │   │       │   ├── Fa6SolidItalic.svelte
+    │   │       │   ├── Fa6SolidLink.svelte
+    │   │       │   ├── Fa6SolidParagraph.svelte
+    │   │       │   └── Fa6SolidXmark.svelte
+    │   │       ├── link/
+    │   │       │   ├── EditLinkMenu.svelte
+    │   │       │   └── LinkFloatingMenu.svelte
+    │   │       └── styles/
+    │   │           ├── CodeBlock.css
+    │   │           ├── Controls.css
+    │   │           ├── EditLink.css
+    │   │           ├── ProseMirror.css
+    │   │           └── Tipex.css
+    │   └── routes/
+    │       ├── +layout.svelte
+    │       ├── +page.svelte
+    │       ├── +page.ts
+    │       └── customization/
+    │           └── +page.svelte
+    ├── static/
+    └── tests/
+        └── test.ts
+
+================================================
+File: /README.md
+================================================
+# Tipex
+
+Tipex stands as an advanced rich text editor tailored for Svelte, meticulously engineered with the robust
+frameworks [Tiptap](https://tiptap.dev/) and [Prosemirror](https://prosemirror.net/). It empowers developers to
+effortlessly craft rich text editors, liberating them from the intricacies of underlying technologies, style management,
+and related complexities.
+
+> Svelte5 and runes mode activated! ✨🔮
+
+## Key Features
+
+- 🚀 **Svelte 5 Ready**: Built with Svelte 5's latest features including runes and snippets
+- 🎨 **Customizable Controls**: Flexible control system with both default and custom options
+- 🔌 **Plugin Architecture**: Extensible through Tiptap extensions
+- 📱 **Responsive**: Works great on both desktop and mobile devices
+- 🎯 **Floating Menu**: Context-aware floating toolbar for enhanced editing experience
+- 🔗 **Link Management**: Built-in link handling with preview and editing capabilities
+- 🎭 **Theming Support**: Easy styling with CSS variables and utility classes
+- ⚡ **Performance Optimized**: Leverages Svelte's reactivity for smooth editing
+- 💼 **TypeScript Support**: Full TypeScript support for better development experience
+
+## Installation
+
+Install the package from [NPM](https://www.npmjs.com/package/@friendofsvelte/tipex):
+
+```bash
+npm install "@friendofsvelte/tipex"
+```
+
+## Basic Usage
+
+Import the component and use it in your component:
+
+```svelte
+<script lang="ts">
+    import {Tipex} from "@friendofsvelte/tipex";
+    
+    let body = `<p>This <a target="_blank" rel="noopener noreferrer" href="">content</a> is written by <a target="_blank" rel="noopener noreferrer" href="http://bishwas.net/">Bishwas</a> in 2023.</p>`;
+</script>
+
+<Tipex 
+    {body} 
+    controls 
+    floating
+    style="margin-top: 1rem; margin-bottom: 0;"
+    class="h-[70vh] border border-neutral-200"
+/>
+```
+
+## Core Concepts
+
+### Control Modes
+
+Tipex offers two control modes:
+
+1. **Default Controls** (`controls={true}`):
+    - Pre-built formatting toolbar
+    - Customizable through the `utilities` prop
+    - Perfect for quick implementation
+
+2. **Custom Controls** (`controls={false}`):
+    - Full control over the editor interface
+    - Use `controlComponent` for custom implementations
+    - Ideal for specialized use cases
+
+### Extension System
+
+Tipex leverages Tiptap's extension system for enhanced functionality:
+
+```typescript
+import { Tipex } from "@friendofsvelte/tipex";
+import { TextAlign } from '@tiptap/extension-text-align';
+
+const extensions = [
+	TextAlign.configure({
+		types: ['heading', 'paragraph'],
+	}),
+];
+
+// Use in component
+<Tipex { extensions }
+/>
+```
+
+### Floating Menu
+
+The floating menu provides context-aware formatting options:
+
+```svelte
+<Tipex floating /> // Enables the floating menu
+```
+
+## Advanced Usage
+
+### Custom Head and Foot Sections
+
+Add custom components above or below the editor using Svelte 5 snippets:
+
+```svelte
+<script lang="ts">
+    import {Tipex} from "@friendofsvelte/tipex";
+    
+    let body = "";
+</script>
+
+<Tipex {body}>
+    {#snippet head(editor)}
+        <CustomHeader {editor} />
+    {/snippet}
+    
+    {#snippet foot(editor)}
+        <CustomFooter {editor} />
+    {/snippet}
+</Tipex>
+```
+
+### Custom Utilities
+
+Add custom controls while keeping the default toolbar:
+
+```svelte
+<script lang="ts">
+    import {Tipex} from "@friendofsvelte/tipex";
+    
+    let body = "";
+</script>
+
+<Tipex {body} controls>
+    {#snippet utilities(editor)}
+        <CustomFormatting {editor} />
+    {/snippet}
+</Tipex>
+```
+
+### Custom Control Component
+
+Create a completely custom control interface:
+
+```svelte
+<script lang="ts">
+    import {Tipex} from "@friendofsvelte/tipex";
+    
+    let body = "";
+</script>
+
+<Tipex {body} controls={false}>
+    {#snippet controlComponent(editor)}
+        <MyCustomControls {editor} />
+    {/snippet}
+</Tipex>
+```
+
+## How to get html content from editor?
+
+```svelte
+<script lang="ts">
+    import {Tipex} from "@friendofsvelte/tipex";
+    
+    let body = "";
+    let editor: Editor | undefined = $state();
+
+	const htmlContent = $derived(editor?.getHTML()); // Get HTML content
+ </script>
+ 
+ <Tipex {body} bind:tipex={editor} />
+ ```
+
+## Documentation
+
+For comprehensive documentation, visit [tipex.pages.dev](https://tipex.pages.dev/).
+
+## About Friend Of Svelte
+
+![Friend Of Svelte Logo](https://avatars.githubusercontent.com/u/143795012?s=200&v=4)
+
+[Friend Of Svelte](https://github.com/friendofsvelte) is a community-driven project to help Svelte developers find and
+develop awesome Svelte resources. Our mission is to create high-quality, maintainable, and accessible tools for the
+Svelte ecosystem.
+
+### Join the Community
+
+- 🌟 Star our repositories
+- 🤝 Contribute to projects
+- 📢 Share your ideas
+- 👥 Open memberships for everyone
+
+If you like this project, you can be one of the friends by contributing to the project. Memberships are open for
+everyone.
+
+## License
+
+MIT Licensed. Copyright (c) 2023-2024 Friend of Svelte.
+
+================================================
+File: /package.json
+================================================
+{
+  "name": "@friendofsvelte/tipex",
+  "version": "0.0.7-fix-0",
+  "keywords": [
+    "svelte",
+    "text editor",
+    "svelte 5",
+    "rich text",
+    "svelte kit"
+  ],
+  "author": "bishwas bhandari",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/friendofsvelte/tipex/issues"
+  },
+  "homepage": "https://tipex.pages.dev/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/friendofsvelte/tipex.git"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build && npm run package",
+    "preview": "vite preview",
+    "package": "svelte-kit sync && svelte-package && publint",
+    "prepareTipexCss": "postcss --dir ./dist/tipex/styles --config ./postcss.config.js ./dist/tipex/styles/*.css && postcss src/app.postcss -o dist/tipex/styles/app.css",
+    "packageTipex": "npm run package && npm run prepareTipexCss",
+    "prepublishOnly": "npm run packageTipex",
+    "test": "npm run test:integration && npm run test:unit",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --plugin-search-dir . --check . && eslint .",
+    "format": "prettier --plugin-search-dir . --write .",
+    "test:integration": "playwright test",
+    "test:unit": "vitest"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    },
+    "./styles/*.css": "./dist/tipex/styles/*.css"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@friendofsvelte/toggle": "0.0.2-svelte.5.docup",
+    "@playwright/test": "^1.28.1",
+    "@sveltejs/adapter-cloudflare": "^4.7.4",
+    "@tailwindcss/typography": "^0.5.13",
+    "svelte-highlight": "^7.4.1",
+    "tslib": "^2.4.1",
+    "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/package": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@types/eslint": "^9.6.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.7.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-svelte": "^2.36.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.3.2",
+    "prettier-plugin-svelte": "^3.2.6",
+    "prettier-plugin-tailwindcss": "^0.6.5",
+    "publint": "^0.2.0",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.0.0",
+    "tailwindcss": "^3.4.9",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^5.0.11",
+    "vitest": "^2.0.4",
+    "postcss": "^8.4.38",
+    "postcss-cli": "^10.1.0",
+    "postcss-load-config": "^4.0.1"
+  },
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "dependencies": {
+    "@tiptap/core": "^2.1.13",
+    "@tiptap/extension-code-block": "^2.1.13",
+    "@tiptap/extension-code-block-lowlight": "^2.1.13",
+    "@tiptap/extension-floating-menu": "^2.1.13",
+    "@tiptap/extension-image": "^2.1.13",
+    "@tiptap/extension-link": "^2.1.13",
+    "@tiptap/extension-placeholder": "^2.1.13",
+    "@tiptap/pm": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13",
+  "iconify-icon": "^1.0.8",
+    "lowlight": "^2.9.0"
+  },
+  "overrides": {}
+}
+
+
+================================================
+File: /playwright.config.ts
+================================================
+import type { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+	webServer: {
+		command: 'npm run build && npm run preview',
+		port: 4173
+	},
+	testDir: 'tests',
+	testMatch: /(.+\.)?(test|spec)\.[jt]s/
+};
+
+export default config;
+
+
+================================================
+File: /postcss.config.cjs
+================================================
+const tailwindcss = require('tailwindcss');
+const autoprefixer = require('autoprefixer');
+
+const config = {
+	plugins: [
+		//Some plugins, like tailwindcss/nesting, need to run before Tailwind,
+		tailwindcss(),
+		//But others, like autoprefixer, need to run after,
+		autoprefixer
+	]
+};
+
+module.exports = config;
+
+
+================================================
+File: /svelte.config.js
+================================================
+import adapter from '@sveltejs/adapter-cloudflare';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
+	// for more information about preprocessors
+	preprocess: vitePreprocess(),
+
+	kit: {
+		// adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.
+		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
+		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
+		adapter: adapter(),
+		alias: {
+			$item: './src/item'
+		}
+	}
+};
+
+export default config;
+
+
+================================================
+File: /tailwind.config.cjs
+================================================
+/** @type {import('tailwindcss').Config}*/
+const config = {
+	content: ['./src/**/*.{html,js,svelte,ts}'],
+
+	theme: {
+		extend: {}
+	},
+
+	plugins: [],
+
+	darkMode: 'class'
+};
+
+module.exports = config;
+
+
+================================================
+File: /tsconfig.json
+================================================
+{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": false
+  }
+}
+
+
+================================================
+File: /vite.config.ts
+================================================
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+	plugins: [sveltekit()],
+	test: {
+		include: ['src/**/*.{test,spec}.{js,ts}']
+	},
+	define: {
+		__VERSION__: JSON.stringify(process.env.npm_package_version),
+	},
+});
+
+
+================================================
+File: /.eslintignore
+================================================
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+
+================================================
+File: /.eslintrc.cjs
+================================================
+module.exports = {
+	root: true,
+	extends: [
+		'eslint:recommended',
+		'plugin:@typescript-eslint/recommended',
+		'plugin:svelte/recommended',
+		'prettier'
+	],
+	parser: '@typescript-eslint/parser',
+	plugins: ['@typescript-eslint'],
+	parserOptions: {
+		sourceType: 'module',
+		ecmaVersion: 2020,
+		extraFileExtensions: ['.svelte']
+	},
+	env: {
+		browser: true,
+		es2017: true,
+		node: true
+	},
+	overrides: [
+		{
+			files: ['*.svelte'],
+			parser: 'svelte-eslint-parser',
+			parserOptions: {
+				parser: '@typescript-eslint/parser'
+			}
+		}
+	]
+};
+
+
+================================================
+File: /.npmrc
+================================================
+engine-strict=true
+resolution-mode=highest
+
+
+================================================
+File: /.prettierignore
+================================================
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+
+================================================
+File: /.prettierrc
+================================================
+{
+	"useTabs": true,
+	"singleQuote": true,
+	"trailingComma": "none",
+	"printWidth": 100,
+	"plugins": ["prettier-plugin-svelte"],
+	"pluginSearchDirs": ["."],
+	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
+}
+
+
+================================================
+File: /src/app.d.ts
+================================================
+// See https://kit.svelte.dev/docs/types#app
+// for information about these interfaces
+declare global {
+	namespace App {
+		// interface Error {}
+		// interface Locals {}
+		// interface PageData {}
+		// interface Platform {}
+	}
+
+	export interface GithubRepo {
+		id: number;
+		node_id: string;
+		name: string;
+		full_name: string;
+		private: boolean;
+		owner: Owner;
+		html_url: string;
+		description: string;
+		fork: boolean;
+		url: string;
+		forks_url: string;
+		keys_url: string;
+		collaborators_url: string;
+		teams_url: string;
+		hooks_url: string;
+		issue_events_url: string;
+		events_url: string;
+		assignees_url: string;
+		branches_url: string;
+		tags_url: string;
+		blobs_url: string;
+		git_tags_url: string;
+		git_refs_url: string;
+		trees_url: string;
+		statuses_url: string;
+		languages_url: string;
+		stargazers_url: string;
+		contributors_url: string;
+		subscribers_url: string;
+		subscription_url: string;
+		commits_url: string;
+		git_commits_url: string;
+		comments_url: string;
+		issue_comment_url: string;
+		contents_url: string;
+		compare_url: string;
+		merges_url: string;
+		archive_url: string;
+		downloads_url: string;
+		issues_url: string;
+		pulls_url: string;
+		milestones_url: string;
+		notifications_url: string;
+		labels_url: string;
+		releases_url: string;
+		deployments_url: string;
+		created_at: string;
+		updated_at: string;
+		pushed_at: string;
+		git_url: string;
+		ssh_url: string;
+		clone_url: string;
+		svn_url: string;
+		homepage: string;
+		size: number;
+		stargazers_count: number;
+		watchers_count: number;
+		language: string;
+		has_issues: boolean;
+		has_projects: boolean;
+		has_downloads: boolean;
+		has_wiki: boolean;
+		has_pages: boolean;
+		has_discussions: boolean;
+		forks_count: number;
+		mirror_url: any;
+		archived: boolean;
+		disabled: boolean;
+		open_issues_count: number;
+		license: any;
+		allow_forking: boolean;
+		is_template: boolean;
+		web_commit_signoff_required: boolean;
+		topics: string[];
+		visibility: string;
+		forks: number;
+		open_issues: number;
+		watchers: number;
+		default_branch: string;
+		temp_clone_token: any;
+		custom_properties: CustomProperties;
+		organization: Organization;
+		network_count: number;
+		subscribers_count: number;
+	}
+
+	export interface Owner {
+		login: string;
+		id: number;
+		node_id: string;
+		avatar_url: string;
+		gravatar_id: string;
+		url: string;
+		html_url: string;
+		followers_url: string;
+		following_url: string;
+		gists_url: string;
+		starred_url: string;
+		subscriptions_url: string;
+		organizations_url: string;
+		repos_url: string;
+		events_url: string;
+		received_events_url: string;
+		type: string;
+		site_admin: boolean;
+	}
+
+	export interface CustomProperties {}
+
+	export interface Organization {
+		login: string;
+		id: number;
+		node_id: string;
+		avatar_url: string;
+		gravatar_id: string;
+		url: string;
+		html_url: string;
+		followers_url: string;
+		following_url: string;
+		gists_url: string;
+		starred_url: string;
+		subscriptions_url: string;
+		organizations_url: string;
+		repos_url: string;
+		events_url: string;
+		received_events_url: string;
+		type: string;
+		site_admin: boolean;
+	}
+}
+
+export {};
+
+
+================================================
+File: /src/app.html
+================================================
+<!DOCTYPE html>
+<html lang="en" class="%appearanceMode%">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="google-site-verification" content="eknTn-rEdzhz1q5nN8YdQxwK7YnQhqwPTlwiMjauiyI" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div>%sveltekit.body%</div>
+	</body>
+</html>
+
+
+================================================
+File: /src/app.postcss
+================================================
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+================================================
+File: /src/hooks.server.ts
+================================================
+import {sequence} from "@sveltejs/kit/hooks";
+import {handleAppearance} from "@friendofsvelte/toggle";
+
+
+export const handle = sequence(
+    handleAppearance
+);
+
+
+
+================================================
+File: /src/index.test.ts
+================================================
+import { describe, it, expect } from 'vitest';
+
+describe('sum test', () => {
+	it('adds 1 + 2 to equal 3', () => {
+		expect(1 + 2).toBe(3);
+	});
+});
+
+
+================================================
+File: /src/root.css
+================================================
+@import url('./fonts/work-sans.css');
+
+body {
+    @apply bg-gradient-to-b from-gray-100 to-gray-200 dark:from-stone-900 dark:to-neutral-950 min-h-screen;
+    font-family: work-sans, sans-serif;
+}
+
+a[href^="http"], a[href^="/"] {
+    @apply text-blue-500 hover:text-blue-600
+    dark:text-blue-400 dark:hover:text-blue-300;
+}
+
+pre {
+    @apply rounded-md
+    overflow-x-auto
+    whitespace-pre-wrap
+    border border-neutral-300 dark:border-neutral-800 shadow-sm;
+}
+
+table {
+    @apply border-collapse;
+}
+
+th {
+    @apply px-4 py-2
+    text-left
+    border
+    border-neutral-200 dark:border-stone-900
+    bg-neutral-100 dark:bg-neutral-800
+    text-neutral-700 dark:text-neutral-200;
+}
+
+td {
+    @apply px-4 py-2
+    border
+    border-neutral-300 dark:border-stone-900
+    text-neutral-700 dark:text-neutral-200;
+}
+
+tr {
+    @apply even:bg-neutral-100 even:dark:bg-neutral-800
+    odd:bg-neutral-200 odd:dark:bg-neutral-700;
+}
+
+
+blockquote {
+    @apply rounded border-l-4 border-neutral-200 dark:border-neutral-700
+    bg-neutral-100 dark:bg-neutral-800
+    text-neutral-700 dark:text-neutral-200
+    px-4 py-2
+    mt-3 ml-2
+    overflow-x-auto;
+}
+
+
+code {
+    @apply bg-neutral-100 dark:bg-neutral-800
+    text-neutral-700 dark:text-neutral-200
+    px-1;
+}
+
+.head-section {
+    @apply flex flex-wrap flex-row gap-2 md:gap-3 mb-2 mt-2
+    -ml-1 border-b border-neutral-200 dark:border-neutral-700
+    pb-2;
+}
+
+.head-section h1 {
+    @apply flex justify-center items-center gap-3;
+}
+
+.icon-link-section {
+    @apply flex flex-row flex-wrap sm:flex-nowrap gap-2 md:gap-3 mb-2 mt-2
+    ml-auto;
+}
+
+.icon-link-section a {
+    @apply flex items-center justify-center
+    bg-neutral-100 dark:bg-neutral-800 hover:scale-105 duration-100;
+}
+
+h1 {
+    @apply mb-3 text-3xl font-bold
+    text-neutral-700 dark:text-neutral-200;
+}
+
+p {
+    @apply text-base sm:text-lg mt-1 mb-2
+    text-neutral-600 dark:text-neutral-300;
+}
+
+.image-tab {
+    @apply flex flex-col justify-center gap-1;
+}
+
+figcaption {
+    @apply text-center text-sm text-neutral-600 dark:text-neutral-300;
+}
+
+h2 {
+    @apply text-2xl font-bold
+    text-neutral-700 dark:text-neutral-200;
+}
+
+h3 {
+    @apply text-xl font-bold
+    text-neutral-700 dark:text-neutral-200;
+}
+
+================================================
+File: /src/fonts/work-sans.css
+================================================
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 900;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Black.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 900;
+    src: local('sans-serif'), url('./work-sans/WorkSans-BlackItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 700;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Bold.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 700;
+    src: local('sans-serif'), url('./work-sans/WorkSans-BoldItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 800;
+    src: local('sans-serif'), url('./work-sans/WorkSans-ExtraBold.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 800;
+    src: local('sans-serif'), url('./work-sans/WorkSans-ExtraBoldItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 200;
+    src: local('sans-serif'), url('./work-sans/WorkSans-ExtraLight.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 200;
+    src: local('sans-serif'), url('./work-sans/WorkSans-ExtraLightItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 400;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Italic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 300;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Light.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 300;
+    src: local('sans-serif'), url('./work-sans/WorkSans-LightItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 500;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Medium.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 500;
+    src: local('sans-serif'), url('./work-sans/WorkSans-MediumItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 400;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Regular.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 600;
+    src: local('sans-serif'), url('./work-sans/WorkSans-SemiBold.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 600;
+    src: local('sans-serif'), url('./work-sans/WorkSans-SemiBoldItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: normal;
+    font-weight: 100;
+    src: local('sans-serif'), url('./work-sans/WorkSans-Thin.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'work-sans';
+    font-style: italic;
+    font-weight: 100;
+    src: local('sans-serif'), url('./work-sans/WorkSans-ThinItalic.ttf') format('truetype');
+    font-display: swap;
+}
+
+================================================
+File: /src/item/Footer.svelte
+================================================
+<footer>
+	<a href="https://github.com/friendofsvelte/tipex" target="_blank" rel="noopener noreferrer">
+		Maybe, Star us on Github?
+	</a>
+
+	<a href="https://bishwas.net" target="_blank" rel="noopener noreferrer">
+		About Author
+	</a>
+</footer>
+
+
+<style lang="postcss">
+    footer {
+        @apply flex flex-row items-center justify-between w-full max-w-3xl;
+        @apply mt-10;
+        @apply pt-3 px-2 border-t border-neutral-200 dark:border-neutral-700;
+    }
+
+    footer a {
+        @apply text-gray-500 dark:text-gray-400;
+        @apply hover:text-gray-700 dark:hover:text-gray-300;
+        @apply text-sm;
+    }
+</style>
+
+================================================
+File: /src/item/ParamSpan.svelte
+================================================
+<script lang="ts">
+	let { name } = $props();
+</script>
+
+{name}<span
+	class="text-pink-500">(</span><span
+	class="text-yellow-500">tipex</span><span
+	class="text-pink-500">)</span>
+
+================================================
+File: /src/item/PropsTable.svelte
+================================================
+<script lang="ts">
+	let function_string = '() => {}';
+</script>
+
+<div class="overflow-x-auto">
+	<table class="table-auto w-full mt-3">
+		<thead>
+		<tr>
+			<th>Prop</th>
+			<th>Type</th>
+			<th>Default</th>
+			<th>Description</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>extensions</td>
+			<td>Extensions[]</td>
+			<td>defaultExtensions</td>
+			<td>Extensions to be used in the editor.</td>
+		</tr>
+		<tr>
+			<td>floating</td>
+			<td>boolean</td>
+			<td>false</td>
+			<td>Determines display of default floating menu.</td>
+		</tr>
+		<tr>
+			<td>oncreate</td>
+			<td>function</td>
+			<td>{function_string}</td>
+			<td>Callback function when the editor is created.</td>
+		</tr>
+		<tr>
+			<td>ondestroy</td>
+			<td>function</td>
+			<td>{function_string}</td>
+			<td>Callback function when the editor is destroyed.</td>
+		</tr>
+		<tr>
+			<td>onupdate</td>
+			<td>function</td>
+			<td>{function_string}</td>
+			<td>Callback function when the editor is updated.</td>
+		</tr>
+		<tr>
+			<td>body</td>
+			<td>string</td>
+			<td>''</td>
+			<td>HTML content to render.</td>
+		</tr>
+		<tr>
+			<td>this</td>
+			<td>TipTap</td>
+			<td>N/A</td>
+			<td>Instance of the editor.</td>
+		</tr>
+		<tr>
+			<td>class</td>
+			<td>string</td>
+			<td>''</td>
+			<td>Class to be applied to the editor.</td>
+		</tr>
+		<tr>
+			<td>style</td>
+			<td>string</td>
+			<td>''</td>
+			<td>Style to be applied to the editor.</td>
+		</tr>
+		<tr>
+			<td>focal</td>
+			<td>boolean</td>
+			<td>true</td>
+			<td>Focus outline when editing (blue ring).</td>
+		</tr>
+		<tr>
+			<td>controls</td>
+			<td>boolean</td>
+			<td>false</td>
+			<td>Display the default controls.</td>
+		</tr>
+		<tr>
+			<td>ctxId</td>
+			<td>{'${string}_tipex'}</td>
+			<td>_tipex</td>
+			<td>Sets context ID to get editor instance via getContext.</td>
+		</tr>
+		<!-- Add additional props here as necessary -->
+		</tbody>
+	</table>
+</div>
+
+<blockquote>
+	<p class="text-gray-700"><strong>Note:</strong>
+		For better customization, please have a look at [<a href="/customization#slot-props">Slot Props</a>]
+</blockquote>
+
+
+================================================
+File: /src/item/SlotPropsTable.svelte
+================================================
+<script>
+	import ParamSpan from '$item/ParamSpan.svelte';
+</script>
+
+<h2 class="mt-6" id="Snippet-props">Tipex Props</h2>
+<div class="overflow-x-auto">
+	<table class="table-auto w-full mt-3">
+		<thead>
+		<tr>
+			<th>Prop Name</th>
+			<th>Default</th>
+			<th>Condition</th>
+			<th>Description</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr>
+			<td>
+				<ParamSpan name="head" />
+			</td>
+			<td>undefined</td>
+			<td>Optional</td>
+			<td>A slot that accepts a function receiving the TipexEditor instance, rendered above the main editor content
+				area
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<ParamSpan name="controlComponent" />
+			</td>
+			<td>undefined</td>
+			<td>Only used when controls=false</td>
+			<td>A custom control component that receives the editor instance. Cannot be used together with the utilities
+				prop
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<ParamSpan name="utilities" />
+			</td>
+			<td>Utility</td>
+			<td>Only used when controls=true</td>
+			<td>
+				Custom utility components rendered within the default Controls component. Cannot
+				be used together with controlComponent
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<ParamSpan name="foot" />
+			</td>
+			<td>undefined</td>
+			<td>Optional</td>
+			<td>
+				A slot that accepts a function receiving the TipexEditor instance,
+				rendered below the editor content and controls
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<blockquote>
+	<p class="text-gray-700"><strong>Note:</strong>
+		These props are mutually exclusive based on the control mode:
+	</p>
+	<ul class="list-disc list-inside">
+		<li>When <code>controls=true</code>: Only <code>utilities</code> can be used</li>
+		<li>When <code>controls=false</code>: Only <code>controlComponent</code> can be used</li>
+	</ul>
+
+	<p class="text-gray-700">
+		This is enforced by the <code>WithControlsOn</code> and <code>WithControlsOff</code> type interfaces.
+	</p>
+</blockquote>
+
+
+================================================
+File: /src/item/ThemeToggle.svelte
+================================================
+<script lang="ts">
+	import { scale } from 'svelte/transition';
+	import { appearance } from '@friendofsvelte/toggle';
+	import '@friendofsvelte/toggle/styles/Toggle.css';
+</script>
+
+
+<button
+	class="dark-mode-button group" class:isDarkMode={appearance} in:scale
+	onclick={()=>appearance.dark=!appearance.dark}>
+	<iconify-icon icon={appearance.dark ? 'fa-solid:moon' : 'fa-solid:sun'}
+								class="group-active:animate-spin"></iconify-icon>
+</button>
+
+
+================================================
+File: /src/item/codes/advanceCodes.ts
+================================================
+const customizeControlImplementation = `<Tipex body={body}
+   controlComponent={CustomControl}
+   />`;
+
+const addHeadFootComponent = `<script lang="ts">
+ import {Tipex} from "@friendofsvelte/tipex";
+ import YourCustomHead from "./YourCustomHead.svelte";
+ import YourCustomFooter from "./YouCustomFooter.svelte";
+ import CustomControl from "./CustomControl.svelte";
+</script>
+
+<Tipex body={body}>
+  {#snippet head(tipex)}
+    <YourCustomHead/>
+  {/snippet}
+  {#snippet controlComponent(tipex)}
+    <CustomControl/>
+  {/snippet}
+  {#snippet foot(tipex)}
+    <YourCustomFooter/>
+  {/snippet}
+</Tipex>`;
+
+const tweakingExtensions = `<script lang="ts">
+    import {defaultExtensions, Tipex} from "@friendofsvelte/tipex";
+     let newExtensions = [
+        ...defaultExtensions,
+         Heading.configure({
+            levels: [2, 3, 4, 5, 6]
+        })
+    ] // sample of tweaking extensions, so that only heading 2 to 6 are available
+</script>
+<Tipex extensions={newExtensions} .../>
+`;
+
+export default {
+	customizeControlImplementation,
+	addHeadFootComponent,
+	tweakingExtensions
+};
+
+
+================================================
+File: /src/item/codes/index.ts
+================================================
+export const insertUtils = `import {Utility} from "@friendofsvelte/tipex";
+<Tipex body={body}>
+  {#snippet utilities(tipex)}
+    <Utility {tipex}/>
+  {/snippet}
+</Tipex>`;
+
+export const appendUtils = `<Tipex body={body}>
+ {#snippet utilities(tipex)}
+   <div aria-label="Custom utility button">...</div>
+ {/snippet}
+</Tipex>`;
+
+export const overrideControl = `<Tipex body={body}>
+   {#snippet controlComponent(tipex)}
+	   <div aria-label="New Custom Control">...</div>
+	 {/snippet}
+</Tipex>`;
+
+export const install = `npm install "@friendofsvelte/tipex";`;
+export const usage = `<script lang="ts">
+    import {Tipex} from '@friendofsvelte/tipex';
+    let body = \`<p>The initial html content.</p>\`;
+</script>
+
+<!-- Shorthands to disable: !controls !floating !focal -->
+<Tipex {body} controls floating focal
+    style="margin-top: 1rem; margin-bottom: 0;" 
+    class="h-[70vh] border border-neutral-200"/>
+`;
+
+let body = `
+<p>This <strong>content</strong> was written by <a target="_blank" rel="noopener" href="http://bishwas.net/">Bishwas</a> in 2023. You can edit this content and see the changes in the editor.</p><p>Do you have any questions? Feel free to ask in the <a target="_blank" rel="noopener noreferrer" href="https://github.com/friendofsvelte/tipex">Github repository</a>.</p><p>Try writing some code, list, or blockquote, and see how it looks in the editor.</p>
+<hr/>
+<p>I hope you enjoyed it 😊</p>
+`;
+
+export let styling = `import "@friendofsvelte/tipex/styles/Tipex.css";
+import "@friendofsvelte/tipex/styles/ProseMirror.css";
+import "@friendofsvelte/tipex/styles/Controls.css";
+import "@friendofsvelte/tipex/styles/EditLink.css";
+import "@friendofsvelte/tipex/styles/CodeBlock.css";`;
+
+export let access = `<Tipex body={htmlCotent} bind:tipex={editor} />`;
+
+const codes = {
+	insertUtils,
+	install,
+	usage,
+	appendUtils,
+	overrideControl,
+	body,
+	access,
+	styling
+};
+export default codes;
+
+
+================================================
+File: /src/lib/index.ts
+================================================
+export { default as Tipex, type TipexEditor, type TipexProps } from './tipex/Tipex.svelte';
+export { default as Utility, type UtilityProps } from './tipex/Utility.svelte';
+export { defaultExtensions } from './tipex/default.js';
+
+
+================================================
+File: /src/lib/tipex/Controls.svelte
+================================================
+<script lang="ts" module>
+	import type { Snippet } from 'svelte';
+	import type { TipexEditor } from './Tipex.svelte';
+
+	/**
+	 * Defines the properties for the default Controls component.
+	 */
+	export interface ControlsProps {
+		children?: Snippet;
+		tipex: TipexEditor;
+	}
+</script>
+
+<script lang="ts">
+	import Fa6SolidParagraph from './icons/Fa6SolidParagraph.svelte';
+	import Fa6SolidBold from './icons/Fa6SolidBold.svelte';
+	import Fa6SolidItalic from './icons/Fa6SolidItalic.svelte';
+	import Fa6SolidCode from './icons/Fa6SolidCode.svelte';
+
+	let { children, tipex }: ControlsProps = $props();
+</script>
+
+{#if tipex}
+	<div class="tipex-controller">
+		<div class="tipex-basic-controller-wrapper">
+			<button
+				onclick={() => tipex?.chain().focus().toggleHeading({ level: 1 }).run()}
+				class:active={tipex?.isActive('heading', { level: 1 })}
+				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+				aria-label="Heading 1"
+				type="button"
+			>
+				H1
+			</button>
+
+			<button
+				onclick={() => tipex?.chain().focus().toggleHeading({ level: 2 }).run()}
+				class:active={tipex?.isActive('heading', { level: 2 })}
+				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+				aria-label="Heading 2"
+				type="button"
+			>
+				H2
+			</button>
+
+			<button
+				onclick={() => tipex?.chain().focus().setParagraph().run()}
+				class:active={tipex?.isActive('paragraph')}
+				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+				aria-label="Paragraph/Normal text"
+				type="button"
+			>
+				<Fa6SolidParagraph display class="h-4 w-4" />
+			</button>
+
+			<button
+				onclick={() => tipex?.chain().focus().toggleBold().run()}
+				class:active={tipex?.isActive('bold')}
+				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+				aria-label="Bold"
+				type="button"
+			>
+				<Fa6SolidBold display class="h-4 w-4" />
+			</button>
+
+			<button
+				onclick={() => tipex?.chain().focus().toggleItalic().run()}
+				class:active={tipex?.isActive('italic')}
+				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+				aria-label="Italic"
+				type="button"
+			>
+				<Fa6SolidItalic display class="h-4 w-4" />
+			</button>
+
+			<button
+				onclick={() => tipex?.chain().focus().toggleCode().run()}
+				class:active={tipex?.isActive('code')}
+				class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+				aria-label="Code"
+				type="button"
+			>
+				<Fa6SolidCode display class="h-4 w-4" />
+			</button>
+
+		</div>
+		{@render children?.()}
+	</div>
+{/if}
+
+
+================================================
+File: /src/lib/tipex/Tipex.svelte
+================================================
+<script lang="ts" module>
+	import type { Snippet } from 'svelte';
+	import type { AnyExtension, EditorEvents } from '@tiptap/core';
+
+	export type TipexEditor = InstanceType<typeof Editor> | undefined;
+
+	export type HasEditorSnippet = Snippet<[TipexEditor]>;
+
+	export interface Boolish {
+		focal?: boolean;
+		floating?: boolean;
+		'!focal'?: never;
+		'!floating'?: never;
+	}
+
+	export interface NonBoolish {
+		'!focal'?: true;
+		'!floating'?: true;
+		focal?: never;
+		floating?: never;
+	}
+
+	export interface WithControlsOn {
+		controls?: true;
+		'!controls'?: never;
+		controlComponent?: never;
+		utilities?: HasEditorSnippet;
+	}
+
+	export interface WithControlsOff {
+		controls?: false;
+		'!controls'?: never;
+		utilities?: never;
+		controlComponent?: HasEditorSnippet;
+	}
+
+	export interface WithControlsNot {
+		'!controls': true;
+		controls?: never;
+		utilities?: never;
+		controlComponent?: never;
+	}
+
+	export type WithControlsX = WithControlsOn | WithControlsOff | WithControlsNot;
+
+	export type TipexProps = {
+		class?: string;
+		/**
+		 * Context ID to be used for the editor.
+		 */
+		ctxId?: `${string}_tipex`;
+		extensions?: AnyExtension[];
+		/**
+		 * The editor's head section.
+		 */
+		foot?: HasEditorSnippet;
+		/**
+		 * The editor's foot section.
+		 */
+		head?: HasEditorSnippet;
+		body?: string;
+		oncreate?: (props: EditorEvents['create']) => void;
+		ondestroy?: (props: EditorEvents['destroy']) => void;
+		onupdate?: (props: EditorEvents['update']) => void;
+		style?: string;
+		/**
+		 * The editor instance.
+		 */
+		tipex?: TipexEditor;
+		/**
+		 * Whether the editor should is focused, bind.
+		 */
+		focused?: boolean;
+	} & WithControlsX & (Boolish | NonBoolish);
+</script>
+
+<script lang="ts">
+	import { defaultExtensions } from './default.js';
+	import { onMount, setContext } from 'svelte';
+	import { Editor } from '@tiptap/core';
+	import StarterKit from '@tiptap/starter-kit';
+	import Controls from '../tipex/Controls.svelte';
+	import { getDefaultFloatingMenu } from '../tipex/prepare.js';
+	import LinkFloatingMenu from '../tipex/link/LinkFloatingMenu.svelte';
+	import Utility from '../tipex/Utility.svelte';
+
+	let {
+		extensions = $bindable(defaultExtensions),
+		tipex = $bindable(),
+		floating = false,
+		controls = false,
+		oncreate = () => {
+		},
+		ondestroy = () => {
+		},
+		onupdate = () => {
+		},
+		body = '',
+		class: className = '',
+		style = '',
+		focal = true,
+		focused = $bindable(false),
+		head,
+		controlComponent,
+		utilities,
+		foot,
+		ctxId = `_tipex`,
+		...restProps
+	}: TipexProps = $props();
+
+	focal = restProps['!focal'] === undefined ? focal : !restProps['!focal'];
+	floating = restProps['!floating'] === undefined ? floating : !restProps['!floating'];
+	controls = restProps['!controls'] === undefined ? controls : !restProps['!controls'];
+
+	function onFocusChange() {
+		focused = !!(editorsParentRef && editorsParentRef.contains(document.activeElement));
+	}
+
+	let floatingRef: HTMLDivElement | undefined = $state();
+	let tipexEditorRef: HTMLDivElement | undefined = $state();
+	let editorsParentRef: HTMLDivElement | undefined = $state();
+
+	onMount(() => {
+		if (floating && !extensions.find(ext => ext.name === 'floatingMenu') && floatingRef) {
+			extensions.push(getDefaultFloatingMenu(floatingRef));
+		}
+		tipex = new Editor({
+			element: tipexEditorRef,
+			extensions: [
+				StarterKit.configure({
+					codeBlock: false
+				}),
+				...extensions
+			],
+			content: body as string,
+			onTransaction({ editor }) {
+				// force re-render so `tipex.isActive` works as expected
+				tipex = undefined;
+				tipex = editor;
+			},
+			autofocus: true,
+			onCreate: oncreate,
+			onDestroy: ondestroy,
+			onUpdate: onupdate
+		});
+		setContext(ctxId, tipex);
+	});
+</script>
+
+<svelte:document onfocusin={onFocusChange} onfocusout={onFocusChange} />
+
+{#if floating}
+	<LinkFloatingMenu bind:floatingRef {tipex} />
+{/if}
+
+<div class="tipex-editor {className}" {style} bind:this={editorsParentRef} class:focused class:focal>
+	<div class="tipex-editor-wrap">
+		{@render head?.(tipex)}
+		<div class="tipex-editor-section" bind:this={tipexEditorRef}></div>
+		{#if controls}
+			<!-- Default controls -->
+			<Controls {tipex}>
+				{#if utilities}
+					<div class="tipex-utilities">
+						{@render utilities?.(tipex)}
+					</div>
+				{:else}
+					<!-- Default utilities -->
+					<div class="tipex-utilities">
+						<Utility {tipex} />
+					</div>
+				{/if}
+			</Controls>
+		{:else}
+			{@render controlComponent?.(tipex)}
+		{/if}
+		{@render foot?.(tipex)}
+	</div>
+</div>
+
+
+================================================
+File: /src/lib/tipex/Utility.svelte
+================================================
+<script lang="ts" module>
+	import { type Snippet } from 'svelte';
+	import EditLinkMenu from '../tipex/link/EditLinkMenu.svelte';
+	import type { TipexEditor } from './Tipex.svelte';
+
+	export interface UtilityProps {
+		children?: Snippet;
+		tipex: TipexEditor;
+	}
+</script>
+
+<script lang="ts">
+	import Fa6SolidCopy from './icons/Fa6SolidCopy.svelte';
+
+	let { children, tipex }: UtilityProps = $props();
+
+	let enableLinkEdit = $state(false);
+
+	function copy() {
+		navigator.clipboard.writeText(tipex?.getHTML() || '');
+		tipex?.chain().focus().run();
+	}
+</script>
+
+{#if !enableLinkEdit}
+	<button
+		class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+		onclick={copy}
+		type="button"
+		aria-label="Copy HTML">
+		<Fa6SolidCopy display class="h-4 w-4" />
+	</button>
+	{@render children?.()}
+{/if}
+
+<EditLinkMenu bind:enableLinkEdit {tipex} />
+
+
+================================================
+File: /src/lib/tipex/default.ts
+================================================
+import { Link } from '@tiptap/extension-link';
+import { Image } from '@tiptap/extension-image';
+import { Placeholder } from '@tiptap/extension-placeholder';
+import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
+import { lowlight } from 'lowlight';
+
+export const defaultExtensions = [
+	Link.configure({
+		openOnClick: false,
+		HTMLAttributes: {
+			target: '_blank',
+			rel: 'noopener noreferrer'
+		}
+	}),
+	Image.configure({
+		allowBase64: true
+	}),
+	Placeholder.configure({
+		showOnlyWhenEditable: false
+	}),
+	CodeBlockLowlight.configure({
+		lowlight,
+		languageClassPrefix: 'language-',
+		defaultLanguage: 'plaintext'
+	})
+];
+
+
+================================================
+File: /src/lib/tipex/prepare.ts
+================================================
+import { FloatingMenu } from '@tiptap/extension-floating-menu';
+
+export function getDefaultFloatingMenu(editLinkRef: HTMLElement) {
+	return FloatingMenu.configure({
+		pluginKey: 'floatingLinkEdit',
+		element: editLinkRef,
+		shouldShow: ({ editor }) => {
+			return editor.isActive('link');
+		},
+		tippyOptions: {
+			placement: 'top-start',
+			zIndex: 0,
+			popperOptions: {
+				placement: 'top-start',
+				strategy: 'fixed'
+			},
+			appendTo: () => document.body
+		}
+	});
+}
+
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidArrowUpRightFromSquare.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidArrowUpRightFromSquareProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidArrowUpRightFromSquareProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 512 512"
+   class="{className}">
+  <path fill="currentColor" d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32h82.7L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3V192c0 17.7 14.3 32 32 32s32-14.3 32-32V32c0-17.7-14.3-32-32-32zM80 32C35.8 32 0 67.8 0 112v320c0 44.2 35.8 80 80 80h320c44.2 0 80-35.8 80-80V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v112c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V112c0-8.8 7.2-16 16-16h112c17.7 0 32-14.3 32-32s-14.3-32-32-32z"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidBold.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidBoldProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidBoldProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 384 512"
+   class="{className}">
+  <path fill="currentColor" d="M0 64c0-17.7 14.3-32 32-32h192c70.7 0 128 57.3 128 128c0 31.3-11.3 60.1-30 82.3c37.1 22.4 62 63.1 62 109.7c0 70.7-57.3 128-128 128H32c-17.7 0-32-14.3-32-32s14.3-32 32-32h16V96H32C14.3 96 0 81.7 0 64m224 160c35.3 0 64-28.7 64-64s-28.7-64-64-64H112v128zm-112 64v128h144c35.3 0 64-28.7 64-64s-28.7-64-64-64z"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidCheck.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidCheckProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidCheckProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 448 512"
+   class="{className}">
+  <path fill="currentColor" d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7l233.4-233.3c12.5-12.5 32.8-12.5 45.3 0z"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidCode.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidCodeProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidCodeProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 640 512"
+   class="{className}">
+  <path fill="currentColor" d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6m80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3l89.3 89.4l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidCopy.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidCopyProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidCopyProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 448 512"
+   class="{className}">
+  <path fill="currentColor" d="M208 0h124.1C344.8 0 357 5.1 366 14.1L433.9 82c9 9 14.1 21.2 14.1 33.9V336c0 26.5-21.5 48-48 48H208c-26.5 0-48-21.5-48-48V48c0-26.5 21.5-48 48-48M48 128h80v64H64v256h192v-32h64v48c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V176c0-26.5 21.5-48 48-48"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidItalic.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidItalicProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidItalicProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 384 512"
+   class="{className}">
+  <path fill="currentColor" d="M128 64c0-17.7 14.3-32 32-32h192c17.7 0 32 14.3 32 32s-14.3 32-32 32h-58.7L160 416h64c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32h58.7L224 96h-64c-17.7 0-32-14.3-32-32"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidLink.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidLinkProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidLinkProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 640 512"
+   class="{className}">
+  <path fill="currentColor" d="M579.8 267.7c56.5-56.5 56.5-148 0-204.5c-50-50-128.8-56.5-186.3-15.4l-1.6 1.1c-14.4 10.3-17.7 30.3-7.4 44.6s30.3 17.7 44.6 7.4l1.6-1.1c32.1-22.9 76-19.3 103.8 8.6c31.5 31.5 31.5 82.5 0 114L422.3 334.8c-31.5 31.5-82.5 31.5-114 0c-27.9-27.9-31.5-71.8-8.6-103.8l1.1-1.6c10.3-14.4 6.9-34.4-7.4-44.6s-34.4-6.9-44.6 7.4l-1.1 1.6C206.5 251.2 213 330 263 380c56.5 56.5 148 56.5 204.5 0zM60.2 244.3c-56.5 56.5-56.5 148 0 204.5c50 50 128.8 56.5 186.3 15.4l1.6-1.1c14.4-10.3 17.7-30.3 7.4-44.6s-30.3-17.7-44.6-7.4l-1.6 1.1c-32.1 22.9-76 19.3-103.8-8.6C74 372 74 321 105.5 289.5l112.2-112.3c31.5-31.5 82.5-31.5 114 0c27.9 27.9 31.5 71.8 8.6 103.9l-1.1 1.6c-10.3 14.4-6.9 34.4 7.4 44.6s34.4 6.9 44.6-7.4l1.1-1.6C433.5 260.8 427 182 377 132c-56.5-56.5-148-56.5-204.5 0z"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidParagraph.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidParagraphProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidParagraphProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 448 512"
+   class="{className}">
+  <path fill="currentColor" d="M192 32h224c17.7 0 32 14.3 32 32s-14.3 32-32 32h-32v352c0 17.7-14.3 32-32 32s-32-14.3-32-32V96h-32v352c0 17.7-14.3 32-32 32s-32-14.3-32-32v-96h-32c-88.4 0-160-71.6-160-160S103.6 32 192 32"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/icons/Fa6SolidXmark.svelte
+================================================
+<script lang="ts" module>
+  export interface Fa6SolidXmarkProps {
+    display?: boolean;
+    occupy?: boolean;
+    size?: number;
+    class?: string;
+  }
+</script>
+
+<script lang="ts">
+  const {display = false, occupy = true, size = 0.7, class: className = ''}: Fa6SolidXmarkProps = $props();
+</script>
+
+{#if display}
+  <svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="{size}em"
+   height="{size}em"
+   viewBox="0 0 384 512"
+   class="{className}">
+  <path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7L86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256L41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3l105.4 105.3c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256z"/>
+</svg>
+{:else if occupy}
+  <div style="height: {size}em; width: {size}em;"></div>
+{/if}
+
+================================================
+File: /src/lib/tipex/link/EditLinkMenu.svelte
+================================================
+<script lang="ts" module>
+	import type { TipexEditor } from '../Tipex.svelte';
+
+	export interface EditLinkMenuProps {
+		enableLinkEdit?: boolean;
+		tipex: TipexEditor;
+	}
+</script>
+
+<script lang="ts">
+	import Fa6SolidXmark from '../icons/Fa6SolidXmark.svelte';
+	import Fa6SolidLink from '../icons/Fa6SolidLink.svelte';
+
+	let { enableLinkEdit = $bindable(false), tipex }: EditLinkMenuProps = $props();
+
+	let linkInputRef: HTMLInputElement | undefined = $state();
+
+	function handleLinkAndSave() {
+		if (!linkInputRef) return;
+		let isValidURL = linkInputRef.value.startsWith('http://')
+			|| linkInputRef.value.startsWith('https://')
+			|| linkInputRef.value.startsWith('mailto:')
+			|| linkInputRef.value.startsWith('tel:')
+			|| linkInputRef.value.startsWith('/');
+		if (linkInputRef.value && isValidURL) {
+			tipex?.commands.setLink({ href: linkInputRef.value });
+			enableLinkEdit = false;
+		}
+	}
+
+	function handleEditLinkToggle() {
+		enableLinkEdit = !enableLinkEdit;
+	}
+
+	function handlePasteLink() {
+		navigator.clipboard.readText().then(text => {
+			if (linkInputRef && (text.startsWith('http://')
+				|| text.startsWith('https://')
+				|| text.startsWith('mailto:')
+				|| text.startsWith('tel:')
+				|| text.startsWith('/'))) {
+				linkInputRef.value = text;
+			}
+		});
+	}
+
+	$effect(() => {
+		if (enableLinkEdit) {
+			handlePasteLink();
+		}
+	});
+</script>
+
+<button
+	onclick={handleEditLinkToggle}
+	class="tipex-edit-button tipex-button-extra tipex-button-rigid"
+	class:active={enableLinkEdit}
+	aria-label="Edit link"
+>
+	{#if enableLinkEdit}
+		<Fa6SolidXmark display class="h-4 w-4" />
+	{:else}
+		<Fa6SolidLink display class="h-4 w-4" />
+	{/if}
+</button>
+
+{#if enableLinkEdit}
+	<div class="tipex-link-edit-input-group">
+		<input type="text" placeholder="Your link here" bind:this={linkInputRef}
+					 value={tipex?.getAttributes('link').href || ''} />
+		<button class="tipex-edit-button tipex-button-extra tipex-button-free" type="button"
+						onclick={handleLinkAndSave}>
+			Save
+		</button>
+	</div>
+{/if}
+
+
+================================================
+File: /src/lib/tipex/link/LinkFloatingMenu.svelte
+================================================
+<script lang="ts" module>
+	import type { TipexEditor } from '../Tipex.svelte';
+
+	export interface LinkFloatingMenuProps {
+		floatingRef: HTMLDivElement | undefined;
+		tipex: TipexEditor;
+	}
+</script>
+
+<script lang="ts">
+	import { fade } from 'svelte/transition';
+	import { Editor } from '@tiptap/core';
+	import { onMount } from 'svelte';
+	import Fa6SolidXmark from '../icons/Fa6SolidXmark.svelte';
+	import Fa6SolidCheck from '../icons/Fa6SolidCheck.svelte';
+	import Fa6SolidArrowUpRightFromSquare from '../icons/Fa6SolidArrowUpRightFromSquare.svelte';
+
+	let { floatingRef = $bindable(), tipex }: LinkFloatingMenuProps = $props();
+
+	function handleAcceptLink() {
+		if (tipex instanceof Editor) {
+			tipex.chain().focus(tipex.state.selection.$anchor.pos - tipex.state.selection.$anchor.parentOffset).run();
+		}
+	}
+
+	function handleCancelLink() {
+		if (tipex instanceof Editor) {
+			tipex.chain().focus().unsetLink().run();
+		}
+	}
+
+	function handleOpenLink() {
+		if (tipex instanceof Editor) {
+			window.open(tipex.getAttributes('link').href, 'popup', `width=700,height=900,location=0,top=0,right=0`);
+		}
+	}
+
+	let hideAnchorControl = $state(true);
+
+	const computedStyleString = $derived(`display: ${hideAnchorControl ? 'none' : 'flex'}`);
+
+	onMount(() => {
+		hideAnchorControl = false;
+	});
+</script>
+
+<div class="tipex-floating-group"
+		 bind:this={floatingRef}
+		 style={computedStyleString}
+		 transition:fade>
+	<button type="button" class="tipex-floating-button" onclick={handleOpenLink} aria-label="Open link in new tab">
+		<Fa6SolidArrowUpRightFromSquare display class="h-3 w-3"/>
+	</button>
+	<button type="button" class="tipex-floating-button" onclick={handleAcceptLink} aria-label="Accept link">
+		<Fa6SolidCheck display class="h-3 w-3"/>
+	</button>
+	<button type="button" class="tipex-floating-button" onclick={handleCancelLink} aria-label="Cancel link">
+		<Fa6SolidXmark display class="h-3 w-3"/>
+	</button>
+</div>
+
+
+================================================
+File: /src/lib/tipex/styles/CodeBlock.css
+================================================
+pre code.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+}
+
+code.hljs {
+    padding: 3px 5px;
+}
+
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+    color: #24292e;
+    background: #ffffff;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+    /* prettylights-syntax-keyword */
+    color: #d73a49;
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+    /* prettylights-syntax-entity */
+    color: #6f42c1;
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+    /* prettylights-syntax-constant */
+    color: #005cc5;
+}
+
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+    /* prettylights-syntax-string */
+    color: #032f62;
+}
+
+.hljs-built_in,
+.hljs-symbol {
+    /* prettylights-syntax-variable */
+    color: #e36209;
+}
+
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+    /* prettylights-syntax-comment */
+    color: #6a737d;
+}
+
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+    /* prettylights-syntax-entity-tag */
+    color: #22863a;
+}
+
+.hljs-subst {
+    /* prettylights-syntax-storage-modifier-import */
+    color: #24292e;
+}
+
+.hljs-section {
+    /* prettylights-syntax-markup-heading */
+    color: #005cc5;
+    font-weight: bold;
+}
+
+.hljs-bullet {
+    /* prettylights-syntax-markup-list */
+    color: #735c0f;
+}
+
+.hljs-emphasis {
+    /* prettylights-syntax-markup-italic */
+    color: #24292e;
+    font-style: italic;
+}
+
+.hljs-strong {
+    /* prettylights-syntax-markup-bold */
+    color: #24292e;
+    font-weight: bold;
+}
+
+.hljs-addition {
+    /* prettylights-syntax-markup-inserted */
+    color: #22863a;
+    background-color: #f0fff4;
+}
+
+.hljs-deletion {
+    /* prettylights-syntax-markup-deleted */
+    color: #b31d28;
+    background-color: #ffeef0;
+}
+
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+    /* purposely ignored */
+}
+
+/*!
+  Theme: GitHub Dark Dimmed
+  Description: Dark dimmed theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Colors taken from GitHub's CSS
+*/
+.dark .hljs {
+    color: #adbac7;
+    background: #22272e;
+}
+
+.dark .hljs-doctag,
+.dark .hljs-keyword,
+.dark .hljs-meta .hljs-keyword,
+.dark .hljs-template-tag,
+.dark .hljs-template-variable,
+.dark .hljs-type,
+.dark .hljs-variable.language_ {
+    /* prettylights-syntax-keyword */
+    color: #f47067;
+}
+
+.dark .hljs-title,
+.dark .hljs-title.class_,
+.dark .hljs-title.class_.inherited__,
+.dark .hljs-title.function_ {
+    /* prettylights-syntax-entity */
+    color: #dcbdfb;
+}
+
+.dark .hljs-attr,
+.dark .hljs-attribute,
+.dark .hljs-literal,
+.dark .hljs-meta,
+.dark .hljs-number,
+.dark .hljs-operator,
+.dark .hljs-variable,
+.dark .hljs-selector-attr,
+.dark .hljs-selector-class,
+.dark .hljs-selector-id {
+    /* prettylights-syntax-constant */
+    color: #6cb6ff;
+}
+
+.dark .hljs-regexp,
+.dark .hljs-string,
+.dark .hljs-meta .hljs-string {
+    /* prettylights-syntax-string */
+    color: #96d0ff;
+}
+
+.dark .hljs-built_in,
+.dark .hljs-symbol {
+    /* prettylights-syntax-variable */
+    color: #f69d50;
+}
+
+.dark .hljs-comment,
+.dark .hljs-code,
+.dark .hljs-formula {
+    /* prettylights-syntax-comment */
+    color: #768390;
+}
+
+.dark .hljs-name,
+.dark .hljs-quote,
+.dark .hljs-selector-tag,
+.dark .hljs-selector-pseudo {
+    /* prettylights-syntax-entity-tag */
+    color: #8ddb8c;
+}
+
+.dark .hljs-subst {
+    /* prettylights-syntax-storage-modifier-import */
+    color: #adbac7;
+}
+
+.dark .hljs-section {
+    /* prettylights-syntax-markup-heading */
+    color: #316dca;
+    font-weight: bold;
+}
+
+.dark .hljs-bullet {
+    /* prettylights-syntax-markup-list */
+    color: #eac55f;
+}
+
+.dark .hljs-emphasis {
+    /* prettylights-syntax-markup-italic */
+    color: #adbac7;
+    font-style: italic;
+}
+
+.dark .hljs-strong {
+    /* prettylights-syntax-markup-bold */
+    color: #adbac7;
+    font-weight: bold;
+}
+
+.dark .hljs-addition {
+    /* prettylights-syntax-markup-inserted */
+    color: #b4f1b4;
+    background-color: #1b4721;
+}
+
+.dark .hljs-deletion {
+    /* prettylights-syntax-markup-deleted */
+    color: #ffd8d3;
+    background-color: #78191b;
+}
+
+.dark .hljs-char.escape_,
+.dark .hljs-link,
+.dark .hljs-params,
+.dark .hljs-property,
+.dark .hljs-punctuation,
+.dark .hljs-tag {
+    /* purposely ignored */
+}
+
+
+================================================
+File: /src/lib/tipex/styles/Controls.css
+================================================
+
+.tipex-controller {
+    @apply flex flex-row flex-wrap justify-between md:flex-row gap-2 sticky bottom-0 z-10 py-2 px-3
+    rounded-b-md backdrop-filter backdrop-blur-sm
+    bg-neutral-200 dark:bg-gray-800/80
+    border-t border-neutral-300 dark:border-gray-700;
+}
+
+.tipex-basic-controller-wrapper {
+    @apply flex gap-2 flex-wrap;
+}
+
+.tipex-edit-button {
+    @apply bg-neutral-50 text-neutral-700
+    dark:bg-gray-800 dark:text-gray-200
+    border dark:border-gray-700 border-neutral-400
+    dark:hover:bg-neutral-600/5 hover:bg-gray-100
+    dark:hover:border-gray-600
+    rounded-md flex justify-center items-center
+    duration-100 cursor-pointer;
+}
+
+.tipex-button-rigid {
+    @apply px-2 py-1 h-9 w-9;
+}
+
+.tipex-button-free {
+    @apply px-2 py-1 h-9;
+}
+
+.tipex-button-extra {
+    @apply hover:scale-105 active:scale-90 focus:scale-105 focus:shadow active:border-neutral-900 dark:active:border-white;
+}
+
+.tipex-edit-button.active {
+    @apply dark:bg-gray-800 bg-zinc-200/70 border-neutral-700 dark:border-zinc-300
+    text-zinc-700 dark:text-zinc-300;
+}
+
+================================================
+File: /src/lib/tipex/styles/EditLink.css
+================================================
+
+.tipex-floating-button {
+    @apply flex flex-row items-center justify-center
+    border dark:border-neutral-700/60 border-neutral-200/70
+    rounded-lg
+    hover:bg-neutral-200 dark:hover:bg-neutral-800
+    h-6 w-6;
+}
+
+.tipex-floating-group {
+    @apply rounded-lg shadow
+    text-gray-600 dark:text-gray-400
+    text-xs py-0.5 px-1
+    z-10
+    flex flex-row gap-0.5 items-center
+    bg-neutral-100 dark:bg-neutral-800;
+}
+
+
+.tipex-link-edit-input-group input {
+    @apply focus:outline-0 pl-2 pr-1 w-full text-gray-950 dark:text-gray-200 text-xs truncate
+    bg-gray-300 dark:bg-gray-700 dark:placeholder-gray-400 placeholder-gray-600
+    dark:focus:placeholder-gray-400 focus:placeholder-gray-600 rounded-md;
+}
+
+.tipex-link-edit-top {
+    @apply flex rounded-md;
+}
+
+.tipex-link-edit-input-group {
+    @apply flex gap-2 h-full w-full max-w-xl;
+}
+
+
+================================================
+File: /src/lib/tipex/styles/ProseMirror.css
+================================================
+
+.tipex-editor-section .ProseMirror {
+    @apply outline-none
+    px-2.5 pb-1.5 h-full
+    text-gray-800 dark:text-gray-200;
+}
+
+.tipex-editor-section .ProseMirror pre {
+    @apply bg-gray-200 text-blue-800 text-sm
+    dark:bg-gray-800 dark:text-blue-300
+    px-4 py-7 mt-7 ml-2 mr-4
+    overflow-x-hidden
+    mb-3;
+}
+
+.tipex-editor-section .ProseMirror code {
+    @apply bg-gray-200 text-blue-800
+    dark:bg-gray-800 dark:text-blue-300
+    p-1 rounded;
+}
+
+.tipex-editor-section .ProseMirror h1 {
+    @apply text-2xl font-black dark:text-gray-200 text-gray-950
+    my-3;
+}
+
+.tipex-editor-section .ProseMirror h2 {
+    @apply text-xl font-bold
+    my-2;
+}
+
+.tipex-editor-section .ProseMirror h3 {
+    @apply text-lg font-semibold
+    my-1;
+}
+
+
+.tipex-editor-section .ProseMirror img[src] {
+    @apply mb-2;
+}
+
+.tipex-editor-section .ProseMirror h4,
+.tipex-editor-section .ProseMirror h5,
+.tipex-editor-section .ProseMirror h6 {
+    @apply text-base font-medium
+    mb-1;
+}
+
+.tipex-editor-section .ProseMirror p {
+    @apply text-base
+    mb-2;
+}
+
+.tipex-editor-section .ProseMirror a[href] {
+    @apply text-blue-500 hover:underline
+    hover:text-blue-600;
+}
+
+.tipex-editor-section .ProseMirror ul {
+    @apply list-disc ml-7;
+}
+
+
+.tipex-editor-section .ProseMirror ol {
+    @apply list-decimal ml-7;
+}
+
+.tipex-editor-section .ProseMirror li {
+}
+
+.tipex-editor-section .ProseMirror li {
+    @apply mb-1;
+}
+
+.tipex-editor-section .ProseMirror blockquote {
+    @apply border-l-4 border-gray-300 pl-2
+    mb-2 ml-2;
+}
+
+.tipex-editor-section .ProseMirror img {
+    @apply max-w-full;
+}
+
+.tipex-editor-section .ProseMirror hr {
+    @apply border border-gray-300 dark:border-gray-600/30;
+}
+
+.tipex-editor-section .ProseMirror del {
+    @apply line-through;
+}
+
+.tipex-editor-section .ProseMirror em {
+    @apply italic;
+}
+
+.tipex-editor-section .ProseMirror strong {
+    @apply font-bold;
+}
+
+.tipex-editor-section .ProseMirror .is-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    @apply pointer-events-none text-gray-400
+    dark:text-gray-600;
+}
+
+================================================
+File: /src/lib/tipex/styles/Tipex.css
+================================================
+
+.tipex-editor {
+    @apply flex flex-row
+    gap-0
+    dark:bg-neutral-900 bg-neutral-50
+    rounded-md
+    py-0
+    duration-200 overflow-y-hidden;
+}
+
+.tipex-editor-wrap {
+    @apply flex flex-col gap-0 h-full w-full;
+}
+
+.tipex-editor-section {
+    @apply px-0.5 py-2
+    h-full
+    overflow-y-auto;
+}
+
+.tipex-editor.focused.focal {
+    @apply outline-none ring-4 ring-blue-500 border-transparent;
+}
+
+.tipex-utilities {
+    @apply flex gap-2 ml-auto max-w-lg w-full justify-end;
+}
+
+================================================
+File: /src/routes/+layout.svelte
+================================================
+<script lang="ts">
+	import '../app.postcss';
+	import '../root.css';
+	import 'iconify-icon';
+	import { page } from '$app/stores';
+	import '$lib/tipex/styles/CodeBlock.css';
+	import Footer from '$item/Footer.svelte';
+	import ThemeToggle from '$item/ThemeToggle.svelte';
+	import TrackAppearance from '@friendofsvelte/toggle';
+
+	interface LayoutProps {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: LayoutProps = $props();
+</script>
+
+<TrackAppearance />
+<div class="home-wrapper">
+	{#if $page.url.pathname !== '/'}
+		<ThemeToggle className="fixed top-5 right-7" />
+	{/if}
+	<div class="max-w-4xl w-full">
+		{@render children?.()}
+	</div>
+	<Footer />
+</div>
+
+<style lang="postcss">
+    .home-wrapper {
+        @apply flex flex-col items-center justify-center;
+        @apply py-10 px-3;
+    }
+</style>
+
+================================================
+File: /src/routes/+page.svelte
+================================================
+<script lang="ts">
+	import Tipex from '$lib/tipex/Tipex.svelte';
+	import '$lib/tipex/styles/Controls.css';
+	import '$lib/tipex/styles/EditLink.css';
+	import '$lib/tipex/styles/ProseMirror.css';
+	import '$lib/tipex/styles/Tipex.css';
+
+	import PropsTable from '$item/PropsTable.svelte';
+	import { Highlight, HighlightSvelte } from 'svelte-highlight';
+	import { shell, typescript } from 'svelte-highlight/languages';
+	import codes from '$item/codes';
+	import ThemeToggle from '$item/ThemeToggle.svelte';
+	import { page } from '$app/stores';
+	import type { Editor } from '@tiptap/core';
+
+	let editor: Editor | undefined = $state();
+
+	const htmlContent = $derived(editor?.getHTML());
+	// $inspect('htmlContent', htmlContent);
+</script>
+
+<svelte:head>
+	<title>Tipex Editor - Svelte Text Editor | Friend Of Svelte</title>
+	<meta name="description"
+				content="Tipex editor, a rich text editor for Svelte, a beautiful and extremely customizable editor for Svelte.">
+</svelte:head>
+
+
+<div class="head-section">
+	<h1>Tipex Editor
+		<span
+			class="text-sm text-neutral-600 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+			{__VERSION__}
+		</span>
+	</h1>
+	<div class="icon-link-section">
+		<a class="w-8 h-8 rounded-2xl"
+			 aria-label="NPM Package"
+			 href="https://www.npmjs.com/package/@friendofsvelte/tipex"
+			 target="_blank" rel="noopener noreferrer">
+			<iconify-icon icon="logos:npm-icon" class="w-4"></iconify-icon>
+		</a>
+		<a
+			class="px-2 h-8 rounded-2xl gap-1"
+			href="https://github.com/friendofsvelte/tipex"
+			target="_blank" rel="noopener noreferrer">
+			<iconify-icon icon="fa6-brands:github"
+										class="text-gray-700 dark:text-gray-200 w-4"></iconify-icon>
+			{#if $page.data.repo && 'stargazers_count' in $page.data.repo}
+				<span class="ml-1 text-gray-600 dark:text-gray-400">{$page.data.repo.stargazers_count}+</span>
+			{/if}
+		</a>
+		<!--		https://buymeacoffee.com/bishwasbh -->
+		<a class="h-8 px-3 flex items-center gap-2 shrink-0 rounded-2xl !text-yellow-600"
+			 href="https://www.buymeacoffee.com/bishwasbh"
+			 target="_blank" rel="noopener noreferrer">
+			<iconify-icon icon="simple-icons:buymeacoffee" class="w-4"></iconify-icon>
+			<span class="text-sm">Buy me a coffee</span>
+		</a>
+		<ThemeToggle />
+	</div>
+</div>
+
+<p>
+	Tipex stands as an advanced rich text editor tailored for Svelte, meticulously engineered with the robust
+	frameworks <a target="_blank" rel="noopener noreferrer" href="https://tiptap.dev/">Tiptap</a> and
+	<a target="_blank" rel="noopener noreferrer" href="https://prosemirror.net/">Prosemirror</a>. It
+	empowers developers to effortlessly craft rich text editors, liberating
+	them from the intricacies of underlying technologies, style management, and related complexities.
+</p>
+
+
+<Tipex
+	body={codes.body} bind:tipex={editor}
+	controls floating focal
+	class="h-[70vh] border border-neutral-200
+	dark:border-neutral-700 shadow-xl mt-3"
+>
+</Tipex>
+
+<h2 class="mt-8">Installation</h2>
+<p>
+	Install the package from <a href="https://www.npmjs.com/package/@friendofsvelte/tipex"
+															target="_blank" rel="noopener noreferrer">NPM</a>.
+</p>
+<Highlight language={shell} code={codes.install} />
+
+<h2 class="mt-8">Usage</h2>
+<p>
+	Import the component and use it in your component.
+</p>
+<HighlightSvelte code={codes.usage} />
+
+<h3 class="mt-7">Quick short-hands</h3>
+<ul class="list-disc pl-5 text-black dark:text-white">
+	<li>
+		<code>!controls</code>: Disable the control buttons, or <code>controls={false}</code>.
+	</li>
+	<li>
+		<code>!floating</code>: Disable the floating toolbar, or <code>floating={false}</code>.
+	</li>
+	<li>
+		<code>!focal</code>: Disable the focal point, or <code>focal={false}</code>.
+	</li>
+</ul>
+
+<h2 class="mt-8">Styling</h2>
+<p>
+	Tipex comes with a default style. You can use it by importing the following CSS file inside the
+	<code>{'script'}</code> tag.
+</p>
+<Highlight language={typescript} code={codes.styling} />
+
+
+<blockquote class="mt-2">
+	<p>
+		The import for <code>@friendofsvelte/tipex/styles/ProseMirror.css</code> is used to
+		style content written in the editor. You can use your own style or use the default one.
+		Or, remove any CSS you don't wanna use.
+	</p>
+</blockquote>
+
+<h2 class="mt-8">Props</h2>
+<p>
+	Tipex component accepts following props.
+</p>
+<PropsTable />
+
+<h2 class="mt-8">Accessing Editor Instance</h2>
+<p>
+	You can access the editor instance via:
+</p>
+<HighlightSvelte code={codes.access} />
+<p>
+	The editor instance is stored in a store. You can use it to access the editor instance
+	from anywhere in your app.
+</p>
+
+<h2 class="mt-8">Customizing Editor</h2>
+<p>
+	Tipex is built taking into consideration the need for customization. We believe that
+	a software lacking customization is a software lacking soul. Tipex provides an extensive
+	set of options to customize the editor to your heart's content. From functionality, style,
+	to key bindings, you can customize almost everything. Visit the
+	<a href="/customization"> customization page</a> to learn more.
+</p>
+
+<h2 class="mt-4">About Friend Of Svelte</h2>
+<div class="flex flex-col md:flex-row gap-2 md:gap-3 mb-2 mt-2">
+	<img src="https://avatars.githubusercontent.com/u/143795012?s=200&v=4" alt="Friend Of Svelte Logo"
+			 class="w-12 h-12 rounded" />
+	<p>
+		<a href="https://github.com/friendofsvelte" target="_blank" rel="noopener noreferrer">Friend Of
+			Svelte</a> is a
+		community driven project to help Svelte developers to find and develop awesome Svelte resources.
+	</p>
+</div>
+
+<p>
+	If you like this project, you can be one of the friend by contributing to the project. Memberships are open
+	for everyone.
+</p>
+
+<style lang="postcss">
+</style>
+
+================================================
+File: /src/routes/+page.ts
+================================================
+import type { PageLoad } from './$types.js';
+
+const API_URL = 'https://api.github.com/repos/';
+const REPO_URL = 'friendofsvelte/tipex';
+const FULL_URL = API_URL + REPO_URL;
+
+export const load: PageLoad = async ({ fetch }) => {
+	let repo: GithubRepo | NonNullable<any>;
+	try {
+		const response = await fetch(FULL_URL);
+		repo = await response.json();
+	} catch (e) {
+		console.log(e);
+		repo = {};
+	}
+	return {
+		repo
+	};
+};
+
+
+================================================
+File: /src/routes/customization/+page.svelte
+================================================
+<script>
+	import { typescript } from 'svelte-highlight/languages';
+	import { Highlight, HighlightSvelte } from 'svelte-highlight';
+	import advanceCodes from '$item/codes/advanceCodes';
+	import codes from '$item/codes';
+	import SlotPropsTable from '$item/SlotPropsTable.svelte';
+</script>
+
+<svelte:head>
+	<title>Customization | Tipex Editor</title>
+	<meta name="description"
+				content="Customize Tipex Editor, a highly customizable text editor for Svelte and SvelteKit.">
+</svelte:head>
+
+<a href="/" class="flex items-center gap-3 bg-neutral-50 dark:bg-neutral-800 px-3 py-1 rounded-lg shadow-sm w-fit">
+	<iconify-icon icon="fa6-solid:house" class="text-sm"></iconify-icon>
+	Back to Home
+</a>
+
+<h1 class="mt-8">Customization</h1>
+<p>
+	As we have said, a software having customization is a software having soul. Tipex editor is highly customizable.
+	You can customize the editor to your heart's content.
+</p>
+
+<h2 class="mt-8" id="in-built-utility-buttons">In-built Utility Buttons</h2>
+
+<p>
+	The in-built utility buttons consist of <code>Copy</code> and <code>Link</code> buttons.
+</p>
+
+<figure class="image-tab">
+	<img src="https://github.com/friendofsvelte/tipex/assets/42182303/c6feb3c0-9ed8-4f9e-88d2-42b7895a72a8"
+			 alt="Svelte Text Editor: Tipex Editor with custom utility buttons"
+			 class="w-full rounded-xl mt-2 shadow-xl border border-neutral-200 dark:border-neutral-700" />
+
+	<figcaption>
+		Location of utility buttons in Text Editor
+	</figcaption>
+</figure>
+<h3 class="mt-8">Insert a set of buttons</h3>
+<p>
+	Here's a basic example of how you can insert in-built utility buttons.
+</p>
+<Highlight language={typescript} code={codes.insertUtils} />
+
+<h3 class="mt-8">Append custom buttons between</h3>
+<p>
+	To append new buttons you can use the <code>Utility.svelte</code> component, it has a <code>slot</code> for you
+	to insert your buttons.
+</p>
+<Highlight language={typescript} code={codes.appendUtils} />
+
+<SlotPropsTable />
+
+<h3 id="new_custom_controls" class="mt-8">Using new custom controls</h3>
+<p>
+	You can override the default controls with your own custom controls. Here's an example of how you can do it.
+</p>
+<Highlight language={typescript} code={codes.overrideControl} />
+
+<p>
+	Or, you can use <code>{'{#snippet controlComponent}'}</code> to append your buttons.
+</p>
+
+<h2 class="mt-8">Image Upload</h2>
+<p>
+	Tipex editor supports image upload. You can upload images by dragging and dropping them in the editor, or
+	by copy pasting them from your clipboard, which is the most common way to upload images.
+</p>
+
+<h3 class="mt-4 mb-1">Custom Image Upload Tab</h3>
+<p>
+	You can use utility customization for this. Apply the upper mentioned method to append your custom button.
+</p>
+
+<h2 class="mt-8" id="advanced-customization">Advanced Customization</h2>
+
+<p>
+	Tipex, being a highly customizable editor, allows you to customize the editor to your heart's content and
+	make it look like your own. Here's some ways you can customize the editor.
+</p>
+
+<figure class="image-tab">
+	<img src="https://github.com/friendofsvelte/tipex/assets/42182303/9aa4814f-b360-473f-85af-ba147d7e6a56"
+			 alt="Svelte Text Editor: Advanced Customization of Tipex Editor"
+			 class="w-full rounded-xl mt-2 shadow-xl border border-neutral-200 dark:border-neutral-800" />
+
+	<figcaption>
+		Advanced Customization of Tipex Editor, <a href="https://github.com/Bishwas-py/tipexed-editor" target="_blank">Source
+		Code</a>
+	</figcaption>
+</figure>
+
+<h2 class="mt-8">Customize the controls</h2>
+
+<p>
+	You can customize the controls of the editor by passing a <code>controlComponent</code> slot.
+</p>
+
+<HighlightSvelte code={advanceCodes.addHeadFootComponent} />
+
+<p class="mt-7">
+	You can also add a header and footer with using a slot.
+</p>
+
+<h2 class="mt-8">Tweaking extensions</h2>
+
+<p>
+	Tipex provides an <code>defaultExtensions</code> object which contains all the extensions that are used in the
+	editor. You can tweak the extensions, or add new extensions to the editor by passing a <code>extensions</code>
+	prop to the editor.
+</p>
+
+<HighlightSvelte code={advanceCodes.tweakingExtensions} />
+
+================================================
+File: /tests/test.ts
+================================================
+import { expect, test } from '@playwright/test';
+
+test('index page has expected h1', async ({ page }) => {
+	await page.goto('/');
+	await expect(page.getByRole('heading', { name: 'Welcome to SvelteKit' })).toBeVisible();
+});
+
+

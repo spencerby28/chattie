@@ -1,0 +1,27 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+
+	import type { Channel, SimpleMember } from '$lib/types';
+
+	const currentUser = $page.data.user;
+
+	$: dmChannels =
+		$page.data.channels?.filter(
+			(c: Channel) => c.type === 'dm' && c.members.includes(currentUser.$id)
+		) || [];
+
+	$: otherUsers = dmChannels.map((channel: Channel) => {
+		const otherId = channel.members.find((id) => id !== currentUser.$id);
+		return $page.data.workspace.memberData.find((m: SimpleMember) => m.id === otherId);
+	});
+</script>
+
+<div class="space-y-2">
+	<h3 class="px-3 font-semibold">Direct Messages</h3>
+	{#each otherUsers as user}
+		<a href="/dm/{user.id}" class="flex items-center gap-2 px-3 py-2 hover:bg-accent rounded-lg">
+			<img src={user.avatar || '/images/avatar.png'} alt="" class="w-6 h-6 rounded-full" />
+			<span>{user.name}</span>
+		</a>
+	{/each}
+</div>

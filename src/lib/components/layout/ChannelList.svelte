@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Channel } from '$lib/types';
-	import { ChannelType } from '$lib/types';
+	
 	import AddChannel from '$lib/components/features/AddChannel.svelte';
 	import { channelStore } from '$lib/stores/channels';
 	import * as ContextMenu from "$lib/components/ui/context-menu";
@@ -13,13 +13,13 @@
 	
 	// Filter channels for current workspace
 	$: workspaceChannels = $channelStore.filter(channel => channel.workspace_id === workspaceId);
-	$: publicChannels = workspaceChannels.filter((c) => c.type === ChannelType.Public);
-	$: privateChannels = workspaceChannels.filter((c) => c.type === ChannelType.Private);
+	$: publicChannels = workspaceChannels.filter((c) => c.type === 'public');
+	$: privateChannels = workspaceChannels.filter((c) => c.type === 'private');
 
 	let channelToUpdate: Channel | null = null;
 	let channelToDelete: Channel | null = null;
 	let updatedName = '';
-	let updatedType: ChannelType;
+	let updatedType = '';
 
 	async function handleUpdate(channel: Channel) {
 		channelToUpdate = channel;
@@ -191,8 +191,8 @@
 					bind:value={updatedType}
 					class="col-span-3 flex h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm dark:border-gray-700"
 				>
-					<option value={ChannelType.Public}>Public</option>
-					<option value={ChannelType.Private}>Private</option>
+					<option value="public">Public</option>
+					<option value="private">Private</option>
 				</select>
 			</div>
 		</div>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { MessageSquare, Smile, MoreVertical } from 'lucide-svelte';
-	import type { Message, User } from '$lib/types';
+	import type { Message, SimpleMember } from '$lib/types';
 	
 	import { createEventDispatcher } from 'svelte';
 	import { announceFeature } from '$lib/utils/toast';
@@ -10,7 +10,7 @@
 	
 	const dispatch = createEventDispatcher();
 	export let message: Message;
-	export let user: User;
+	export let user: SimpleMember;
 	export let onDropdownOpenChange: (open: boolean) => void;
 	const commonEmojis = ['👍', '❤️', '😂', '🎉', '🙏', '👀', '🔥', '✨'];
 
@@ -97,7 +97,7 @@
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content align="end">
 			<DropdownMenu.Item on:click={() => handleCopy(message.$id)}>Copy message</DropdownMenu.Item>
-			{#if message.sender_id === user.$id}
+			{#if message.sender_id === user.id}
 				<DropdownMenu.Item on:click={() => handleEdit(message.$id)}>Edit message</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item on:click={() => handleDelete(message.$id)} class="text-red-600 focus:text-red-600">

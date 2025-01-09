@@ -7,7 +7,7 @@
 	import type { Channel } from '$lib/types';
 	import { channelStore } from '$lib/stores/channels';
 	import ReplyBox from '$lib/components/features/ReplyBox.svelte';
-
+	import RichMessageComposer from '$lib/components/features/messages/RichMessageComposer.svelte';
 	// Reset message store when page data changes
 	$: if ($page.data.messages) {
 		messageStore.set($page.data.messages);
@@ -29,9 +29,12 @@
 	</div>
 
 	<!-- Message Composer - Fixed height at bottom -->
-	<div class="p-4 border-t bg-white dark:bg-gray-950">
+	<div class="bg-background dark:bg-background">
+		<RichMessageComposer />
+		<!--
 		<MessageComposer />
 		<ReplyBox />
+		-->
 	</div>
 	
 </div> 

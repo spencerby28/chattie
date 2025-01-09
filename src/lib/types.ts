@@ -1,83 +1,77 @@
 import type { Models } from "appwrite";
 
-export type User = Models.Document & {
-  id: string;
-  email: string;
-  fullName: string;
-  displayName: string;
-  avatar: string;
-  status: UserStatus;
-  workspaceIds: string[];
+export interface Workspace extends Models.Document {
+    name: string;
+    owner_id: string;
+    members: string[];
+    ai_persona?: string;
+    message_frequency?: number;
+    channels?: Channel[];
 }
 
-export enum UserStatus {
-  Online = 'online',
-  Away = 'away',
-  Offline = 'offline'
+export interface Channel extends Models.Document {
+    workspace_id: string;
+    name: string;
+    type: string;
+    members: string[];
+    last_message_at?: Date;
+    description?: string;
+    purpose?: string;
+    topics?: string[];
+    primary_personas?: string[];
 }
 
-export type Workspace = Models.Document & {
-  id: string;
-  name: string;
-  ownerId: string;
-  channels: Channel[];
-  members: WorkspaceMember[];
-  settings: WorkspaceSettings;
+export interface Message extends Models.Document {
+    channel_id: string;
+    workspace_id: string;
+    sender_type: string;
+    sender_id: string;
+    content: string;
+    edited_at?: Date;
+    mentions?: string[];
+    ai_context?: string;
+    ai_prompt?: string;
+    attachments?: Attachment[];
+    reactions?: Reaction[];
+    sender_name?: string;
 }
 
-export interface WorkspaceMember {
-  userId: string;
-  role: WorkspaceRole;
+export interface SimpleMember {
+    id: string;
+    name: string;
 }
 
-export enum WorkspaceRole {
-  Admin = 'admin',
-  Member = 'member'
+export interface AiPersona extends Models.Document {
+    workspace_id: string;
+    name: string;
+    personality: string;
+    conversation_style: string;
+    avatar_url?: string;
+    knowledge_base?: string[];
+    greeting?: string;
+    role?: string;
+    opinions?: string[];
+    ai_user_id?: string;
 }
 
-export interface WorkspaceSettings {
-  allowInvites: boolean;
-  allowFileUploads: boolean;
-  maxFileSize: number;
+export interface MessageThread extends Models.Document {
+    parent_message_id: string;
+    channel_id: string;
+    workspace_id: string;
+    last_reply_at: Date;
+    participant_ids: string[];
+    ai_participants?: string[];
 }
 
-export type Channel = Models.Document & {
-  id: string;
-  workspaceId: string;
-  name: string;
-  type: ChannelType;
-  members: string[];
+export interface Attachment extends Models.Document {
+    type?: string;
+    url?: string;
+    name?: string;
+    size?: number;
 }
 
-export enum ChannelType {
-  Public = 'public',
-  Private = 'private'
-}
-
-export type Message = Models.Document & {
-  channel_id: string;
-  workspace_id: string;
-  sender_type: 'person' | 'ai';
-  sender_id: string;
-  content: string;
-  edited_at: string | null;
-  mentions: string[];
-  ai_context: string | null;
-  ai_prompt: string | null;
-  attachments: Attachment[];
-  reactions: Reaction[];
-  user?: User;
-}
-
-export type Attachment = Models.Document & {
-  type: string;
-  url: string;
-  name: string;
-  size: number;
-}
-
-export type Reaction = Models.Document & {
-  message_id: string;
-  emoji: string;
-  userIds: string[];
+export interface Reaction extends Models.Document {
+    userIds?: string[];
+    emoji?: string;
+    message_id?: string;
 }
