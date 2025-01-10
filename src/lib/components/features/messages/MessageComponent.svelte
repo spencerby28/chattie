@@ -1,15 +1,19 @@
 <script lang="ts">
-	import type { Message, SimpleMember } from '$lib/types';
+	import type { Message, SimpleMember, Reaction } from '$lib/types';
 	import * as Popover from "$lib/components/ui/popover";
 	import * as ContextMenu from "$lib/components/ui/context-menu";
 	import MessageActions from '../MessageActions.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { page } from '$app/stores';
 	import { messageStore } from '$lib/stores/messages';
+	import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
+	import { avatarStore } from '$lib/stores/avatars';
+	import { reactionsStore } from '$lib/stores/reactions';
 
 	export let message: Message;
 	export let user: SimpleMember;
 	export let memberData: SimpleMember[] = [];
+	export let reactions: Reaction[] = [];
 
 	const dispatch = createEventDispatcher();
 
@@ -23,9 +27,12 @@
 	}
 
 	function getRelativeTime(timestamp: string): string {
-		const messageTime = new Date(timestamp).getTime();
-		const now = new Date().getTime();
-		const diffSeconds = Math.floor((now - messageTime) / 1000);
+		const messageTime = new Date(timestamp);
+		const now = new Date();
+		const diffSeconds = Math.floor((now.getTime() - messageTime.getTime()) / 1000);
+		const diffDays = Math.floor(diffSeconds / (24 * 60 * 60));
+		const isToday = messageTime.toDateString() === now.toDateString();
+		const isYesterday = new Date(now.setDate(now.getDate() - 1)).toDateString() === messageTime.toDateString();
 
 		if (diffSeconds < 30) {
 			return 'now';
@@ -33,61 +40,47 @@
 			return `${diffSeconds}s`;
 		} else if (diffSeconds < 600) { // 10 minutes
 			return `${Math.floor(diffSeconds / 60)}m`;
+		} else if (isToday) {
+			return messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		} else if (isYesterday) {
+			return 'Yesterday';
+		} else if (diffDays < 7) {
+			return messageTime.toLocaleDateString([], { weekday: 'long' });
 		} else {
-			return new Date(timestamp).toLocaleTimeString();
+			return messageTime.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: '2-digit' });
 		}
 	}
 
 	async function handleEmojiSelect(messageId: string, emoji: string, channelId: string) {
 		try {
-			const response = await fetch(`/api/message/update`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ messageId, emoji, channelId })
-			});
-			
-			if (response.ok) {
-				const data = await response.json();
-				if (data.message) {
-					messageStore.updateMessage(messageId, data.message);
-				}
-			}
+			await handleReactionClick({ emoji, userIds: [] });
 		} catch (error) {
-			console.error('Error updating reaction:', error);
+			console.error('Error creating reaction:', error);
 		}
 	}
 
 	async function handleReactionClick(reaction: any) {
-		if (reaction.userIds.includes(user.id)) {
-			// If user already reacted, remove the reaction
-			try {
-				const response = await fetch(`/api/message/update`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ 
-						messageId: message.$id, 
-						emoji: reaction.emoji, 
-						channelId: message.channel_id,
-						remove: true 
-					})
-				});
-				
-				if (response.ok) {
-					const data = await response.json();
-					if (data.message) {
-						messageStore.updateMessage(message.$id, data.message);
-					}
-				}
-			} catch (error) {
-				console.error('Error removing reaction:', error);
+		const hasReacted = reaction.userIds?.includes(user.id);
+		
+		try {
+			const response = await fetch(`/api/reactions/update`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ 
+					messageId: message.$id, 
+					emoji: reaction.emoji, 
+					channelId: message.channel_id,
+					remove: hasReacted 
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to update reaction');
 			}
-		} else {
-			// If user hasn't reacted, add the reaction
-			await handleEmojiSelect(message.$id, reaction.emoji, message.channel_id);
+		} catch (error) {
+			console.error('Error updating reaction:', error);
 		}
 	}
 
@@ -102,20 +95,25 @@
 			detail: event.detail
 		});
 	}
+
+	// Find the message sender's data from memberData
+	$: messageSender = memberData.find(m => m.id === message.sender_id);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div 
-	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200"
+	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200 hover:relative"
 	on:mouseenter={() => hoveredMessageId = message.$id}
 	on:mouseleave={() => hoveredMessageId = null}
 >
-	<div class="flex items-center">
-		<img
-			src={message.user?.avatar || '/images/avatar.png'}
-			alt=""
-			class="w-10 h-10 rounded-lg object-cover"
-		/>
+	<div class="absolute inset-0 group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 opacity-0 group-hover:opacity-40 rounded-lg transition-opacity duration-200"></div>
+	<div class="flex-shrink-0 pt-0.5 relative">
+		<Avatar
+			src={messageSender?.avatarId ? avatarStore.getAvatarUrl(messageSender.avatarId) : undefined}
+			fallback={message.sender_name?.[0]?.toUpperCase() || '?'}
+			name={message.sender_name || 'Unknown'}
+			size="lg"
+			/>
 	</div>
 	<div class="flex-1">
 		<div class="flex flex-col">
@@ -127,31 +125,33 @@
 			<p class="mt-1">{message.content}</p>
 		{/if}
 
-		{#if message.reactions && message.reactions.length > 0}
+		{#if reactions.length > 0}
 			<div class="flex flex-wrap gap-1 mt-1">
 				<ContextMenu.Root>
 					<ContextMenu.Trigger>
 						<div class="flex flex-wrap gap-1">
-							{#each message.reactions as reaction}
-								<button 
-									class="px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer {reaction.userIds?.includes(user.id) ? 'bg-accent' : ''}"
-									on:click={() => handleReactionClick(reaction)}
-								>
-									<span class="inline-flex items-center gap-1">
-										{reaction.emoji}
-										<span class="font-medium text-accent-foreground">{reaction.userIds?.length || 1}</span>
-									</span>
-								</button>
+							{#each reactions as reaction}
+								{#if reaction.userIds?.length > 0}
+									<button 
+										class="px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer {reaction.userIds?.includes(user.id) ? 'bg-accent' : ''}"
+										on:click={() => handleReactionClick(reaction)}
+									>
+										<span class="inline-flex items-center gap-1">
+											{reaction.emoji}
+											<span class="font-medium text-accent-foreground">{reaction.userIds?.length}</span>
+										</span>
+									</button>
+								{/if}
 							{/each}
 						</div>
 					</ContextMenu.Trigger>
 					<ContextMenu.Content class="w-48">
-						{#each message.reactions as reaction}
+						{#each reactions as reaction}
 							<div class="p-2 border-b border-accent last:border-0">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-2">
 										<span class="text-lg">{reaction.emoji}</span>
-										<span class="text-sm text-accent-foreground">{reaction.userIds?.length || 1}</span>
+										<span class="text-sm text-accent-foreground">{reaction.userIds?.length}</span>
 									</div>
 									{#if reaction.userIds?.includes(user.id)}
 										<button 
@@ -197,14 +197,14 @@
 			/>
 		</div>
 		<div class="text-sm text-accent-foreground pr-2">
-			{#if getRelativeTime(message.$createdAt) === new Date(message.$createdAt).toLocaleTimeString()}
-				<span class="w-[95px] text-right inline-block">
+			{#if getRelativeTime(message.$createdAt) === new Date(message.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+				<span class="w-[90px] text-right inline-block">
 					{getRelativeTime(message.$createdAt)}
 				</span>
 			{:else}
 				<Popover.Root>
 					<Popover.Trigger>
-						<span class="w-[499px] text-right inline-block">
+						<span class="w-[80px] text-right inline-block">
 							{getRelativeTime(message.$createdAt)}
 						</span>
 					</Popover.Trigger>

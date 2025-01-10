@@ -4,9 +4,10 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { channelStore } from '$lib/stores/channels';
 	import { toast } from 'svelte-sonner';
+	import { RealtimeService } from '$lib/services/realtime';
 
 	export let workspaceId: string;
 	let channelName = '';
@@ -15,8 +16,11 @@
 	let error = '';
 	let dialogOpen = false;
 
+	// Get realtime service instance
+	const realtime = RealtimeService.getInstance();
+
 	// Subscribe to channelStore to check for duplicates and limits
-	$: workspaceChannels = $channelStore.filter((channel) => channel.workspace_id === workspaceId);
+	$: workspaceChannels = $channelStore.channels.filter((channel) => channel.workspace_id === workspaceId);
 	$: channelExists = !loading && workspaceChannels.some(
 		(channel) => channel.name.toLowerCase() === channelName.toLowerCase()
 	);
@@ -86,15 +90,13 @@
 			isPrivate = false;
 			dialogOpen = false;
 			
-			
-			channelStore.addChannel(data.channel);
-			
+			// Reinitialize realtime to get new permissions
+			console.log('[AddChannel] Reinitializing realtime after channel creation');
+			await realtime.reinitialize();
+			console.log('[AddChannel] Realtime reinitialized');
 
-			// Navigate with a flag to trigger a server reload
-			await goto(
-				`/workspaces/${workspaceId}/channels/${data.channel.$id}?reload=true`, 
-				{ replaceState: true }
-			);
+			// Navigate to the new channel
+			await goto(`/workspaces/${workspaceId}/channels/${data.channel.$id}`);
 		} catch (error) {
 			console.error('Error creating channel:', error);
 			toast.error(error instanceof Error ? error.message : 'Failed to create channel');

@@ -6,6 +6,9 @@
 	import { createEventDispatcher } from 'svelte';
 	import { announceFeature } from '$lib/utils/toast';
 	import { messageStore } from '$lib/stores/messages';
+	import { RealtimeService } from '$lib/services/realtime';
+	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	
 	const dispatch = createEventDispatcher();
@@ -14,31 +17,64 @@
 	export let onDropdownOpenChange: (open: boolean) => void;
 	const commonEmojis = ['👍', '❤️', '😂', '🎉', '🙏', '👀', '🔥', '✨'];
 
+	// Get realtime service instance
+	const realtime = RealtimeService.getInstance();
+
 	async function handleEmojiSelect(messageId: string, emoji: string) {
 		const channelId = message.channel_id;
 		try {
-			const response = await fetch(`/api/message/update`, {
+			const response = await fetch(`/api/reactions/create`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ messageId, emoji, channelId })
 			});
 			if (response.ok) {
 				const data = await response.json();
-				if (data.message) {
-					messageStore.updateMessage(messageId, data.message);
+				if (data.reaction) {
+					// Update message store with new reaction
+					messageStore.updateMessage(messageId, {
+						...message,
+						reactions: [...(message.reactions || []), data.reaction]
+					});
 				}
 			}
 		} catch (error) {
-			console.error('Error updating reaction:', error);
+			console.error('Error creating reaction:', error);
 		}
 		dispatch('emojiSelect', { messageId, emoji, channelId });
 		onDropdownOpenChange(false);
 	}
 
-	function handleReply(messageId: string) {
-	//	dispatch('reply', { messageId });
-		//onDropdownOpenChange(false);
-		announceFeature('Reply to messages');
+	async function handleReply(messageId: string) {
+		try {
+			// Create thread channel and initial message
+			const response = await fetch('/api/thread/add', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					messageId,
+					workspaceId: message.workspace_id,
+					content: message.content
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to create thread');
+			}
+
+			const { channel } = await response.json();
+			
+			// Reinitialize realtime to get new permissions
+			await realtime.reinitialize();
+
+			// Navigate to the new thread channel
+			await goto(`/workspaces/${message.workspace_id}/channels/${channel.$id}`);
+		} catch (error) {
+			console.error('Error creating thread:', error);
+			toast.error('Failed to create thread');
+		}
 	}
 
 	function handleCopy(messageId: string) {
@@ -52,9 +88,9 @@
 	}
 
 	async function handleDelete(messageId: string) {
-		const response = await fetch(`/api/message/delete`, {
-			method: 'POST',
-			body: JSON.stringify({ messageId, channelId: message.channel_id })
+		const response = await fetch(`/api/message/update`, {
+			method: 'DELETE',
+			body: JSON.stringify({ messageId })
 		});
 		if (response.ok) {
 			messageStore.deleteMessage(messageId);
@@ -65,6 +101,7 @@
 	function startChannelFromMessage(messageId: string) {
 		dispatch('startChannel', { messageId });
 	}
+
 </script>
 
 <div class="flex -inset-4">
@@ -97,7 +134,7 @@
 		</DropdownMenu.Trigger>
 		<DropdownMenu.Content align="end">
 			<DropdownMenu.Item on:click={() => handleCopy(message.$id)}>Copy message</DropdownMenu.Item>
-			{#if message.sender_id === user.id}
+			{#if message.sender_id === user.$id}
 				<DropdownMenu.Item on:click={() => handleEdit(message.$id)}>Edit message</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item on:click={() => handleDelete(message.$id)} class="text-red-600 focus:text-red-600">

@@ -1,23 +1,76 @@
 <script lang="ts">
-	import { Tipex, Utility, defaultExtensions } from '@friendofsvelte/tipex';
-	import type { Editor } from '@tiptap/core';
-	import { cn } from '$lib/utils';
-	import { Extension } from '@tiptap/core';
-	import type { KeyboardShortcutCommand } from '@tiptap/core';
-	import { Button } from '$lib/components/ui/button';
+    import { goto } from '$app/navigation';
+    import { page } from '$app/stores';
+    import { Input } from '$lib/components/ui/input';
+    import { Button } from '$lib/components/ui/button';
+    import { debounce } from 'lodash-es';
+    import type { PageData } from './$types';
 
-	import '@friendofsvelte/tipex/styles/Tipex.css';
-	import '@friendofsvelte/tipex/styles/ProseMirror.css';
+    export let data: PageData;
 
-	import '@friendofsvelte/tipex/styles/CodeBlock.css';
-	import Control from '$lib/components/features/messages/Control.svelte';
-	import RichMessageComposer from '$lib/components/features/messages/RichMessageComposer.svelte';
+    let searchInput = $page.url.searchParams.get('q') || '';
+    let isSearching = false;
+
+    // Debounced search function for instant search
+    const debouncedSearch = debounce((value: string) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('q', value);
+        goto(url.toString(), { replaceState: true });
+    }, 300);
+
+    // Handle input changes for instant search
+    function handleInput(event: Event) {
+        const value = (event.target as HTMLInputElement).value;
+        searchInput = value;
+        debouncedSearch(value);
+    }
+
+    // Handle search button click for full search
+    function handleSearchClick() {
+        isSearching = true;
+        const url = new URL(window.location.href);
+        url.searchParams.set('q', searchInput);
+        goto(url.toString())
+            .finally(() => {
+                isSearching = false;
+            });
+    }
 </script>
 
-<div class="bg-white h-full">
-	<div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80vh] h-[80vh] bg-background rounded-3xl flex items-center justify-center pt-10">
-		<div class="font-chattie text-[75vh] bg-gradient-to-r from-blue-400/60 to-purple-600/60 bg-clip-text text-transparent">
-			C
-		</div>
-	</div>
+<div class="container mx-auto p-4 space-y-6">
+    <div class="flex gap-4">
+        <Input
+            type="search"
+            placeholder="Search messages..."
+            value={searchInput}
+            on:input={handleInput}
+            class="flex-1"
+        />
+        <Button 
+            on:click={handleSearchClick}
+            disabled={isSearching}
+            variant="default"
+        >
+            {isSearching ? 'Searching...' : 'Search'}
+        </Button>
+    </div>
+
+    {#if data.error}
+        <div class="text-destructive">{data.error}</div>
+    {/if}
+
+    <div class="space-y-4">
+        {#if data.messages.length === 0}
+            <p class="text-muted-foreground">No messages found</p>
+        {:else}
+            {#each data.messages as message}
+                <div class="border rounded-lg p-4">
+                    <p class="text-sm text-muted-foreground">
+                        {new Date(message.$createdAt).toLocaleString()}
+                    </p>
+                    <p class="mt-2">{message.content}</p>
+                </div>
+            {/each}
+        {/if}
+    </div>
 </div>

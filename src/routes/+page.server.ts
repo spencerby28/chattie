@@ -44,11 +44,10 @@ export const actions: Actions = {
 		}
 
 		try {
-			const client = createSessionClient(event);
 			const adminClient = createAdminClient();
 
 			// Get the current workspace
-			const workspace = await client.databases.getDocument('main', 'workspaces', workspaceId);
+			const workspace = await adminClient.databases.getDocument('main', 'workspaces', workspaceId);
 
 			await adminClient.databases.updateDocument('main', 'workspaces', workspaceId, {
 				members: [...workspace.members, locals.user.$id]
@@ -57,13 +56,20 @@ export const actions: Actions = {
 				Permission.update(Role.user(locals.user.$id))
 			]);
 			
+			// Get channels for this workspace
+			const channelsResponse = await adminClient.databases.listDocuments(
+				'main',
+				'channels',
+				[Query.equal('workspace_id', workspaceId)]
+			);
+
 			const account = await adminClient.users.get(locals.user.$id);
-					const channelIds = workspace.channels.map((channel: Channel) => channel.$id);
-					console.log('updating labels with channels:', channelIds);
-					await adminClient.users.updateLabels(
-						account.$id,
-						[...(account.labels || []), ...channelIds]
-					);
+			const channelIds = channelsResponse.documents.map((channel) => channel.$id);
+			console.log('updating labels with channels:', channelIds);
+			await adminClient.users.updateLabels(
+				account.$id,
+				[...(account.labels || []), ...channelIds]
+			);
 			console.log('joined workspace:', workspaceId);
 			console.log('labels:', account.labels);
 			

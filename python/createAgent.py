@@ -12,6 +12,7 @@ from appwrite.services.users import Users
 from appwrite.id import ID
 from appwrite.permission import Permission
 from appwrite.role import Role
+from appwrite.query import Label
 import secrets
 import string
 import logging

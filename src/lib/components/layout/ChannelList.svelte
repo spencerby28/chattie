@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Channel } from '$lib/types';
-	
 	import AddChannel from '$lib/components/features/AddChannel.svelte';
 	import { channelStore } from '$lib/stores/channels';
 	import * as ContextMenu from "$lib/components/ui/context-menu";
@@ -11,11 +10,6 @@
 
 	$: currentChannelId = $page.params.channelId;
 	
-	// Filter channels for current workspace
-	$: workspaceChannels = $channelStore.filter(channel => channel.workspace_id === workspaceId);
-	$: publicChannels = workspaceChannels.filter((c) => c.type === 'public');
-	$: privateChannels = workspaceChannels.filter((c) => c.type === 'private');
-
 	let channelToUpdate: Channel | null = null;
 	let channelToDelete: Channel | null = null;
 	let updatedName = '';
@@ -50,6 +44,7 @@
 				throw new Error('Failed to update channel');
 			}
 
+			// Update will happen through realtime
 		} catch (err) {
 			console.error('Error updating channel:', err);
 		} finally {
@@ -69,8 +64,8 @@
 		if (element) element.classList.add('animate-pulse', 'bg-gray-100', 'dark:bg-gray-800');
 
 		try {
-			const response = await fetch('/api/channel/update', {
-				method: 'DELETE',
+			const response = await fetch('/api/channel/delete', {
+				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -83,6 +78,7 @@
 				throw new Error('Failed to delete channel');
 			}
 
+			// Delete will happen through realtime
 		} catch (err) {
 			console.error('Error deleting channel:', err);
 		} finally {
@@ -100,7 +96,7 @@
 		</div>
 
 		<div class="space-y-1">
-			{#each publicChannels as channel (channel.$id)}
+			{#each $channelStore.channels.filter(c => c.workspace_id === workspaceId && c.type === 'public') as channel (channel.$id)}
 				<ContextMenu.Root>
 					<ContextMenu.Trigger>
 						<a
@@ -127,14 +123,14 @@
 	</div>
 
 	<!-- Private Channels -->
-	{#if privateChannels.length > 0}
+	{#if $channelStore.channels.filter(c => c.workspace_id === workspaceId && c.type === 'private').length > 0}
 		<div>
 			<div class="flex items-center justify-between mb-2">
 				<h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Private</h3>
 			</div>
 
 			<div class="space-y-1">
-				{#each privateChannels as channel (channel.$id)}
+				{#each $channelStore.channels.filter(c => c.workspace_id === workspaceId && c.type === 'private') as channel (channel.$id)}
 					<ContextMenu.Root>
 						<ContextMenu.Trigger>
 							<a

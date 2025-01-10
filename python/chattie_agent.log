@@ -1463,3 +1463,142 @@ appwrite.exception.AppwriteException: Invalid document structure: Unknown attrib
 2025-01-07 19:39:57,856 [INFO] Successfully stored channel: soda-industry-news with ID: 677dd76d0014de351b87
 2025-01-07 19:39:57,856 [INFO] Workspace creation completed. Personas: 5, Channels: 10
 2025-01-07 19:39:57,858 [INFO] ::1 [07/Jan/2025:19:39:13 -0600] "GET /?workspace_id=677dd741002027a66550&description=what%20is%20the%20best%20soda HTTP/1.1" 200 19495 "-" "node"
+2025-01-09 11:03:41,763 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-09 11:03:41,764 [INFO] Appwrite admin client initialized
+2025-01-09 11:05:46,849 [INFO] Starting workspace creation for ID: 678001ea0018af38f3df
+2025-01-09 11:05:46,853 [INFO] Workspace description: Pineapple on pizza
+2025-01-09 11:05:46,853 [INFO] Creating AI user for workspace: 678001ea0018af38f3df
+2025-01-09 11:05:46,853 [INFO] Attempting to create AI user with email: ai.678001ea0018af38f3df@chattie.local
+2025-01-09 11:05:47,133 [INFO] Successfully created AI user: ai-678001ea0018af38f3df
+2025-01-09 11:05:47,134 [INFO] AI user created/retrieved: ai-678001ea0018af38f3df
+2025-01-09 11:05:47,134 [INFO] Generating personas with Deepseek
+2025-01-09 11:06:13,881 [INFO] Generated 5 personas
+2025-01-09 11:06:13,882 [INFO] Processing persona 1/5: Chef Pineapple Pete
+2025-01-09 11:06:13,882 [INFO] Storing persona in Appwrite: Chef Pineapple Pete
+2025-01-09 11:06:13,883 [ERROR] Failed to store persona Chef Pineapple Pete: name 'Label' is not defined
+2025-01-09 11:06:13,883 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.read(Label.user(ai_user_id))
+NameError: name 'Label' is not defined
+2025-01-09 11:06:13,885 [INFO] Processing persona 2/5: Dr. Sweet & Savory
+2025-01-09 11:06:13,885 [INFO] Storing persona in Appwrite: Dr. Sweet & Savory
+2025-01-09 11:06:13,885 [ERROR] Failed to store persona Dr. Sweet & Savory: name 'Label' is not defined
+2025-01-09 11:06:13,885 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.read(Label.user(ai_user_id))
+NameError: name 'Label' is not defined
+2025-01-09 11:06:13,885 [INFO] Processing persona 3/5: Pineapple Purist Paige
+2025-01-09 11:06:13,885 [INFO] Storing persona in Appwrite: Pineapple Purist Paige
+2025-01-09 11:06:13,886 [ERROR] Failed to store persona Pineapple Purist Paige: name 'Label' is not defined
+2025-01-09 11:06:13,886 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.read(Label.user(ai_user_id))
+NameError: name 'Label' is not defined
+2025-01-09 11:06:13,886 [INFO] Processing persona 4/5: Rebel Roni
+2025-01-09 11:06:13,886 [INFO] Storing persona in Appwrite: Rebel Roni
+2025-01-09 11:06:13,886 [ERROR] Failed to store persona Rebel Roni: name 'Label' is not defined
+2025-01-09 11:06:13,886 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.read(Label.user(ai_user_id))
+NameError: name 'Label' is not defined
+2025-01-09 11:06:13,887 [INFO] Processing persona 5/5: Traditionalist Tony
+2025-01-09 11:06:13,887 [INFO] Storing persona in Appwrite: Traditionalist Tony
+2025-01-09 11:06:13,887 [ERROR] Failed to store persona Traditionalist Tony: name 'Label' is not defined
+2025-01-09 11:06:13,887 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.read(Label.user(ai_user_id))
+NameError: name 'Label' is not defined
+2025-01-09 11:06:13,887 [INFO] Generating channels with Deepseek
+2025-01-09 11:06:27,968 [INFO] Generated 6 channels
+2025-01-09 11:06:27,969 [INFO] Processing channel 1/6: pineapple-lovers
+2025-01-09 11:06:27,969 [INFO] Storing channel in Appwrite: pineapple-lovers
+2025-01-09 11:06:28,107 [INFO] Successfully stored channel: pineapple-lovers with ID: 678002130021c710cfd0
+2025-01-09 11:06:28,108 [INFO] Processing channel 2/6: pineapple-haters
+2025-01-09 11:06:28,108 [INFO] Storing channel in Appwrite: pineapple-haters
+2025-01-09 11:06:28,251 [INFO] Successfully stored channel: pineapple-haters with ID: 67800214000f09583f10
+2025-01-09 11:06:28,251 [INFO] Processing channel 3/6: pineapple-science
+2025-01-09 11:06:28,251 [INFO] Storing channel in Appwrite: pineapple-science
+2025-01-09 11:06:28,393 [INFO] Successfully stored channel: pineapple-science with ID: 6780021400384bc7e5fa
+2025-01-09 11:06:28,393 [INFO] Processing channel 4/6: pineapple-history
+2025-01-09 11:06:28,393 [INFO] Storing channel in Appwrite: pineapple-history
+2025-01-09 11:06:28,536 [INFO] Successfully stored channel: pineapple-history with ID: 67800214003247fe3149
+2025-01-09 11:06:28,536 [INFO] Processing channel 5/6: pineapple-debates
+2025-01-09 11:06:28,536 [INFO] Storing channel in Appwrite: pineapple-debates
+2025-01-09 11:06:28,677 [INFO] Successfully stored channel: pineapple-debates with ID: 67800214003b4e8f1942
+2025-01-09 11:06:28,677 [INFO] Processing channel 6/6: pineapple-innovations
+2025-01-09 11:06:28,677 [INFO] Storing channel in Appwrite: pineapple-innovations
+2025-01-09 11:06:28,814 [INFO] Successfully stored channel: pineapple-innovations with ID: 678002140034cead661c
+2025-01-09 11:06:28,814 [INFO] Workspace creation completed. Personas: 0, Channels: 6
+2025-01-09 11:06:28,816 [INFO] ::1 [09/Jan/2025:11:05:46 -0600] "GET /?workspace_id=678001ea0018af38f3df&description=Pineapple%20on%20pizza HTTP/1.1" 200 7000 "-" "node"
+2025-01-09 11:07:51,868 [INFO] Starting workspace creation for ID: 6780026700192adc7027
+2025-01-09 11:07:51,871 [INFO] Workspace description: Pineapple never belongs on pizza. Yes or no?
+2025-01-09 11:07:51,871 [INFO] Creating AI user for workspace: 6780026700192adc7027
+2025-01-09 11:07:51,872 [INFO] Attempting to create AI user with email: ai.6780026700192adc7027@chattie.local
+2025-01-09 11:07:52,136 [INFO] Successfully created AI user: ai-6780026700192adc7027
+2025-01-09 11:07:52,136 [INFO] AI user created/retrieved: ai-6780026700192adc7027
+2025-01-09 11:07:52,136 [INFO] Generating personas with Deepseek
+2025-01-09 11:08:15,975 [INFO] Generated 5 personas
+2025-01-09 11:08:15,975 [INFO] Processing persona 1/5: Chef Marco Salerno
+2025-01-09 11:08:15,975 [INFO] Storing persona in Appwrite: Chef Marco Salerno
+2025-01-09 11:08:15,976 [ERROR] Failed to store persona Chef Marco Salerno: name 'Label' is not defined
+2025-01-09 11:08:15,976 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.delete(Role.user(workspace_id)),
+NameError: name 'Label' is not defined
+2025-01-09 11:08:15,977 [INFO] Processing persona 2/5: Dr. Evelyn Hart
+2025-01-09 11:08:15,978 [INFO] Storing persona in Appwrite: Dr. Evelyn Hart
+2025-01-09 11:08:15,978 [ERROR] Failed to store persona Dr. Evelyn Hart: name 'Label' is not defined
+2025-01-09 11:08:15,978 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.delete(Role.user(workspace_id)),
+NameError: name 'Label' is not defined
+2025-01-09 11:08:15,978 [INFO] Processing persona 3/5: PineapplePete88
+2025-01-09 11:08:15,978 [INFO] Storing persona in Appwrite: PineapplePete88
+2025-01-09 11:08:15,978 [ERROR] Failed to store persona PineapplePete88: name 'Label' is not defined
+2025-01-09 11:08:15,978 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.delete(Role.user(workspace_id)),
+NameError: name 'Label' is not defined
+2025-01-09 11:08:15,978 [INFO] Processing persona 4/5: Chef Priya Patel
+2025-01-09 11:08:15,978 [INFO] Storing persona in Appwrite: Chef Priya Patel
+2025-01-09 11:08:15,978 [ERROR] Failed to store persona Chef Priya Patel: name 'Label' is not defined
+2025-01-09 11:08:15,978 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.delete(Role.user(workspace_id)),
+NameError: name 'Label' is not defined
+2025-01-09 11:08:15,978 [INFO] Processing persona 5/5: The Pizza Purist
+2025-01-09 11:08:15,978 [INFO] Storing persona in Appwrite: The Pizza Purist
+2025-01-09 11:08:15,978 [ERROR] Failed to store persona The Pizza Purist: name 'Label' is not defined
+2025-01-09 11:08:15,978 [ERROR] name 'Label' is not defined
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 247, in create_workspace
+    Permission.delete(Role.user(workspace_id)),
+NameError: name 'Label' is not defined
+2025-01-09 11:08:15,978 [INFO] Generating channels with Deepseek
+2025-01-09 11:08:29,352 [INFO] Generated 5 channels
+2025-01-09 11:08:29,353 [INFO] Processing channel 1/5: pineapple-pizza-debate
+2025-01-09 11:08:29,353 [INFO] Storing channel in Appwrite: pineapple-pizza-debate
+2025-01-09 11:08:29,494 [INFO] Successfully stored channel: pineapple-pizza-debate with ID: 6780028d0004f87b239f
+2025-01-09 11:08:29,495 [INFO] Processing channel 2/5: recipe-innovations
+2025-01-09 11:08:29,495 [INFO] Storing channel in Appwrite: recipe-innovations
+2025-01-09 11:08:29,635 [INFO] Successfully stored channel: recipe-innovations with ID: 6780028d0006e7a71345
+2025-01-09 11:08:29,636 [INFO] Processing channel 3/5: health-nutrition-facts
+2025-01-09 11:08:29,636 [INFO] Storing channel in Appwrite: health-nutrition-facts
+2025-01-09 11:08:29,766 [INFO] Successfully stored channel: health-nutrition-facts with ID: 6780028d000a10ec72c6
+2025-01-09 11:08:29,766 [INFO] Processing channel 4/5: cultural-perspectives
+2025-01-09 11:08:29,766 [INFO] Storing channel in Appwrite: cultural-perspectives
+2025-01-09 11:08:29,901 [INFO] Successfully stored channel: cultural-perspectives with ID: 6780028d003befda6b0a
+2025-01-09 11:08:29,902 [INFO] Processing channel 5/5: pizza-polling-station
+2025-01-09 11:08:29,902 [INFO] Storing channel in Appwrite: pizza-polling-station
+2025-01-09 11:08:30,059 [INFO] Successfully stored channel: pizza-polling-station with ID: 6780028d000d56a15143
+2025-01-09 11:08:30,059 [INFO] Workspace creation completed. Personas: 0, Channels: 5
+2025-01-09 11:08:30,059 [INFO] ::1 [09/Jan/2025:11:07:51 -0600] "GET /?workspace_id=6780026700192adc7027&description=Pineapple%20never%20belongs%20on%20pizza.%20Yes%20or%20no%3F HTTP/1.1" 200 6022 "-" "node"

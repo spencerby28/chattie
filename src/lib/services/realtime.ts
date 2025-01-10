@@ -6,7 +6,16 @@ import { channelStore } from '$lib/stores/channels';
 import { goto } from '$app/navigation';
 import { toast } from 'svelte-sonner';
 import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
-import { writable, type Writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
+import type { SimpleMember } from '$lib/types';
+import { avatarStore } from '$lib/stores/avatars';
+import { memberStore } from '$lib/stores/members';
+import { browser } from '$app/environment';
+import { presenceStore } from '$lib/stores/presence';
+import { reactionsStore } from '$lib/stores/reactions';
+
+// Define connection states
+type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 
 type RealtimeEvent = {
 	events: string[];
@@ -23,18 +32,49 @@ export interface NotificationState {
 	}>;
 }
 
+function parseEventType(events: string[]): string {
+	if (events.some(evt => evt.includes('create'))) return 'create';
+	if (events.some(evt => evt.includes('update'))) return 'update';
+	if (events.some(evt => evt.includes('delete'))) return 'delete';
+	return 'unknown';
+}
+
+function handlePresenceEvent(eventType: string, payload: any) {
+	// console.log('[RealtimeService] Handling presence event:', { eventType, payload });
+	
+	// For create or update events, update the presence store
+	if (eventType === 'create' || eventType === 'update') {
+		presenceStore.updateStatus(
+			payload.userId,
+			payload.baseStatus,
+			payload.customStatus
+		);
+	} else if (eventType === 'delete') {
+		// If a presence document is deleted, set user to offline
+		presenceStore.updateStatus(payload.userId, 'offline');
+	}
+}
+
 export class RealtimeService {
 	private static instance: RealtimeService;
-	private client: Client;
+	private client: Client | null = null;
 	private unsubscribe: (() => void) | null = null;
-	private isConnected: boolean;
-	public notificationState: Writable<NotificationState>;
+	private connectionState: Writable<ConnectionState> = writable('disconnected');
+	private notificationState: Writable<NotificationState>;
+	private initializationPromise: Promise<() => void> | null = null;
+	private unsubWorkspace: any;
+	private unsubChannels: any;
+	private unsubMessages: any;
+	private unsubPresence: any;
 
 	private constructor() {
-		this.client = new Client()
-			.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-			.setProject(PUBLIC_APPWRITE_PROJECT);
-		this.isConnected = false;
+		// Only create client in browser
+		if (browser) {
+			this.client = new Client()
+				.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
+				.setProject(PUBLIC_APPWRITE_PROJECT);
+		}
+		
 		this.notificationState = writable({
 			unreadMessages: {},
 			mentions: [],
@@ -49,309 +89,288 @@ export class RealtimeService {
 		return RealtimeService.instance;
 	}
 
-	public initialize(): () => void {
-		console.log('Initializing global realtime connection');
-		if (this.unsubscribe) {
-			console.log('Already connected to realtime');
+	public getConnectionState(): Writable<ConnectionState> {
+		return this.connectionState;
+	}
+
+	public getNotificationState(): Writable<NotificationState> {
+		return this.notificationState;
+	}
+
+	public async initialize(): Promise<() => void> {
+		// Never initialize on server
+		if (!browser) {
+			return () => {};
+		}
+
+		// If already initializing, return the existing promise
+		if (this.initializationPromise) {
+			return this.initializationPromise;
+		}
+
+		// If already connected, return the existing unsubscribe function
+		if (get(this.connectionState) === 'connected' && this.unsubscribe) {
 			return this.unsubscribe;
 		}
 
-		const collections = [
-			'databases.main.collections.messages.documents',
-			'databases.main.collections.reactions.documents',
-			'databases.main.collections.channels.documents',
-			'databases.main.collections.workspaces.documents'
-		];
+		this.initializationPromise = new Promise<() => void>(async (resolve, reject) => {
+			console.log('[RealtimeService] Starting initialization');
+			this.connectionState.set('connecting');
 
-		console.log('Subscribing to all collections:', collections);
+			// Ensure we have a client
+			if (!this.client) {
+				this.client = new Client()
+					.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
+					.setProject(PUBLIC_APPWRITE_PROJECT);
+			}
 
-		this.unsubscribe = this.client.subscribe(collections, (response) => {
-			const event = response as RealtimeEvent;
-			console.log('Global event received:', event);
+			const collections = [
+				'databases.main.collections.messages.documents',
+				'databases.main.collections.reactions.documents',
+				'databases.main.collections.channels.documents',
+				'databases.main.collections.workspaces.documents',
+				'databases.main.collections.presence.documents'
+			];
 
-			const collectionName = event.events[0].split('.')[3];
-			const eventType = event.events[0].split('.').pop();
-			const payload = event.payload;
+			try {
+				// Clean up any existing subscription
+				if (this.unsubscribe) {
+					console.log('[RealtimeService] Cleaning up existing subscription');
+					this.unsubscribe();
+					this.unsubscribe = null;
+				}
 
-			switch (collectionName) {
-				case 'messages':
-					this.handleMessageEvent(eventType!, payload);
-					break;
-				case 'reactions':
-					this.handleReactionEvent(eventType!, payload);
-					break;
-				case 'channels':
-					this.handleChannelEvent(eventType!, payload);
-					break;
-				case 'workspaces':
-					this.handleWorkspaceEvent(eventType!, payload);
-					break;
+				this.unsubscribe = this.client.subscribe(collections, (response) => {
+					const event = response as RealtimeEvent;
+					const collectionName = event.events[0].split('.')[3];
+					const eventType = event.events[0].split('.').pop();
+					const payload = event.payload;
+
+					// Log the event for debugging
+				//	console.log(`[RealtimeService] ${collectionName} ${eventType}:`, payload);
+
+					switch (collectionName) {
+						case 'messages':
+							this.handleMessageEvent(eventType!, payload);
+							break;
+						case 'reactions':
+							this.handleReactionEvent(eventType!, payload);
+							break;
+						case 'channels':
+							this.handleChannelEvent(eventType!, payload);
+							break;
+						case 'workspaces':
+							this.handleWorkspaceEvent(eventType!, payload);
+							break;
+						case 'presence':
+							handlePresenceEvent(eventType!, payload);
+							break;
+					}
+				});
+
+				this.connectionState.set('connected');
+				console.log('[RealtimeService] Successfully initialized and connected');
+				resolve(() => {
+					if (this.unsubscribe) this.unsubscribe();
+				});
+			} catch (error) {
+				console.error('[RealtimeService] Failed to initialize:', error);
+				this.connectionState.set('disconnected');
+				this.unsubscribe = null;
+				reject(error);
+			} finally {
+				this.initializationPromise = null;
 			}
 		});
 
-		return () => this.cleanup();
+		return this.initializationPromise;
 	}
 
-	private async handleMessageEvent(eventType: string, payload: Message) {
-		//console.log('Handling message event:', eventType, payload);
-
-		// Update stores
-		if (eventType === 'create') {
-		//	console.log('Adding new message to store:', payload);
-			messageStore.addMessage(payload);
-
-			// Update unread count for channel
-			this.notificationState.update((state) => {
-				const count = (state.unreadMessages[payload.channel_id] || 0) + 1;
-		//		console.log('Updating unread count for channel', payload.channel_id, 'to', count);
-				return {
-					...state,
-					unreadMessages: {
-						...state.unreadMessages,
-						[payload.channel_id]: count
-					}
-				};
-			});
-
-			// Check for mentions
-			if (payload.mentions?.length) {
-				console.log('Message contains mentions:', payload.mentions);
-				this.notificationState.update((state) => ({
-					...state,
-					mentions: [payload, ...state.mentions].slice(0, 50) // Keep last 50 mentions
-				}));
-			}
-		} else if (eventType === 'update') {
-			console.log('Updating existing message:', payload.$id);
-			// Fetch the full message to get the latest state
-
-			const { databases } = createBrowserClient();
-			const fullMessage = await databases.getDocument('main', 'messages', payload.$id);
-		
-
-			messageStore.updateMessage(payload.$id, fullMessage);
-		} else if (eventType === 'delete') {
-			console.log('Deleting message:', payload.$id);
-			messageStore.deleteMessage(payload.$id);
+	private handleMessageEvent(eventType: string, payload: Message) {
+		switch (eventType) {
+			case 'create':
+				messageStore.addMessage(payload);
+				this.updateUnreadCount(payload.channel_id);
+				this.checkMentions(payload);
+				break;
+			case 'update':
+				messageStore.updateMessage(payload.$id, payload);
+				break;
+			case 'delete':
+				messageStore.deleteMessage(payload.$id);
+				break;
 		}
 
-		// Add to recent activity
-		this.notificationState.update((state) => ({
-			...state,
-			recentActivity: [
-				{
-					type: 'message' as const,
-					payload,
-					timestamp: Date.now()
-				},
-				...state.recentActivity
-			].slice(0, 50) // Keep last 50 activities
-		}));
-
-		// Show toast if needed (based on preferences)
-		if (eventType === 'create') {
-			const { account } = createBrowserClient();
-			const currentUser = await account.get();
-
-			// Only show notification if message is from someone else
-			if (payload.sender_id !== currentUser.$id) {
-				console.log('Checking notification preferences for message from:', payload.sender_name);
-				const shouldShow = await this.shouldNotify(payload.workspace_id, 'message');
-
-				// Check if user is currently in the channel where message was sent
-				const currentPath = window.location.pathname;
-				const isInChannel = currentPath.includes(
-					`/workspaces/${payload.workspace_id}/channels/${payload.channel_id}`
-				);
-
-				if (shouldShow && !isInChannel) {
-					const author = payload.sender_name || 'Someone';
-					console.log('Showing toast notification for message from:', author);
-					toast(`💬 New message in #${payload.channel_name || 'channel'}`, {
-						description: `${author}: ${payload.content.substring(0, 60)}${payload.content.length > 60 ? '...' : ''}`,
-						action: {
-							label: 'View',
-							onClick: () =>
-								goto(`/workspaces/${payload.workspace_id}/channels/${payload.channel_id}`)
-						}
-					});
-				} else if (isInChannel) {
-					// TODO: Implement last seen functionality here
-					// This is where we'll track when the user last saw messages in this channel
-				}
-			}
-		}
+		this.addToRecentActivity('message', payload);
 	}
 
-	private async handleReactionEvent(eventType: string, payload: any) {
-		//  console.log('Handling reaction event:', eventType, payload);
-
-		// Only process if we have a message_id
-		const messageId = payload.message_id;
-		if (!messageId) return;
-
-		try {
-			// Get the message from Appwrite to ensure we have latest state
-			const { databases } = createBrowserClient();
-			const message = await databases.getDocument('main', 'messages', messageId);
-
-			// Update the message in our store with the latest reactions
-			if (message) {
-				console.log('Updating message with new reactions:', message);
-				messageStore.updateMessage(messageId, message);
-			}
-		} catch (error) {
-			console.error('Error updating message reactions:', error);
-		}
-
-		// Add to recent activity
-		this.notificationState.update((state) => ({
-			...state,
-			recentActivity: [
-				{
-					type: 'reaction' as const,
-					payload,
-					timestamp: Date.now()
-				},
-				...state.recentActivity
-			].slice(0, 50)
-		}));
-
-		// Show toast if needed
-		if (eventType === 'create') {
-			const shouldShow = await this.shouldNotify(payload.workspace_id, 'work');
-			if (shouldShow) {
-				const currentPath = window.location.pathname;
-				const isInChannel = currentPath.includes(
-					`/workspaces/${payload.workspace_id}/channels/${payload.channel_id}`
-				);
-
-				if (!isInChannel) {
-					const author = payload.user_name || 'Someone';
-					toast(`${payload.emoji} New reaction`, {
-						description: `${author} reacted to a message in #${payload.channel_name || 'channel'}`,
-						action: {
-							label: 'View',
-							onClick: () =>
-								goto(`/workspaces/${payload.workspace_id}/channels/${payload.channel_id}`)
-						}
-					});
-				}
-			}
-		}
-	}
-
-	private async handleChannelEvent(eventType: string, payload: Channel) {
-		// Update channel store
-		if (eventType === 'create') {
-			channelStore.addChannel(payload);
-			// Reinitialize realtime connection to get new permissions
-			await this.reinitialize();
-		} else if (eventType === 'update') {
-			channelStore.updateChannel(payload.$id, payload);
-		} else if (eventType === 'delete') {
-			channelStore.deleteChannel(payload.$id);
-		}
-
-		// Add to recent activity
-		this.notificationState.update((state) => ({
-			...state,
-			recentActivity: [
-				{
-					type: 'channel' as const,
-					payload,
-					timestamp: Date.now()
-				},
-				...state.recentActivity
-			].slice(0, 50)
-		}));
-
-		// Show toast if needed
-		const shouldShow = await this.shouldNotify(payload.workspace_id, 'work');
-		if (shouldShow) {
-			if (eventType === 'create') {
-				toast('📢 New Channel Created', {
-					description: `Channel #${payload.name} was created`,
-					action: {
-						label: 'View',
-						onClick: () => goto(`/workspaces/${payload.workspace_id}/channels/${payload.$id}`)
-					}
+	private handleReactionEvent(eventType: string, payload: any) {
+		switch (eventType) {
+			case 'create':
+			case 'update':
+				reactionsStore.updateReaction(payload.message_id, {
+					emoji: payload.emoji,
+					userIds: payload.userIds || [payload.user_id]
 				});
-			} else if (eventType === 'update') {
-				toast('🔄 Channel Updated', {
-					description: `Channel #${payload.name} was updated`,
-					action: {
-						label: 'View',
-						onClick: () => goto(`/workspaces/${payload.workspace_id}/channels/${payload.$id}`)
-					}
-				});
-			}
+				break;
+			case 'delete':
+				reactionsStore.removeReaction(payload.message_id, payload.emoji);
+				break;
 		}
+		this.addToRecentActivity('reaction', payload);
+	}
+
+	private handleChannelEvent(eventType: string, payload: Channel) {
+		switch (eventType) {
+			case 'create':
+				// Delay channel store update to ensure label is updated first
+				setTimeout(() => {
+					channelStore.addChannel(payload);
+					this.showChannelToast('Channel Created', payload);
+					// Reinitialize realtime to get new channel permissions
+					console.log('[RealtimeService] New channel created, reinitializing to get new permissions');
+					this.reinitialize().catch(error => {
+						console.error('[RealtimeService] Failed to reinitialize after channel creation:', error);
+					});
+				}, 500); // Small delay to ensure label update completes
+				break;
+			case 'update':
+				channelStore.updateChannel(payload.$id, payload);
+				this.showChannelToast('Channel Updated', payload);
+				break;
+			case 'delete':
+				channelStore.deleteChannel(payload.$id);
+				this.showChannelToast('Channel Deleted', payload);
+				break;
+		}
+
+		this.addToRecentActivity('channel', payload);
 	}
 
 	private handleWorkspaceEvent(eventType: string, payload: Workspace) {
-		console.log('Workspace event:', eventType, payload);
-		console.log('Workspace channels:', payload.channels);
+		// Workspace events might require navigation or UI updates
+		switch (eventType) {
+			case 'delete':
+				// If user is in the deleted workspace, redirect to home
+				const currentPath = window.location.pathname;
+				if (currentPath.includes(`/workspaces/${payload.$id}`)) {
+					toast('Workspace Deleted', {
+						description: `The workspace "${payload.name}" has been deleted.`
+					});
+					goto('/');
+				}
+				break;
+			case 'update':
+				// Update member store with new members and ensure avatars are initialized
+				if (payload.members) {
+					const currentMembers = get(memberStore);
+					const currentMemberIds = new Set(currentMembers.map(m => m.id));
+					const newMemberIds = new Set(payload.members);
+					
+					// Only fetch details for members that aren't already in the store
+					const membersToFetch = payload.members.filter(id => !currentMemberIds.has(id));
+					const membersToRemove = currentMembers.filter(m => !newMemberIds.has(m.id));
+					
+					if (membersToFetch.length > 0) {
+						Promise.all(
+							membersToFetch.map(async (memberId) => {
+								try {
+									const response = await fetch('/api/user', {
+										method: 'POST',
+										headers: {
+											'Content-Type': 'application/json'
+										},
+										body: JSON.stringify({ userId: memberId })
+									});
 
-		// If workspace is deleted, remove all associated channels
-		if (eventType === 'delete') {
-			console.log('Handling workspace deletion');
-			channelStore.update((channels: Channel[]) => {
-				console.log('Filtering out channels for workspace:', payload.$id);
-				return channels.filter((channel: Channel) => channel.workspace_id !== payload.$id);
-			});
+									if (!response.ok) {
+										throw new Error('Failed to fetch user');
+									}
 
-			// Show toast for workspace deletion
-			toast('🏢 Workspace Deleted', {
-				description: `Workspace "${payload.name}" has been deleted`
-			});
+									const user = await response.json();
+									const avatarId = user.prefs?.avatarId;
+									const avatarUrl = avatarId ? avatarStore.getAvatarUrl(avatarId) : null;
 
-			// Redirect to home if currently in the deleted workspace
-			const currentPath = window.location.pathname;
-			if (currentPath.includes(`/workspaces/${payload.$id}`)) {
-				goto('/');
-			}
-		}
-
-		// If workspace is updated, only update workspace-specific data
-		if (eventType === 'update') {
-			console.log('Workspace update received:', {
-				id: payload.$id,
-				name: payload.name,
-				channelCount: payload.channels?.length || 0
-			});
-
-			// We don't update the channel store here anymore
-			// But let's log what we have for debugging
-			channelStore.update((channels) => {
-				console.log(
-					'Current channels in store:',
-					channels.map((c) => ({ id: c.$id, name: c.name }))
-				);
-				return channels; // Return unchanged
-			});
-
-			toast('🏢 Workspace Updated', {
-				description: `Workspace "${payload.name}" has been updated`
-			});
+									return {
+										id: memberId,
+										name: user.name,
+										avatarId: avatarId,
+										avatarUrl
+									} as SimpleMember;
+								} catch (error) {
+									console.error(`Failed to fetch user details for ${memberId}:`, error);
+									return null;
+								}
+							})
+						)
+						.then((newMembers) => {
+							const validNewMembers = newMembers.filter((m): m is SimpleMember => m !== null);
+							// Keep existing members that are still valid and add new ones
+							const updatedMembers = [
+								...currentMembers.filter(m => !membersToRemove.some(rm => rm.id === m.id)),
+								...validNewMembers
+							];
+							memberStore.updateMembers(updatedMembers);
+						})
+						.catch((error) => {
+							console.error('Failed to update members:', error);
+						});
+					} else if (membersToRemove.length > 0) {
+						// If we only need to remove members, do that without fetching
+						const updatedMembers = currentMembers.filter(m => !membersToRemove.some(rm => rm.id === m.id));
+						memberStore.updateMembers(updatedMembers);
+					}
+				}
+				
+				toast('Workspace Updated', {
+					description: `The workspace "${payload.name}" has been updated.`
+				});
+				break;
 		}
 	}
 
-	private async shouldNotify(
-		workspaceId: string,
-		type: 'work' | 'mention' | 'message'
-	): Promise<boolean> {
-		try {
-			const { account } = createBrowserClient();
-			const prefs = await account.getPrefs();
-			return prefs[`${type}_${workspaceId}`] === true;
-		} catch (error) {
-			console.error('Error checking notification preferences:', error);
-			return false;
+	private updateUnreadCount(channelId: string) {
+		this.notificationState.update((state) => ({
+			...state,
+			unreadMessages: {
+				...state.unreadMessages,
+				[channelId]: (state.unreadMessages[channelId] || 0) + 1
+			}
+		}));
+	}
+
+	private checkMentions(message: Message) {
+		if (message.mentions?.length) {
+			this.notificationState.update((state) => ({
+				...state,
+				mentions: [message, ...state.mentions].slice(0, 50)
+			}));
 		}
+	}
+
+	private addToRecentActivity(type: 'message' | 'reaction' | 'channel', payload: any) {
+		this.notificationState.update((state) => ({
+			...state,
+			recentActivity: [
+				{ type, payload, timestamp: Date.now() },
+				...state.recentActivity
+			].slice(0, 50)
+		}));
+	}
+
+	private showChannelToast(action: string, channel: Channel) {
+		toast(action, {
+			description: `#${channel.name}`,
+			action: {
+				label: 'View',
+				onClick: () => goto(`/workspaces/${channel.workspace_id}/channels/${channel.$id}`)
+			}
+		});
 	}
 
 	public markChannelAsRead(channelId: string) {
+		if (!browser) return;
+		
 		this.notificationState.update((state) => ({
 			...state,
 			unreadMessages: {
@@ -362,23 +381,61 @@ export class RealtimeService {
 	}
 
 	public cleanup() {
-		console.log('Cleaning up realtime connection');
+		if (!browser) return;
+		
+		console.log('[RealtimeService] Starting cleanup');
+		
+		// Cleanup subscription
 		if (this.unsubscribe) {
+			console.log('[RealtimeService] Unsubscribing from realtime events');
 			this.unsubscribe();
 			this.unsubscribe = null;
-			this.isConnected = false;
 		}
-		console.log('Realtime connection cleaned up');
+		
+		// Reset connection state
+		this.connectionState.set('disconnected');
+		
+		// Reset initialization promise
+		this.initializationPromise = null;
+		
+		// Reset client to force WebSocket closure
+		this.client = null;
+		
+		// Cleanup workspace subscription
+		if (this.unsubWorkspace) this.unsubWorkspace();
+		if (this.unsubChannels) this.unsubChannels();
+		if (this.unsubMessages) this.unsubMessages();
+		if (this.unsubPresence) this.unsubPresence();
+		
+		console.log('[RealtimeService] Cleanup complete');
 	}
 
-	public async reinitialize() {
-		console.log('Reinitializing realtime connection');
-		// First cleanup existing connection
-		this.cleanup();
-
-		// Small delay to ensure the old connection is fully closed
+	public async reinitialize(): Promise<() => void> {
+		if (!browser) return () => {};
+		
+		console.log('[RealtimeService] Starting reinitialization');
+		
+		// Clean up existing subscription
+		if (this.unsubscribe) {
+			console.log('[RealtimeService] Cleaning up existing subscription');
+			this.unsubscribe();
+			this.unsubscribe = null;
+		}
+		
+		// Reset connection state
+		this.connectionState.set('disconnected');
+		
+		// Reset initialization promise
+		this.initializationPromise = null;
+		
+		// Create new client
+		this.client = new Client()
+			.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
+			.setProject(PUBLIC_APPWRITE_PROJECT);
+		
+		// Small delay to ensure old connection is fully closed
 		await new Promise((resolve) => setTimeout(resolve, 100));
-
+		
 		// Initialize new connection
 		return this.initialize();
 	}

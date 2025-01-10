@@ -2,6 +2,7 @@ import { createSessionClient } from '$lib/appwrite/appwrite-client';
 import { Query } from 'appwrite';
 import type { LayoutServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
+import type { Message } from '$lib/types';
 
 export const load = (async ({ locals, params, ...event }) => {
   if (!locals.user) {
@@ -14,12 +15,14 @@ export const load = (async ({ locals, params, ...event }) => {
   try {
     const client = createSessionClient(event);
 
-    // Get messages for this channel
+    // Get messages for this channel only
     const messagesResponse = await client.databases.listDocuments(
       'main', 
       'messages',
       [
-        Query.equal('channel_id', params.channelId)
+        Query.equal('channel_id', params.channelId),
+        Query.orderDesc('$createdAt'),
+        Query.limit(50)
       ]
     );
 
@@ -33,7 +36,7 @@ export const load = (async ({ locals, params, ...event }) => {
     }) || [];
 
     return {
-      messages: messagesResponse.documents,
+      messages: messagesResponse.documents as Message[],
       channels: filteredChannels
     };
 

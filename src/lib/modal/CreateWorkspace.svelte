@@ -4,11 +4,17 @@
     import { Label } from "$lib/components/ui/label";
     import { Button } from "$lib/components/ui/button";
     import { goto } from '$app/navigation';
+    import { dev } from '$app/environment';
+    import { RealtimeService } from '$lib/services/realtime';
 
     export let open = false;
     export let onOpenChange: (open: boolean) => void;
 
     let loading = false;
+    let useAI = false;
+
+    // Get realtime service instance
+    const realtime = RealtimeService.getInstance();
 
     async function handleCreateWorkspace(event: SubmitEvent) {
         event.preventDefault();
@@ -20,7 +26,7 @@
         const visibility = formData.get('visibility') as string;
 
         try {
-            const response = await fetch('/api/workspaces/create', {
+            const response = await fetch('/api/workspaces/create' + (useAI ? '?ai=true' : ''), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -38,6 +44,8 @@
 
             const { workspaceId } = await response.json();
             onOpenChange(false);
+            
+            // Navigate with reinitialize flag to ensure new permissions are loaded
             await goto(`/workspaces/${workspaceId}?reinitialize=true`);
         } catch (error) {
             console.error('Error creating workspace:', error);
@@ -108,6 +116,11 @@
                 <AlertDialog.Cancel asChild>
                     <Button type="button" variant="outline" on:click={() => onOpenChange(false)}>Cancel</Button>
                 </AlertDialog.Cancel>
+                {#if dev}
+                    <Button type="button" variant="outline" on:click={() => useAI = !useAI} class={useAI ? "bg-primary text-primary-foreground" : ""}>
+                        {useAI ? "AI Enabled" : "Try AI Feature"}
+                    </Button>
+                {/if}
                 <Button type="submit" disabled={loading}>
                     {loading ? 'Creating...' : 'Create Workspace'}
                 </Button>

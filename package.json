@@ -51,6 +51,7 @@
     "carta-plugin-imsize": "^2.1.0",
     "dompurify": "^3.2.3",
     "highlight.js": "^11.11.1",
+    "lodash-es": "^4.17.21",
     "markdown-it": "^14.1.0",
     "node-appwrite": "^14.1.0",
     "snarkdown": "^2.0.0",

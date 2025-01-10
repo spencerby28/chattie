@@ -21,7 +21,7 @@
 	let dropdownOpen = $state(false);
 	let members = $derived(($page.data.workspace?.memberData || []) as SimpleMember[]); 
 	
-	let body = '';
+	let body = ''
 	let editor: Editor | undefined = $state();
 	let activeHoverMember: { id: string; name: string } | null = $state(null);
 	let hoverCardAnchor: HTMLElement | null = $state(null);
@@ -165,20 +165,20 @@
 			console.log('No content passed, getting from editor');
 			const html = editor.getHTML();
 			const text = editor.getText();
-			console.log('Editor HTML:', html);
-			console.log('Editor Text:', text);
+		//	console.log('Editor HTML:', html);
+		//	console.log('Editor Text:', text);
 			
 			if (html === `<p>${text}</p>`) {
 				content = text;
-				console.log('Using plain text:', content);
+		//		console.log('Using plain text:', content);
 			} else {
 				content = html;
-				console.log('Using HTML:', content);
+		//		console.log('Using HTML:', content);
 			}
 		}
 
 		if (content?.trim()) {
-			console.log('Final message to send:', content);
+		//	console.log('Final message to send:', content);
 			sendMessage(content, $page.params.workspaceId, $page.params.channelId);
 			editor?.commands.clearContent();
 		}

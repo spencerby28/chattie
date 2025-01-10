@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { Message, Reaction } from '$lib/types';
 
 function createMessageStore() {
@@ -8,9 +8,47 @@ function createMessageStore() {
         subscribe,
         set,
         
+        // Initialize messages for a workspace
+        initializeForWorkspace: (messages: Message[]) => {
+            update(existingMessages => {
+                // Create a map of existing messages for quick lookup
+                const existingMap = new Map(existingMessages.map(m => [m.$id, m]));
+                
+                // Update or add new messages
+                messages.forEach(msg => {
+                    const existing = existingMap.get(msg.$id);
+                    if (existing) {
+                        // If message exists, update it if newer
+                        if (new Date(msg.$updatedAt) > new Date(existing.$updatedAt)) {
+                            existingMap.set(msg.$id, msg);
+                        }
+                    } else {
+                        // If message doesn't exist, add it
+                        existingMap.set(msg.$id, msg);
+                    }
+                });
+                
+                return Array.from(existingMap.values())
+                    .sort((a, b) => new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime());
+            });
+        },
+        
         // Add a new message
         addMessage: (message: Message) => {
-            update(messages => [...messages, message]);
+            update(messages => {
+                // Check if message already exists
+                const exists = messages.some(m => m.$id === message.$id);
+                if (exists) {
+                    // If it exists, update it if the new message is newer
+                    return messages.map(m => 
+                        m.$id === message.$id && new Date(message.$updatedAt) > new Date(m.$updatedAt)
+                            ? message 
+                            : m
+                    );
+                }
+                // If it doesn't exist, add it
+                return [...messages, message];
+            });
         },
 
         // Update an existing message
@@ -18,7 +56,7 @@ function createMessageStore() {
             update(messages => 
                 messages.map(msg => 
                     msg.$id === messageId 
-                        ? { ...msg, ...updates }
+                        ? { ...msg, ...updates, $updatedAt: new Date().toISOString() }
                         : msg
                 )
             );
@@ -51,14 +89,29 @@ function createMessageStore() {
 
                         return {
                             ...msg,
-                            reactions: updatedReactions
+                            reactions: updatedReactions,
+                            $updatedAt: new Date().toISOString()
                         };
                     }
                     return msg;
                 })
             );
+        },
+
+        // Clear all messages (only on workspace change)
+        clearAll: () => {
+            set([]);
         }
     };
 }
 
-export const messageStore = createMessageStore(); 
+export const messageStore = createMessageStore();
+
+// Helper function to create a derived store for a specific channel
+export function getChannelMessages(channelId: string) {
+    return derived(messageStore, $messages => 
+        $messages
+            .filter(msg => msg.channel_id === channelId)
+            .sort((a, b) => new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime())
+    );
+} 

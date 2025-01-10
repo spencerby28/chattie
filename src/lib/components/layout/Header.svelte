@@ -4,12 +4,30 @@
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
   import { UserCircle, Sun, Moon } from 'lucide-svelte';
   import { onMount } from 'svelte';
+  import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
+  import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
+  import { mode } from '$lib/stores/mode';
+  import { presenceStore } from '$lib/stores/presence';
 
   let fps = 0;
   let frameCount = 0;
   let lastTime = performance.now();
   let windowWidth: number;
   let isDarkMode = true;
+  let avatarUrl: string | null = null;
+
+  // Update avatar URL whenever user data changes
+  $: {
+    if ($page.data.user?.prefs?.avatarId) {
+      const { storage } = createBrowserClient();
+      avatarUrl = storage.getFileView('avatars', $page.data.user.prefs.avatarId);
+    } else {
+      avatarUrl = null;
+    }
+  }
+
+  // Get current user's presence
+  $: userPresence = $page.data.user ? $presenceStore[$page.data.user.$id] : null;
 
   function updateFPS() {
     frameCount++;
@@ -54,6 +72,7 @@
   function toggleTheme() {
     isDarkMode = !isDarkMode;
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    mode.set(isDarkMode ? 'dark' : 'light');
     updateTheme();
   }
 
@@ -104,8 +123,18 @@
     {#if $page.data.user}
       <DropdownMenu.Root>
         <DropdownMenu.Trigger>
-          <div class="flex items-center gap-2 hover:bg-gray-100 rounded-full p-1 cursor-pointer">
-            <UserCircle class="w-8 h-8" />
+          <div class="flex items-center gap-2 hover:bg-chattie-gradient rounded-xl p-1 cursor-pointer">
+            <div class="relative">
+              <Avatar 
+                src={avatarUrl || $page.data.user.avatarUrl || undefined}
+                fallback={$page.data.user.name?.[0]?.toUpperCase()}
+                name={$page.data.user.name}
+                size="md"
+              />
+              {#if userPresence}
+                <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background" class:bg-green-500={userPresence.baseStatus === 'online'} class:bg-yellow-500={userPresence.baseStatus === 'away'} class:bg-gray-500={userPresence.baseStatus === 'offline'}></div>
+              {/if}
+            </div>
           </div>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
@@ -113,9 +142,17 @@
             <div class="flex flex-col">
               <span>Hey, {$page.data.user.name}</span>
               <span class="text-xs text-muted-foreground">{$page.data.user.email}</span>
+              {#if userPresence?.customStatus}
+                <span class="text-xs text-muted-foreground mt-1">
+                  {userPresence.customStatus.emoji} {userPresence.customStatus.text}
+                </span>
+              {/if}
             </div>
           </DropdownMenu.Label>
           <DropdownMenu.Separator />
+          <DropdownMenu.Item href="/user/{$page.data.user.$id}">
+            Manage Settings
+          </DropdownMenu.Item>
           <DropdownMenu.Item 
             on:click={handleSignOut}
             class="text-destructive"

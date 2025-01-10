@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         if (!content || !channelId || !workspaceId) {
             throw error(400, 'Content, channelId, and workspaceId are required');
         }
-
+        console.log('[message/create] creating message', content, channelId, workspaceId);
         const appwrite = createAdminClient();
         
         const message = await appwrite.databases.createDocument(
@@ -29,9 +29,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 sender_id: locals.user.$id,
                 workspace_id: workspaceId,
                 sender_type: 'user',
-                attachments: [],
-                mentions: [],
-                reactions: [],
                 edited_at: new Date().toISOString()
             },
             [

@@ -5,7 +5,7 @@ import { ID, Permission, Role } from 'appwrite';
 import type { Channel } from '$lib/types';
 import { dev } from '$app/environment';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request, locals, url }) => {
     let workspaceId: any;
     if (!locals.user) {
         throw error(401, 'Unauthorized');
@@ -15,6 +15,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const name = data.name;
     const description = data.description || '';
     const visibility = data.visibility;
+    const useAI = url.searchParams.get('ai') === 'true';
     console.log(data)
 
     if (!name) {
@@ -34,28 +35,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 ai_persona: description,
                 message_frequency: 5,
                 owner_id: locals.user.$id,
-                members: [locals.user.$id],
-                channels: [{
-                    name: 'general',
-                    workspace_id: genId,
-                    type: 'public',
-                    members: [locals.user.$id]
-                }, {
-                    name: 'announcements',
-                    workspace_id: genId,
-                    type: 'public', 
-                    members: [locals.user.$id]
-                }, {
-                    name: 'random',
-                    workspace_id: genId,
-                    type: 'public',
-                    members: [locals.user.$id]
-                }, {
-                    name: 'help',
-                    workspace_id: genId,
-                    type: 'public',
-                    members: [locals.user.$id]
-                }]
+                members: [locals.user.$id]
             },
             visibility === 'private' ? [
                 Permission.read(Role.user(locals.user.$id)),
@@ -68,19 +48,43 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             ]
         );
         workspaceId = workspace.$id;
+        // Create default channels
+        const defaultChannels = ['general', 'announcements', 'random', 'help'];
+        const channelIds = [];
+        for (const channelName of defaultChannels) {
+            const channel = await appwrite.databases.createDocument(
+                'main',
+                'channels',
+                ID.unique(),
+                {
+                    name: channelName,
+                    workspace_id: workspaceId,
+                    type: 'public',
+                    members: [locals.user.$id]
+                },
+                visibility === 'private' ? [
+                    Permission.read(Role.user(locals.user.$id)),
+                    Permission.write(Role.user(locals.user.$id)),
+                    Permission.delete(Role.user(locals.user.$id))
+                ] : [
+                    Permission.read(Role.users()),
+                    Permission.write(Role.users()),
+                    Permission.delete(Role.user(locals.user.$id))
+                ]
+            );
+            channelIds.push(channel.$id);
+        }
         
         const account = await appwrite.users.get(locals.user.$id);
 
-        const channelIds = workspace.channels.map((channel: Channel) => channel.$id);
         console.log('updating labels with channels:', channelIds);
         await appwrite.users.updateLabels(
             account.$id,
             [...(account.labels || []), ...channelIds]
         );
 
-        // Send request to Python server in dev mode only
-        /*
-        if (dev) {
+        // Send request to Python server only if AI is enabled and in dev mode
+        if (dev && useAI) {
             try {
                 const response = await fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`);
                 if (!response.ok) {
@@ -90,7 +94,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 console.error('Failed to connect to Python server:', e);
             }
         }
-        */
 
         return new Response(JSON.stringify({ workspaceId }), {
             headers: { 'Content-Type': 'application/json' }

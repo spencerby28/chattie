@@ -82,6 +82,6 @@ export const actions = {
                 name: name
             });
         }
-        throw redirect(303, '/');
+        throw redirect(303, '/onboarding');
     }
 } satisfies Actions; 

@@ -9,45 +9,82 @@
 	import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
 	import { channelStore } from '$lib/stores/channels';
 	import { workspace } from '$lib/stores/workspace';
+	import { mode } from '$lib/stores/mode';
+	import { browser } from '$app/environment';
 
 	interface NotificationPreferences {
 		[key: string]: boolean;
 	}
 
 	export const notificationPrefs = writable<NotificationPreferences>({});
-	let unsubscribe: (() => void) | undefined;
 
-	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/register' || $page.url.pathname === '/welcome';
-	$: currentChannel = $channelStore.find(channel => channel.$id === $page.params.channelId);
-	$: pageTitle = isAuthRoute 
+	let cleanup: (() => void) | undefined;
+	let previousPath: string | undefined;
+
+	// Get realtime service instance
+	const realtime = RealtimeService.getInstance();
+	const connectionState = realtime.getConnectionState();
+
+	$: nonAuthRoute = !$page.url.pathname.startsWith('/login') && !$page.url.pathname.startsWith('/register');
+	$: currentChannel = browser ? $channelStore.channels.find(channel => channel.$id === $page.params.channelId) : null;
+
+	// Watch for route changes and reinitialize on home page
+	$: if (browser && $page.url.pathname !== previousPath) {
+		previousPath = $page.url.pathname;
+		if ($page.url.pathname === '/') {
+			console.log('[Layout] Home page detected, checking realtime connection');
+			if (nonAuthRoute && $connectionState === 'disconnected') {
+				console.log('[Layout] Initializing realtime on home page');
+				realtime.initialize().then(newCleanup => {
+					if (cleanup) cleanup();
+					cleanup = newCleanup;
+				}).catch(error => {
+					console.error('[Layout] Failed to initialize realtime:', error);
+				});
+			}
+		}
+	}
+
+	$: pageTitle = !nonAuthRoute 
 		? 'Chattie' 
 		: currentChannel 
 			? `#${currentChannel.name} | ${$workspace.currentWorkspace?.name || 'Chattie'}`
 			: $workspace.currentWorkspace?.name 
-				? `${$workspace.currentWorkspace.name} | Chattie`
+				? `${$workspace.currentWorkspace.name} | Chattie` 
 				: 'Chattie';
 
 	onMount(async () => {
+		if (!browser) return;
+		
 		// Only initialize if we're logged in and in the browser
-		if (typeof window !== 'undefined' && !isAuthRoute) {
-			unsubscribe = RealtimeService.getInstance().initialize();
-
-			// Load notification preferences
-			const { account } = createBrowserClient();
+		console.log('[Layout] Checking initialization conditions:', { nonAuthRoute, browser });
+		if (nonAuthRoute) {
 			try {
-				const prefs = await account.getPrefs();
-				notificationPrefs.set(prefs || {});
+				console.log('[Layout] Initializing RealtimeService');
+				cleanup = await realtime.initialize();
+				console.log('[Layout] RealtimeService initialized successfully');
 			} catch (error) {
-				console.error('Error loading notification preferences:', error);
+				console.error('[Layout] Failed to initialize RealtimeService:', error);
 			}
+		} else {
+			console.log('[Layout] Skipping RealtimeService initialization:', { 
+				reason: 'Auth route'
+			});
 		}
 	});
 
 	onDestroy(() => {
-		if (unsubscribe) {
-			unsubscribe();
+		if (!browser) return;
+		
+		console.log('[Layout] Running cleanup');
+		if (cleanup) {
+			console.log('[Layout] Running cleanup function');
+				cleanup();
+				cleanup = undefined;
 		}
+		realtime.cleanup();
 	});
+	$: console.log('mode', $mode)
 </script>
 
 <svelte:head>
@@ -77,11 +114,13 @@
 	<script defer src="https://cloud.umami.is/script.js" data-website-id="e6467774-8839-424f-a021-0be22565ff94"></script>
 </svelte:head>
 
-<Toaster richColors closeButton position="top-right" />
-{#if !isAuthRoute}
+
+
+{#if nonAuthRoute}
 	<AppShell>
 		<slot />
 	</AppShell>
+	<Toaster position="bottom-right" theme={$mode} />
 {:else}
 	<slot />
 {/if}

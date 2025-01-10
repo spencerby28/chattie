@@ -76,3 +76,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         throw error(500, 'Failed to update message reaction');
     }
 };
+
+export const DELETE: RequestHandler = async ({ request, locals }) => {
+    if (!locals.user) {
+        throw error(401, 'Unauthorized');
+    }
+
+    try {
+        const { messageId } = await request.json();
+
+        if (!messageId) {
+            throw error(400, 'MessageId is required');
+        }
+
+        const appwrite = createAdminClient();
+
+        // Delete the message
+        await appwrite.databases.deleteDocument('main', 'messages', messageId);
+
+        return json({ success: true });
+
+    } catch (e) {
+        console.error('Error deleting message:', e);
+        throw error(500, 'Failed to delete message');
+    }
+};

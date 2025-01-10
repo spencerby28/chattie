@@ -17,15 +17,7 @@
     let workspaceDialogOpen = false;
 
     onMount(async () => {
-        if (data.user) {
-            const { account } = createBrowserClient();
-            try {
-                const prefs = await account.getPrefs();
-                notificationPrefs = prefs || {};
-            } catch (error) {
-                console.error('Error loading notification preferences:', error);
-            }
-        }
+
     });
 
     function getWorkspacePrefs(workspaceId: string) {
@@ -46,14 +38,52 @@
             console.error('Error updating notification preferences:', error);
         }
     }
+    async function deleteWorkspace(workspaceId: string) {
+        const element = document.querySelector(`[data-workspace-id="${workspaceId}"]`);
+        if (element) element.classList.add('bg-chattie-gradient');
+
+        try {
+            const response = await fetch('api/workspaces/update', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    workspaceId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete workspace');
+            }
+
+          setTimeout(() => window.location.reload(), 1500);
+
+        } catch (err) {
+            console.error('Error deleting workspace:', err);
+        } finally {
+            if (element) element.classList.remove('bg-chattie-gradient');
+        }
+    }
 
     onMount(async () => {
         const session = await fetch('/api/session').then(res => res.json());
+        console.log('session', session)
         if (session.session) {
             const cookieFallback = JSON.stringify({
                 [`a_session_chattie`]: session.session
             });
             localStorage.setItem('cookieFallback', cookieFallback);
+        }
+        if (data.user) {
+            const { account } = createBrowserClient();
+            await account.get();
+            try {
+                const prefs = await account.getPrefs();
+                notificationPrefs = prefs || {};
+            } catch (error) {
+                console.error('Error loading notification preferences:', error);
+            }
         }
     });
     export let data: PageData;
@@ -76,7 +106,7 @@
                             {#if workspace.owner_id !== data.user?.$id}
                                 <DropdownMenu.Root>
                                     <DropdownMenu.Trigger>
-                                        <Bell class="w-6 h-6 text-black hover:text-gray-700 cursor-pointer" />
+                                        <Bell class="w-6 h-6 text-foreground hover:text-muted-foreground cursor-pointer" />
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content class="min-w-[200px]">
                                         <DropdownMenu.Label>Notification Settings</DropdownMenu.Label>
@@ -116,7 +146,7 @@
                             {:else}
                                 <DropdownMenu.Root>
                                     <DropdownMenu.Trigger>
-                                        <Cog class="w-6 h-6 text-black hover:text-gray-700 cursor-pointer" />
+                                        <Cog class="w-6 h-6 text-foreground hover:text-muted-foreground cursor-pointer" />
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content class="min-w-[200px]">
                                         <DropdownMenu.Label>Manage Workspace</DropdownMenu.Label>
@@ -161,7 +191,7 @@
                                         </DropdownMenu.Sub>
                                         <DropdownMenu.Item>Settings</DropdownMenu.Item>
                                         <DropdownMenu.Item>Members</DropdownMenu.Item>
-                                        <DropdownMenu.Item class="text-destructive">Delete Workspace</DropdownMenu.Item>
+                                        <DropdownMenu.Item class="text-destructive" on:click={() => deleteWorkspace(workspace.$id)}>Delete Workspace</DropdownMenu.Item>
                                     </DropdownMenu.Content>
                                 </DropdownMenu.Root>
                             {/if}

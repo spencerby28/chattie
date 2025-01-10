@@ -1,4 +1,4 @@
-import { Client, Databases, Account } from 'appwrite';
+import { Client, Databases, Account, Storage } from 'appwrite';
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public';
 
 let client: Client;
@@ -12,11 +12,15 @@ export function createBrowserClient() {
 
     return {
         client,
+
         get account() {
             return new Account(client);
         },
         get databases() {
             return new Databases(client);
+        },
+        get storage() {
+            return new Storage(client);
         }
     };
 } 

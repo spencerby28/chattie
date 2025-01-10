@@ -57,6 +57,9 @@ const config: Config = {
 			fontFamily: {
 				sans: [...fontFamily.sans],
 				chattie: ["chattie", ...fontFamily.sans]
+			},
+			backgroundImage: {
+				'chattie-gradient': 'linear-gradient(to right, rgb(96 165 250), rgb(147 51 234))',
 			}
 		}
 	},

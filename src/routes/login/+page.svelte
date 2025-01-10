@@ -3,6 +3,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import type { ActionData } from './$types';
 	import { enhance } from '$app/forms';
+	import { dev } from '$app/environment';
 
 	export let form: ActionData;
 	let loading = false;
@@ -46,7 +47,7 @@
 						name="email"
 						required
 						disabled={loading}
-						value={form?.email ?? ''}
+						value={dev ? "spencer@sb28.xyz" : form?.email ?? ''}
 						class={form?.error ? "border-red-500" : ""}
 					/>
 				</div>
@@ -61,6 +62,7 @@
 						name="password"
 						required
 						disabled={loading}
+						value={dev ? "spencerr" : ""}
 						class={form?.error ? "border-red-500" : ""}
 					/>
 				</div>

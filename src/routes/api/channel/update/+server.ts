@@ -1,6 +1,7 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createAdminClient } from '$lib/appwrite/appwrite-server';
+import { Query } from 'appwrite';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
     if (!locals.user) {
@@ -53,13 +54,30 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 
         const appwrite = createAdminClient();
 
+        // Get all messages for this channel
+        const messages = await appwrite.databases.listDocuments(
+            'main',
+            'messages',
+            [
+                Query.equal('channel_id', channelId)
+            ]
+        );
+
+        // Delete all messages for this channel
+        await Promise.all(
+            messages.documents.map(message =>
+                appwrite.databases.deleteDocument('main', 'messages', message.$id)
+            )
+        );
+
         // Delete the channel document
         await appwrite.databases.deleteDocument(
             'main',
             'channels',
             channelId
         );
-        console.log('Channel deleted:', channelId);
+
+        console.log('Channel and messages deleted:', channelId);
 
         return json({ success: true });
 

@@ -30,15 +30,15 @@ export interface Message extends Models.Document {
     edited_at?: Date;
     mentions?: string[];
     ai_context?: string;
-    ai_prompt?: string;
-    attachments?: Attachment[];
-    reactions?: Reaction[];
+    ai_prompt?: string;    
     sender_name?: string;
 }
 
 export interface SimpleMember {
     id: string;
     name: string;
+    avatarId: string | null;
+    avatarUrl: string | null;
 }
 
 export interface AiPersona extends Models.Document {
@@ -71,7 +71,10 @@ export interface Attachment extends Models.Document {
 }
 
 export interface Reaction extends Models.Document {
-    userIds?: string[];
-    emoji?: string;
-    message_id?: string;
+    message_id: string;
+    emoji: string;
+    user_id: string;
+    user_name: string;
+    channel_id: string;
 }
+

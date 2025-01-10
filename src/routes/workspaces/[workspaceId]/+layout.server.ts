@@ -1,32 +1,55 @@
-import { error } from '@sveltejs/kit';
-import type { LayoutServerLoad } from './$types';
+import { createSessionClient } from '$lib/appwrite/appwrite-client';
 import { createAdminClient } from '$lib/appwrite/appwrite-server';
 import { Query } from 'appwrite';
+import type { LayoutServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
+import type { Message } from '$lib/types';
 
-
-export const load: LayoutServerLoad = async ({ params, locals }) => {
+export const load = (async ({ locals, params, ...event }) => {
 	if (!locals.user) {
-		throw error(401, 'Unauthorized');
+		return {
+			messages: [],
+			channels: [],
+			workspace: null,
+			memberData: []
+		};
 	}
-	const { databases, users } = createAdminClient();
-	try {
-		const workspace = await databases.getDocument('main', 'workspaces', params.workspaceId) ;
 
-		// Fetch user data for all members
+	try {
+		const client = createSessionClient(event);
+		const { databases, users } = createAdminClient();
+
+		// Get workspace document
+		const workspace = await databases.getDocument('main', 'workspaces', params.workspaceId);
+
+		// Fetch member data
 		const memberPromises = workspace.members.map(async (memberId: string) => {
 			try {
 				const user = await users.get(memberId);
+				const prefs = user.prefs || {};
 				return {
 					id: user.$id,
-					name: user.name || user.email
+					name: user.name || user.email,
+					avatarId: prefs.avatarId || null
 				};
 			} catch (e) {
 				console.error(`Error fetching user ${memberId}:`, e);
-				return { id: memberId, name: 'Unknown User' };
+				return { id: memberId, name: 'Unknown User', avatarId: null };
 			}
 		});
 
 		const memberData = await Promise.all(memberPromises);
+
+		// Get all messages for this workspace
+		const messagesResponse = await client.databases.listDocuments(
+			'main', 
+			'messages',
+			[
+				Query.equal('workspace_id', params.workspaceId),
+				Query.orderDesc('$createdAt'),
+				Query.limit(100)
+			]
+		);
 
 		// Filter channels based on type and membership
 		const filteredChannels = workspace.channels?.filter((channel: any) => {
@@ -35,16 +58,14 @@ export const load: LayoutServerLoad = async ({ params, locals }) => {
 		}) || [];
 
 		return {
-			workspace: {
-				...workspace,
-				channels: filteredChannels,
-				memberData // Add the simplified member data
-			}
+			messages: messagesResponse.documents as Message[],
+			channels: filteredChannels,
+			workspace,
+			memberData
 		};
+
 	} catch (e) {
-		console.error('Error loading workspace:', e);
-		throw error(404, {
-			message: 'The requested workspace could not be found or there was an error loading it. Please try again.'
-		});
+		console.error('Error loading workspace data:', e);
+		throw error(500, 'Failed to load workspace data');
 	}
-};
+}) satisfies LayoutServerLoad;

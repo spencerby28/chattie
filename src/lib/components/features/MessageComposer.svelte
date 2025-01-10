@@ -14,7 +14,7 @@
   let textareaEl: HTMLTextAreaElement;
   
   // Get workspace members from page data
-  $: members = ($page.data.workspace?.memberData || []).map(member => ({
+  $: members = ($page.data.workspace?.memberData || []).map((member: any) => ({
     id: member.id,
     name: member.name
   }));

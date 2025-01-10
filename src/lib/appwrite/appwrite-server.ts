@@ -1,4 +1,4 @@
-import { Client, Account, Databases, Users } from 'node-appwrite';
+import { Client, Account, Databases, Users, Storage } from 'node-appwrite';
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public';
 import { APPWRITE_KEY } from '$env/static/private';
 import { SESSION_COOKIE } from './constants';
@@ -20,6 +20,9 @@ export function createAdminClient() {
         },
         get users() {
             return new Users(client);
+        },
+        get storage() {
+            return new Storage(client);
         }
     };
 }

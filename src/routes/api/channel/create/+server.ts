@@ -50,22 +50,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Update workspace to include new channel
         console.log('Getting workspace:', workspace_id);
         const workspace = await appwrite.databases.getDocument('main', 'workspaces', workspace_id);
-        const updatedChannels = [...(workspace.channels || []), {
-            name: channel.name,
-            workspace_id: channel.workspace_id,
-            type: channel.type,
-            members: channel.members,
-            $id: channel.$id
-        }];
-        console.log('Updating workspace with new channel:', channel.$id);
-        await appwrite.databases.updateDocument(
-            'main',
-            'workspaces',
-            workspace_id,
-            {
-                channels: updatedChannels
-            }
-        );
 
         // Update labels for all workspace members
         console.log('Updating labels for workspace members:', workspace.members);

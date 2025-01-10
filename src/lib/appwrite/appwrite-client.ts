@@ -1,5 +1,5 @@
 import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from "$env/static/public";
-import { Client, Account, Databases } from "node-appwrite";
+import { Client, Account, Databases, Storage } from "appwrite";
 import { SESSION_COOKIE } from "./constants";
 
 
@@ -23,6 +23,9 @@ export function createSessionClient(event: any) {
         },
         get databases() {
             return new Databases(client);
+        },
+        get storage() {
+            return new Storage(client);
         }
     };
 }

@@ -1,27 +1,38 @@
 <script lang="ts">
 	import { onMount, afterUpdate } from 'svelte';
 	import type { Message, SimpleMember } from '$lib/types';
-	import { messageStore } from '$lib/stores/messages';
+	import { messageStore, getChannelMessages } from '$lib/stores/messages';
 	import { page } from '$app/stores';
 	import { replyBoxStore } from '$lib/stores/threads';
 	import MessageComponent from '$lib/components/features/messages/MessageComponent.svelte';
+	import { memberStore } from '$lib/stores/members';
+	import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
+	import { Query } from 'appwrite';
+	import { reactionsStore } from '$lib/stores/reactions';
 
 	export let messages: Message[] = [];
 	export let user: SimpleMember;
 
 	// Get workspace members from page data
-	$: memberData = ($page.data.workspace?.memberData || []) as SimpleMember[];
+	$: members = $memberStore;
+
+	// Create derived store for current channel's messages
+	$: currentChannelId = $page.params.channelId;
+	$: channelMessages = getChannelMessages(currentChannelId);
 
 	let container: HTMLDivElement;
 	let showScrollButton = false;
 	let isNearBottom = true;
 	let previousMessagesLength = 0;
 
-	onMount(() => {
+	$: messageReactions = $reactionsStore;
+
+	onMount(async () => {
 		scrollToBottom('auto');
 		
 		// Add scroll listener
 		container?.addEventListener('scroll', handleScroll);
+
 		return () => {
 			container?.removeEventListener('scroll', handleScroll);
 		};
@@ -29,12 +40,12 @@
 
 	afterUpdate(() => {
 		// If messages were added (not just updated or removed)
-		if (messages.length > previousMessagesLength) {
+		if ($channelMessages.length > previousMessagesLength) {
 			if (isNearBottom) {
 				scrollToBottom();
 			}
 		}
-		previousMessagesLength = messages.length;
+		previousMessagesLength = $channelMessages.length;
 	});
 
 	function handleScroll() {
@@ -89,20 +100,23 @@
 	{/if}
 
 	<div class="space-y-4 py-4 scrollbar-none">
-		{#if !messages?.length}
+		{#if !$channelMessages?.length}
 			<div class="text-center text-gray-500 space-y-2 pt-12">
 				<div class="text-6xl">😴</div>
 				<div class="text-2xl">It's awfully quiet...</div>
 			</div>
 		{/if}
 
-		{#each messages?.filter((m) => m?.$id) || [] as message (message.$id)}
-			<MessageComponent 
-				{message}
-				{user}
-				{memberData}
-				on:messageAction={handleMessageAction}
-			/>
+		{#each $channelMessages?.filter((m) => m?.$id) || [] as message (message.$id)}
+			<div class="relative">
+				<MessageComponent
+					{message}
+					{user}
+					memberData={members}
+					reactions={messageReactions[message.$id] || []}
+					on:messageAction={handleMessageAction}
+				/>
+			</div>
 		{/each}
 	</div>
 </div>
