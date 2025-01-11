@@ -1,6 +1,6 @@
 <script lang="ts">
     export let data;
-    let channels = data.workspace.channels || [];
+    let channels = data.workspace?.channels || [];
     import { dev } from '$app/environment';
     import { onMount } from 'svelte';
 
@@ -18,17 +18,8 @@
 
 <div class="flex h-full">
     <main class="flex-1 p-4">
-        {#if channels.length === 0}
-            <div class="flex flex-col items-center justify-center h-full">
-                <div class="text-2xl font-semibold text-gray-700 mb-4">
-                    No Channels Yet
-                </div>
-                <p class="text-gray-500">
-                    Channels will appear here once they're created
-                </p>
-            </div>
-        {:else}
-            {#if dev}
+
+            {#if dev === false}
                 <div class="bg-gray-50 rounded-lg p-6 shadow-sm mt-8">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Debug Workspace Data</h3>
                     <details class="mb-4">
@@ -45,15 +36,47 @@
                     </details>
                 </div>
             {:else}
-                <div class="flex flex-col items-center justify-center h-full space-y-6">
-                    <div class="text-4xl font-light text-gray-600">
-                        Select a channel to start chatting
+                <div class="flex flex-col items-center justify-center h-full space-y-8">
+                    <div class="text-center space-y-4">
+                        <h1 class="text-4xl font-light text-gray-600">
+                            Welcome to Your Workspace
+                        </h1>
+                        <p class="text-gray-500 text-lg max-w-lg">
+                            Select a channel from the sidebar to start collaborating with your team
+                        </p>
                     </div>
-                    <p class="text-gray-500 text-lg">
-                        Choose from the channels list on the left to begin your conversation
-                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                        <div class="p-6 bg-card rounded-lg border border-border">
+                            <h3 class="text-xl font-semibold mb-2">Real-time Chat</h3>
+                            <p class="text-muted-foreground">
+                                Communicate instantly with your team through text, emojis, and file sharing
+                            </p>
+                        </div>
+
+                        <div class="p-6 bg-card rounded-lg border border-border">
+                            <h3 class="text-xl font-semibold mb-2">File Sharing</h3>
+                            <p class="text-muted-foreground">
+                                Easily share and preview files with your team members
+                            </p>
+                        </div>
+
+                        <div class="p-6 bg-card rounded-lg border border-border">
+                            <h3 class="text-xl font-semibold mb-2">Thread Discussions</h3>
+                            <p class="text-muted-foreground">
+                                Keep conversations organized with threaded replies and discussions
+                            </p>
+                        </div>
+
+                        <div class="p-6 bg-card rounded-lg border border-border">
+                            <h3 class="text-xl font-semibold mb-2">Reactions</h3>
+                            <p class="text-muted-foreground">
+                                React to messages with emojis to express yourself quickly
+                            </p>
+                        </div>
+                    </div>
                 </div>
             {/if}
-        {/if}
+
     </main>
 </div>

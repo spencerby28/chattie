@@ -32,6 +32,9 @@ export interface Message extends Models.Document {
     ai_context?: string;
     ai_prompt?: string;    
     sender_name?: string;
+    thread_id?: string;
+    thread_count?: number;
+    attachments?: string[];
 }
 
 export interface SimpleMember {
@@ -64,6 +67,7 @@ export interface MessageThread extends Models.Document {
 }
 
 export interface Attachment extends Models.Document {
+    message_id: string;
     type?: string;
     url?: string;
     name?: string;

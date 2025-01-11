@@ -34,6 +34,16 @@ database = Databases(client)
 gen_ids_dir = Path('gen_ids')
 gen_ids_dir.mkdir(exist_ok=True)
 
+# Default avatar IDs
+DEFAULT_AVATARS = [
+    'acd1b47b-923a-4b3b-b3d5-4f8477322ec4',
+    'b028239c-6769-4386-8c9c-f55161b2c6ef',
+    'c907105b-3c66-4a41-af4f-769751568740',
+    'c491e057-dd58-4d22-85c2-0801d469319b',
+    'f509c043-1ac3-4640-ac6f-5e2b5d09c3bf',
+    '00fbfeee-b33b-4eb3-b793-72806baa1038'
+]
+
 def list_channels():
     channels = database.list_documents(
         database_id='main',
@@ -76,7 +86,7 @@ def create_message(channel, i, num_messages):
         'ai_context': None,
         'ai_prompt': None,
         'attachments': [],
-        'reactions': []
+
     }
     
     result = database.create_document(

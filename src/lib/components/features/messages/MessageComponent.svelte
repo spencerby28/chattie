@@ -9,7 +9,11 @@
 	import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
 	import { avatarStore } from '$lib/stores/avatars';
 	import { reactionsStore } from '$lib/stores/reactions';
-
+	import { MessageSquare, Download } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
+	import { Client, Storage } from 'appwrite';
+	import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public';
 	export let message: Message;
 	export let user: SimpleMember;
 	export let memberData: SimpleMember[] = [];
@@ -20,6 +24,25 @@
 	let hoveredMessageId: string | null = null;
 	let isDropdownOpen = false;
 	let activeMessageId: string | null = null;
+
+	// Get workspace ID from page params
+	const workspaceId = message.workspace_id;
+
+	// Initialize Appwrite client based on message type
+	const appwrite = message.type === 'dm' ? 
+		createBrowserClient() :
+		(() => {
+			const client = new Client()
+				.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
+				.setProject(PUBLIC_APPWRITE_PROJECT);
+			return {
+				storage: new Storage(client)
+			};
+		})();
+
+	// Subscribe to reactions store for this message
+	$: messageReactions = $reactionsStore[message.$id] || [];
+	$: currentReactions = messageReactions.length > 0 ? messageReactions : reactions;
 
 	// Helper function to get member name
 	function getMemberName(userId: string): string {
@@ -51,36 +74,19 @@
 		}
 	}
 
-	async function handleEmojiSelect(messageId: string, emoji: string, channelId: string) {
-		try {
-			await handleReactionClick({ emoji, userIds: [] });
-		} catch (error) {
-			console.error('Error creating reaction:', error);
-		}
-	}
-
 	async function handleReactionClick(reaction: any) {
-		const hasReacted = reaction.userIds?.includes(user.id);
+		if (!reaction.$id || !reaction.userIds?.includes(user.id)) return;
 		
 		try {
-			const response = await fetch(`/api/reactions/update`, {
+			await fetch(`/api/reactions/update`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ 
-					messageId: message.$id, 
-					emoji: reaction.emoji, 
-					channelId: message.channel_id,
-					remove: hasReacted 
-				})
+				body: JSON.stringify({ reactionId: reaction.$id })
 			});
-
-			if (!response.ok) {
-				throw new Error('Failed to update reaction');
-			}
 		} catch (error) {
-			console.error('Error updating reaction:', error);
+			console.error('Error removing reaction:', error);
 		}
 	}
 
@@ -96,49 +102,75 @@
 		});
 	}
 
+	async function downloadFile() {
+		if (message.sender_type === 'file') {
+			const fileId = message.$id;
+			const downloadUrl = appwrite.storage.getFileDownload(workspaceId, fileId);
+			window.open(downloadUrl.toString(), '_blank');
+		}
+	}
+
 	// Find the message sender's data from memberData
 	$: messageSender = memberData.find(m => m.id === message.sender_id);
+
+	$: filePreviewUrl = message.sender_type === 'file' ? 
+		appwrite.storage.getFileView(workspaceId, message.$id).toString() : null;
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div 
-	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200 hover:relative"
+	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200"
 	on:mouseenter={() => hoveredMessageId = message.$id}
 	on:mouseleave={() => hoveredMessageId = null}
 >
 	<div class="absolute inset-0 group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 opacity-0 group-hover:opacity-40 rounded-lg transition-opacity duration-200"></div>
-	<div class="flex-shrink-0 pt-0.5 relative">
+	<div class="flex-shrink-0 pt-0.5 relative z-[1]">
 		<Avatar
 			src={messageSender?.avatarId ? avatarStore.getAvatarUrl(messageSender.avatarId) : undefined}
 			fallback={message.sender_name?.[0]?.toUpperCase() || '?'}
 			name={message.sender_name || 'Unknown'}
 			size="lg"
-			/>
+		/>
 	</div>
-	<div class="flex-1">
+	<div class="flex-1 relative z-[1]">
 		<div class="flex flex-col">
 			<span class="font-semibold">{message.sender_name}</span>
 		</div>
-		{#if message.content.startsWith('<')}
+		{#if message.sender_type === 'file'}
+			<div class="mt-2">
+				<img src={filePreviewUrl} alt="File preview" class="max-w-[300px] rounded-lg shadow-md" />
+				<div class="mt-4">
+					<button 
+						on:click={downloadFile}
+						class="flex items-center text-sm gap-2 px-2 py-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors w-fit"
+					>
+						<Download class="w-3 h-3" />
+						<span>Download</span>
+					</button>
+				</div>
+			</div>
+		{:else if message.content.startsWith('<')}
 			<div class="mt-1 prose prose-sm max-w-none [&_.mention]:text-blue-500 [&_.mention]:bg-blue-500/10 [&_.mention]:rounded [&_.mention]:px-1">{@html message.content}</div>
 		{:else}
 			<p class="mt-1">{message.content}</p>
 		{/if}
 
-		{#if reactions.length > 0}
+		{#if currentReactions.length > 0}
 			<div class="flex flex-wrap gap-1 mt-1">
 				<ContextMenu.Root>
 					<ContextMenu.Trigger>
 						<div class="flex flex-wrap gap-1">
-							{#each reactions as reaction}
+							{#each currentReactions as reaction}
 								{#if reaction.userIds?.length > 0}
 									<button 
-										class="px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer {reaction.userIds?.includes(user.id) ? 'bg-accent' : ''}"
+										class={`px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer ${reaction.userIds?.includes(user.id) ? 'bg-accent' : ''}`}
 										on:click={() => handleReactionClick(reaction)}
 									>
 										<span class="inline-flex items-center gap-1">
 											{reaction.emoji}
-											<span class="font-medium text-accent-foreground">{reaction.userIds?.length}</span>
+											{#if reaction.userIds?.length > 1}
+												<span class="font-medium text-accent-foreground">{reaction.userIds?.length}</span>
+											{/if}
 										</span>
 									</button>
 								{/if}
@@ -146,7 +178,7 @@
 						</div>
 					</ContextMenu.Trigger>
 					<ContextMenu.Content class="w-48">
-						{#each reactions as reaction}
+						{#each currentReactions as reaction}
 							<div class="p-2 border-b border-accent last:border-0">
 								<div class="flex items-center justify-between">
 									<div class="flex items-center gap-2">
@@ -167,10 +199,10 @@
 										{#if reaction.userIds.includes(user.id)}
 											You
 											{#if reaction.userIds.length > 1}
-												, {reaction.userIds.filter(id => id !== user.id).map(id => getMemberName(id)).join(', ')}
+												, {reaction.userIds.filter((id: string) => id !== user.id).map((id: string) => getMemberName(id)).join(', ')}
 											{/if}
 										{:else}
-											{reaction.userIds.map(id => getMemberName(id)).join(', ')}
+											{reaction.userIds.map((id: string) => getMemberName(id)).join(', ')}
 										{/if}
 									</div>
 								{/if}
@@ -180,9 +212,23 @@
 				</ContextMenu.Root>
 			</div>
 		{/if}
+
+		{#if message.thread_id && message.thread_count !== undefined && message.thread_count > 0}
+		
+			<button 
+				on:click={() => goto(`/workspaces/${message.workspace_id}/channels/${message.thread_id}?thread=true`)}
+				class="inline-flex items-center gap-2 mt-2 px-2 py-1 text-sm text-blue-500 hover:text-foreground hover:bg-accent rounded-md transition-colors"
+			>
+				<MessageSquare class="w-4 h-4" />
+				<span class= ''>
+					{message.thread_count} {message.thread_count === 1 ? 'reply' : 'replies'}
+				</span>
+			</button>
+		
+		{/if}
 	</div>
 
-	<div class="absolute right-2 top-2 flex flex-col items-end gap-1">
+	<div class="absolute right-2 top-2 flex flex-col items-end gap-1 z-[1]">
 		<div class="{isDropdownOpen && activeMessageId === message.$id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity hover:bg-accent rounded-lg">
 			<MessageActions
 				{message}

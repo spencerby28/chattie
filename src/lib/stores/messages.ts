@@ -8,27 +8,36 @@ function createMessageStore() {
         subscribe,
         set,
         
-        // Initialize messages for a workspace
-        initializeForWorkspace: (messages: Message[]) => {
+        // Initialize messages for a workspace with pagination support
+        initializeForWorkspace: (messages: Message[], reset: boolean = false) => {
             update(existingMessages => {
+                if (reset) {
+                    return messages;
+                }
+
                 // Create a map of existing messages for quick lookup
-                const existingMap = new Map(existingMessages.map(m => [m.$id, m]));
+                const messageMap = new Map([
+                    ...existingMessages.map(m => [m.$id, m]),
+                    ...messages.map(m => [m.$id, m])
+                ]);
                 
-                // Update or add new messages
-                messages.forEach(msg => {
-                    const existing = existingMap.get(msg.$id);
-                    if (existing) {
-                        // If message exists, update it if newer
-                        if (new Date(msg.$updatedAt) > new Date(existing.$updatedAt)) {
-                            existingMap.set(msg.$id, msg);
-                        }
-                    } else {
-                        // If message doesn't exist, add it
-                        existingMap.set(msg.$id, msg);
-                    }
-                });
+                // Convert back to array and sort by creation time
+                return Array.from(messageMap.values())
+                    .sort((a, b) => new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime());
+            });
+        },
+        
+        // Add messages from pagination
+        addMessages: (messages: Message[]) => {
+            update(existingMessages => {
+                // Create a map of all messages
+                const messageMap = new Map([
+                    ...existingMessages.map(m => [m.$id, m]),
+                    ...messages.map(m => [m.$id, m])
+                ]);
                 
-                return Array.from(existingMap.values())
+                // Convert back to array and sort by creation time
+                return Array.from(messageMap.values())
                     .sort((a, b) => new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime());
             });
         },
@@ -46,8 +55,11 @@ function createMessageStore() {
                             : m
                     );
                 }
-                // If it doesn't exist, add it
-                return [...messages, message];
+                // If it doesn't exist, add it and sort
+                const updatedMessages = [...messages, message];
+                return updatedMessages.sort((a, b) => 
+                    new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime()
+                );
             });
         },
 
@@ -98,7 +110,7 @@ function createMessageStore() {
             );
         },
 
-        // Clear all messages (only on workspace change)
+        // Clear all messages (only on workspace/channel change)
         clearAll: () => {
             set([]);
         }

@@ -21,16 +21,17 @@
 
 	// Initialize or update messages from server data
 	$: if (data.messages?.length) {
-		messageStore.initializeForWorkspace(data.messages);
+		messageStore.initializeForWorkspace(data.messages as Message[]);
 	}
 
 	$: currentChannel = $channelStore.channels.find(channel => channel.$id === $page.params.channelId);
+	$: console.log('channelstore', $channelStore.channels)
 	$: members = $memberStore;
 
 	$: channelTitle = (() => {
 		if (!currentChannel) return '';
 		if (currentChannel.type === 'thread') {
-			return data.messages?.[0]?.content || currentChannel.name;
+			return `Reply to: ${data.messages?.[0]?.content}` || currentChannel.name;
 		}
 		if (currentChannel.type === 'dm' && currentChannel.members.length === 2) {
 			const otherMember = members?.find(m => 
@@ -41,24 +42,38 @@
 		}
 		return currentChannel.name;
 	})();
-	$: console.log( 'channelTitle', currentChannel)
+	$: console.log('channelTitle', currentChannel)
+
+	function handleBackToChannel() {
+		window.history.back();
+	}
 </script>
 
 <div class="flex flex-col h-full bg-white dark:bg-gray-950">
 	<!-- Channel Header -->
 	<div class="p-4 border-b bg-white dark:bg-gray-950">
-		<h1 class="text-xl font-semibold">
-			{#if currentChannel?.type === 'dm'}
-				{channelTitle}
-			{:else}
-				#{channelTitle}
+		<div class="flex items-center gap-4">
+			{#if currentChannel?.type === 'thread'}
+				<button 
+					on:click={handleBackToChannel}
+					class="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+				</button>
 			{/if}
-		</h1>
+			<h1 class="text-xl font-semibold">
+				{#if currentChannel?.type === 'dm'}
+					{channelTitle}
+				{:else}
+					#{channelTitle}
+				{/if}
+			</h1>
+		</div>
 	</div>
 
 	<!-- Message List - Takes remaining height minus header and composer -->
 	<div class="flex-1 min-h-0 overflow-hidden">
-		<MessageList messages={data.messages} user={$page.data.user} />
+		<MessageList messages={data.messages as Message[]} user={$page.data.user} hasMore={true} />
 	</div>
 
 	<!-- Message Composer - Fixed height at bottom -->

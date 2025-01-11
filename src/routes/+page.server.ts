@@ -68,7 +68,7 @@ export const actions: Actions = {
 			console.log('updating labels with channels:', channelIds);
 			await adminClient.users.updateLabels(
 				account.$id,
-				[...(account.labels || []), ...channelIds]
+				[...(account.labels || []), ...channelIds, workspaceId]
 			);
 			console.log('joined workspace:', workspaceId);
 			console.log('labels:', account.labels);

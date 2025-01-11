@@ -48,6 +48,23 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
             ]
         );
         workspaceId = workspace.$id;
+
+        // Create storage bucket for workspace
+        await appwrite.storage.createBucket(
+            workspaceId,
+            name,
+            visibility === 'private' ? [
+                Permission.read(Role.user(locals.user.$id)),
+                Permission.write(Role.user(locals.user.$id)),
+                Permission.delete(Role.user(locals.user.$id))
+            ] : [
+                Permission.read(Role.users()),
+                Permission.write(Role.users()),
+                Permission.delete(Role.user(locals.user.$id))
+            ],
+            true // Enable file security
+        );
+
         // Create default channels
         const defaultChannels = ['general', 'announcements', 'random', 'help'];
         const channelIds = [];
@@ -67,8 +84,8 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
                     Permission.write(Role.user(locals.user.$id)),
                     Permission.delete(Role.user(locals.user.$id))
                 ] : [
-                    Permission.read(Role.users()),
-                    Permission.write(Role.users()),
+                    Permission.read(Role.label(workspaceId)),
+                    Permission.write(Role.label(workspaceId)), 
                     Permission.delete(Role.user(locals.user.$id))
                 ]
             );
@@ -80,7 +97,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
         console.log('updating labels with channels:', channelIds);
         await appwrite.users.updateLabels(
             account.$id,
-            [...(account.labels || []), ...channelIds]
+            [...(account.labels || []), ...channelIds, workspaceId]
         );
 
         // Send request to Python server only if AI is enabled and in dev mode

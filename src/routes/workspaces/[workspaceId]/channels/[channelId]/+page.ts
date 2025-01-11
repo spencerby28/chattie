@@ -37,30 +37,13 @@ export const load: PageLoad = async ({ params }) => {
 			if (!reactionsByMessage[reaction.message_id]) {
 				reactionsByMessage[reaction.message_id] = [];
 			}
-			reactionsByMessage[reaction.message_id].push({
-				emoji: reaction.emoji,
-				userIds: [reaction.user_id]
-			});
+			// Pass the raw reaction document
+			reactionsByMessage[reaction.message_id].push(reaction);
 		});
 
 		console.log('Grouped reactions by message:', reactionsByMessage);
 
-		// Merge reactions with the same emoji
-		Object.keys(reactionsByMessage).forEach(messageId => {
-			const mergedReactions = reactionsByMessage[messageId].reduce((acc: any[], curr: any) => {
-				const existing = acc.find(r => r.emoji === curr.emoji);
-				if (existing) {
-					existing.userIds = [...new Set([...existing.userIds, ...curr.userIds])];
-					return acc;
-				}
-				return [...acc, curr];
-			}, []);
-			reactionsByMessage[messageId] = mergedReactions;
-		});
-
-		console.log('Merged reactions:', reactionsByMessage);
-
-		// Update the reactions store
+		// Update the reactions store with raw reactions
 		Object.entries(reactionsByMessage).forEach(([messageId, reactions]) => {
 			reactionsStore.setMessageReactions(messageId, reactions);
 		});

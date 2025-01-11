@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { MessageSquare, Smile, MoreVertical } from 'lucide-svelte';
-	import type { Message, SimpleMember } from '$lib/types';
+	import type { Message, SimpleMember, Reaction } from '$lib/types';
 	
 	import { createEventDispatcher } from 'svelte';
 	import { announceFeature } from '$lib/utils/toast';
@@ -9,44 +9,69 @@
 	import { RealtimeService } from '$lib/services/realtime';
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
+	import { channelStore } from '$lib/stores/channels';
+	import { reactionsStore } from '$lib/stores/reactions';
 
-	
 	const dispatch = createEventDispatcher();
 	export let message: Message;
-	export let user: SimpleMember;
+	export let user: any;
 	export let onDropdownOpenChange: (open: boolean) => void;
 	const commonEmojis = ['👍', '❤️', '😂', '🎉', '🙏', '👀', '🔥', '✨'];
 
 	// Get realtime service instance
 	const realtime = RealtimeService.getInstance();
 
+	// Subscribe to reactions for this message
+	$: messageReactions = $reactionsStore[message.$id] || [];
+
 	async function handleEmojiSelect(messageId: string, emoji: string) {
 		const channelId = message.channel_id;
+		
+		// Find reaction with matching emoji and check if user's ID is in userIds array
+		const existingReaction = messageReactions.find(reaction => 
+			reaction.emoji === emoji && 
+			reaction.userIds?.includes(user.$id)
+		);
+		
 		try {
-			const response = await fetch(`/api/reactions/create`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ messageId, emoji, channelId })
-			});
-			if (response.ok) {
-				const data = await response.json();
-				if (data.reaction) {
-					// Update message store with new reaction
-					messageStore.updateMessage(messageId, {
-						...message,
-						reactions: [...(message.reactions || []), data.reaction]
-					});
-				}
+			if (existingReaction?.reactionIds?.[user.$id]) {
+				// User has already reacted - remove it using the stored reaction ID
+				await fetch(`/api/reactions/update`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ reactionId: existingReaction.reactionIds[user.$id] })
+				});
+			} else {
+				// User hasn't reacted - add new reaction
+				await fetch(`/api/reactions/create`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ messageId, emoji, channelId })
+				});
 			}
 		} catch (error) {
-			console.error('Error creating reaction:', error);
+			console.error('Error handling reaction:', error);
+			toast.error('Failed to update reaction');
 		}
-		dispatch('emojiSelect', { messageId, emoji, channelId });
+		
 		onDropdownOpenChange(false);
+	}
+
+	// Helper to check if user has reacted with an emoji
+	function hasUserReacted(emoji: string): boolean {
+		return messageReactions.some(r => 
+			r.emoji === emoji && r.userIds?.includes(user.$id)
+		);
 	}
 
 	async function handleReply(messageId: string) {
 		try {
+			// If message already has a thread, just navigate to it
+			if (message.thread_id) {
+				await goto(`/workspaces/${message.workspace_id}/channels/${message.thread_id}?thread=true`);
+				return;
+			}
+
 			// Create thread channel and initial message
 			const response = await fetch('/api/thread/add', {
 				method: 'POST',
@@ -68,9 +93,14 @@
 			
 			// Reinitialize realtime to get new permissions
 			await realtime.reinitialize();
+			console.log('realtime reinitialized')
+			console.log('channel', channel)
+
+			// Add channel to store
+			channelStore.addChannel(channel);
 
 			// Navigate to the new thread channel
-			await goto(`/workspaces/${message.workspace_id}/channels/${channel.$id}`);
+			await goto(`/workspaces/${message.workspace_id}/channels/${channel.$id}?thread=true`);
 		} catch (error) {
 			console.error('Error creating thread:', error);
 			toast.error('Failed to create thread');
@@ -114,7 +144,10 @@
 		<DropdownMenu.Content align="start">
 			<div class="p-2 grid grid-cols-4 gap-2">
 				{#each commonEmojis as emoji}
-					<button class="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded text-lg transition-colors" on:click={() => handleEmojiSelect(message.$id, emoji)}>
+					<button 
+						class={`hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded text-lg transition-colors ${hasUserReacted(emoji) ? 'bg-accent' : ''}`}
+						on:click={() => handleEmojiSelect(message.$id, emoji)}
+					>
 						{emoji}
 					</button>
 				{/each}

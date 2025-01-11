@@ -1,16 +1,17 @@
 <script lang="ts">
 	import type { TipexEditor } from '@friendofsvelte/tipex';
-	import { Loader2, Heading1, Heading2, Type, Bold, Italic, Code, AtSign } from 'lucide-svelte';
+	import { Loader2, Heading1, Heading2, Type, Bold, Italic, Code, AtSign, Paperclip } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
     import Button from '$lib/components/ui/button/button.svelte';
 	import { buttonVariants } from '../../ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { SimpleMember } from '$lib/types';
 
-	let { tipex, members = [], dropdownOpen } = $props<{
+	let { tipex, members = [], dropdownOpen, onFileUpload } = $props<{
 		tipex: TipexEditor;
 		members: SimpleMember[];
 		dropdownOpen: boolean;
+		onFileUpload: () => void;
 	}>();
 
 	const buttons = [
@@ -101,6 +102,21 @@
 			/>
 		</Button>
 	{/each}
+
+	<Button
+		on:click={onFileUpload}
+		class={cn(
+			buttonVariants({ 
+				variant: "outline",
+				size: "sm"
+			}),
+			"hover:bg-gradient-to-r hover:from-blue-400/60 hover:to-purple-600/60"
+		)}
+		title="Upload File"
+		type="button"
+	>
+		<Paperclip class="h-4 w-4 invert" />
+	</Button>
 <!--
 	<DropdownMenu.Root bind:onOpenChange={dropdownOpen}>
 		<DropdownMenu.Trigger>

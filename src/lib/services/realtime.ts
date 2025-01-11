@@ -1,6 +1,6 @@
 import { Client } from 'appwrite';
 import { PUBLIC_APPWRITE_PROJECT, PUBLIC_APPWRITE_ENDPOINT } from '$env/static/public';
-import type { Message, Channel, Workspace } from '$lib/types';
+import type { Message, Channel, Workspace, Attachment } from '$lib/types';
 import { messageStore } from '$lib/stores/messages';
 import { channelStore } from '$lib/stores/channels';
 import { goto } from '$app/navigation';
@@ -129,7 +129,8 @@ export class RealtimeService {
 				'databases.main.collections.reactions.documents',
 				'databases.main.collections.channels.documents',
 				'databases.main.collections.workspaces.documents',
-				'databases.main.collections.presence.documents'
+				'databases.main.collections.presence.documents',
+				'databases.main.collections.attachments.documents'
 			];
 
 			try {
@@ -165,6 +166,9 @@ export class RealtimeService {
 						case 'presence':
 							handlePresenceEvent(eventType!, payload);
 							break;
+						case 'attachments':
+							this.handleAttachmentEvent(eventType!, payload);
+							break;
 					}
 				});
 
@@ -186,12 +190,36 @@ export class RealtimeService {
 		return this.initializationPromise;
 	}
 
+	private handleAttachmentEvent(eventType: string, payload: Attachment) {
+		console.log('[RealtimeService] Handling attachment event:', {
+			eventType,
+			payload
+		});
+	}
+
 	private handleMessageEvent(eventType: string, payload: Message) {
 		switch (eventType) {
 			case 'create':
 				messageStore.addMessage(payload);
 				this.updateUnreadCount(payload.channel_id);
 				this.checkMentions(payload);
+				// Get channel members and send notification to others
+				const channel = get(channelStore).channels.find((c: Channel) => c.$id === payload.channel_id);
+				if (channel) {
+					const members = get(memberStore);
+					members.forEach((member: SimpleMember) => {
+						// Don't notify message sender
+						if (member.id !== payload.user_id) {
+							toast(`New message in #${channel.name}`, {
+								description: payload.content,
+								action: {
+									label: 'View',
+									onClick: () => goto(`/workspaces/${channel.workspace_id}/channels/${channel.$id}`)
+								}
+							});
+						}
+					});
+				}
 				break;
 			case 'update':
 				messageStore.updateMessage(payload.$id, payload);
@@ -205,18 +233,88 @@ export class RealtimeService {
 	}
 
 	private handleReactionEvent(eventType: string, payload: any) {
+		console.log('[RealtimeService] Handling reaction event:', { 
+			eventType, 
+			payload,
+			rawPayload: JSON.stringify(payload, null, 2)  // Log the full payload structure
+		});
+		
+		// Validate the payload has the expected fields
+		if (!payload.message_id || !payload.emoji) {
+			console.error('[RealtimeService] Invalid reaction payload:', payload);
+			return;
+		}
+
 		switch (eventType) {
 			case 'create':
-			case 'update':
-				reactionsStore.updateReaction(payload.message_id, {
+				console.log('[RealtimeService] Creating reaction:', {
+					messageId: payload.message_id,
 					emoji: payload.emoji,
-					userIds: payload.userIds || [payload.user_id]
+					userId: payload.user_id,
+					docId: payload.$id
+				});
+				// Pass the raw reaction to let the store handle merging
+				reactionsStore.updateReaction(payload.message_id, {
+					$id: payload.$id,
+					emoji: payload.emoji,
+					user_id: payload.user_id,
+					message_id: payload.message_id
 				});
 				break;
+			case 'update':
+				// For updates, we get the full reaction state from the server
+				if (payload.remove) {
+					console.log('[RealtimeService] Removing user reaction:', {
+						messageId: payload.message_id,
+						emoji: payload.emoji,
+						userId: payload.userId || payload.user_id,
+						fullPayload: payload
+					});
+					reactionsStore.removeReaction(
+						payload.message_id,
+						payload.emoji,
+						payload.userId || payload.user_id
+					);
+				} else {
+					console.log('[RealtimeService] Updating reaction:', {
+						messageId: payload.message_id,
+						emoji: payload.emoji,
+						userId: payload.user_id,
+						docId: payload.$id
+					});
+					// Pass the raw reaction to let the store handle merging
+					reactionsStore.updateReaction(payload.message_id, {
+						$id: payload.$id,
+						emoji: payload.emoji,
+						user_id: payload.user_id,
+						message_id: payload.message_id
+					});
+				}
+				break;
 			case 'delete':
-				reactionsStore.removeReaction(payload.message_id, payload.emoji);
+				// Handle delete as a user-specific removal
+				console.log('[RealtimeService] Deleting reaction:', {
+					messageId: payload.message_id,
+					emoji: payload.emoji,
+					userId: payload.user_id,
+					fullPayload: payload
+				});
+				
+				// Ensure we're using the correct emoji from the payload
+				const emojiToRemove = payload.emoji;
+				if (!emojiToRemove) {
+					console.error('[RealtimeService] Missing emoji in delete payload:', payload);
+					return;
+				}
+				
+				reactionsStore.removeReaction(
+					payload.message_id,
+					emojiToRemove,
+					payload.user_id
+				);
 				break;
 		}
+		
 		this.addToRecentActivity('reaction', payload);
 	}
 
@@ -225,6 +323,7 @@ export class RealtimeService {
 			case 'create':
 				// Delay channel store update to ensure label is updated first
 				setTimeout(() => {
+					console.log('payload', payload)
 					channelStore.addChannel(payload);
 					this.showChannelToast('Channel Created', payload);
 					// Reinitialize realtime to get new channel permissions

@@ -71,21 +71,25 @@
 	}
 
 	function handleMemberClick(memberId: string) {
-		// Check if there's an existing DM channel with this member
+		if (!currentUserId) return;
+
+		// Find DM channel that includes both the current user and selected member
 		const existingChannel = $channelStore.channels.find(channel => 
 			channel.type === 'dm' && 
-			channel.members?.includes(memberId) && 
-			channel.members?.includes(currentUserId)
+			channel.members?.length === 2 &&
+			channel.members.includes(memberId) && 
+			channel.members.includes(currentUserId)
 		);
 
 		if (existingChannel) {
 			// Navigate to existing channel
 			goto(`/workspaces/${workspaceId}/channels/${existingChannel.$id}`);
-		} else {
-			// Open modal to create new DM
-			selectedUserId = memberId;
-			directMessageDialogOpen = true;
+			return;
 		}
+
+		// Only open modal if no existing channel found
+		selectedUserId = memberId;
+		directMessageDialogOpen = true;
 	}
 </script>
 
@@ -103,7 +107,7 @@
 					size="md"
 					
 				/>
-				<div class={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${getStatusColor(member.id)} ring-2 ring-white dark:ring-gray-950`} />
+				<div class={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${getStatusColor(member.id)} ring-2 ring-white dark:ring-gray-950`} ></div>
 			</div>
 			<span class="text-sm ml-1">{member.name}</span>
 		</button>

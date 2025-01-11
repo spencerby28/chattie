@@ -12,7 +12,6 @@
     };
     
     const classes = sizeClasses[size];
-    console.log('[avatar]', src, name);
 </script>
 
 {#if src}

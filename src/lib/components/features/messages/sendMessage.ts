@@ -1,7 +1,8 @@
 export async function sendMessage(
   message: string,
   workspaceId: string,
-  channelId: string
+  channelId: string,
+  isThread?: boolean
 ) {
   if (!message.trim()) return;
   
@@ -14,7 +15,8 @@ export async function sendMessage(
       body: JSON.stringify({
         content: message.trim(),
         workspaceId,
-        channelId
+        channelId,
+        isThread
       })
     });
 
