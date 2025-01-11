@@ -19,7 +19,7 @@
 <div class="flex h-full">
     <main class="flex-1 p-4">
 
-            {#if dev === false}
+            {#if dev}
                 <div class="bg-gray-50 rounded-lg p-6 shadow-sm mt-8">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Debug Workspace Data</h3>
                     <details class="mb-4">
