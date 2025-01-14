@@ -91,9 +91,9 @@
 			dialogOpen = false;
 			
 			// Reinitialize realtime to get new permissions
-			console.log('[AddChannel] Reinitializing realtime after channel creation');
-			await realtime.reinitialize();
-			console.log('[AddChannel] Realtime reinitialized');
+		//	console.log('[AddChannel] Reinitializing realtime after channel creation');
+		//	await realtime.reinitialize();
+		//	console.log('[AddChannel] Realtime reinitialized');
 
 			// Navigate to the new channel
 			await goto(`/workspaces/${workspaceId}/channels/${data.channel.$id}`);

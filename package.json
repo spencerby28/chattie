@@ -20,6 +20,7 @@
     "@sveltejs/adapter-vercel": "^5.5.0",
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.10.5",
     "autoprefixer": "^10.4.20",
     "bits-ui": "^0.22.0",
@@ -41,21 +42,14 @@
     "vitest": "^2.1.8"
   },
   "dependencies": {
-    "@cartamd/plugin-code": "^4.0.6",
-    "@cartamd/plugin-emoji": "^4.2.1",
     "@friendofsvelte/tipex": "^0.0.7-fix-0",
     "@tiptap/suggestion": "^2.11.2",
     "@types/dompurify": "^3.0.5",
-    "@types/marked": "^5.0.2",
     "appwrite": "^16.0.2",
-    "carta-md": "^4.6.7",
-    "carta-plugin-imsize": "^2.1.0",
     "dompurify": "^3.2.3",
-    "highlight.js": "^11.11.1",
     "lodash-es": "^4.17.21",
-    "markdown-it": "^14.1.0",
+    "meilisearch": "^0.47.0",
     "node-appwrite": "^14.1.0",
-    "snarkdown": "^2.0.0",
-    "tailwind-editor": "^0.3.3"
+    "simplex-noise": "^4.0.3"
   }
 }

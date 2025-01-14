@@ -14,6 +14,9 @@
     function navigateToChannel(channelId: string) {
         window.location.href = `/channels/${channelId}`;
     }
+    onMount(() => {
+        console.log(data);
+    });
 </script>
 
 <div class="flex h-full">

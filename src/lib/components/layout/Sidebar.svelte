@@ -12,6 +12,7 @@
 	import { avatarStore } from '$lib/stores/avatars';
 	import DirectMessageList from '$lib/components/layout/DirectMessageList.svelte';
 	import { announceFeature } from '$lib/utils/toast';
+	import { onMount } from 'svelte';
 
 	export let members: SimpleMember[];
 	let workspaceDialogOpen = false;
@@ -29,6 +30,10 @@
 
 	let showChannels = true;
 	let showDirectMessages = true;
+
+	onMount(() => {
+		console.log('[Sidebar] onMount');
+	});
 
 	// Prewarm avatars only when members change and are valid
 	$: if (members?.length > 0) {

@@ -10,9 +10,9 @@ load_dotenv()
 
 # Initialize Appwrite Client
 client = Client()
-client.set_endpoint(os.getenv('PUBLIC_APPWRITE_ENDPOINT'))
-client.set_project(os.getenv('APPWRITE_PROJECT_ID'))
-client.set_key(os.getenv('APPWRITE_API_KEY'))
+client.set_endpoint(os.getenv('CHATTIE_PUBLIC_APPWRITE_ENDPOINT'))
+client.set_project(os.getenv('CHATTIE_APPWRITE_PROJECT_ID'))
+client.set_key(os.getenv('CHATTIE_APPWRITE_API_KEY'))
 
 # Initialize Database service
 databases = Databases(client)
@@ -24,6 +24,9 @@ CHANNELS_COLLECTION = 'channels'
 MESSAGES_COLLECTION = 'messages'
 AI_PERSONAS_COLLECTION = 'ai_personas'
 MESSAGE_THREADS_COLLECTION = 'message_threads'
+ATTACHMENTS_COLLECTION = 'attachments'
+REACTIONS_COLLECTION = 'reactions'
+PRESENCE_COLLECTION = 'presence'
 
 def create_collections():
     """Create all necessary collections with appropriate attributes"""
@@ -55,6 +58,10 @@ def create_collections():
         databases.create_string_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'type', 255, required=True)
         databases.create_string_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'members', 255, required=True, array=True)
         databases.create_datetime_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'last_message_at', required=False)
+        databases.create_string_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'description', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'purpose', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'topics', 255, required=False, array=True)
+        databases.create_string_attribute(DATABASE_ID, CHANNELS_COLLECTION, 'primary_personas', 255, required=False, array=True)
 
         # Create Messages Collection
         databases.create_collection(
@@ -73,6 +80,10 @@ def create_collections():
         databases.create_string_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'mentions', 255, required=False, array=True)
         databases.create_string_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'ai_context', 65535, required=False)
         databases.create_string_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'ai_prompt', 65535, required=False)
+        databases.create_string_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'sender_name', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'thread_id', 255, required=False)
+        databases.create_integer_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'thread_count', required=False)
+        databases.create_string_attribute(DATABASE_ID, MESSAGES_COLLECTION, 'attachments', 255, required=False, array=True)
 
         # Create AI Personas Collection
         databases.create_collection(
@@ -88,6 +99,10 @@ def create_collections():
         databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'avatar_url', 255, required=False)
         databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'conversation_style', 255, required=True)
         databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'knowledge_base', 255, required=False, array=True)
+        databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'greeting', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'role', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'opinions', 255, required=False, array=True)
+        databases.create_string_attribute(DATABASE_ID, AI_PERSONAS_COLLECTION, 'ai_user_id', 255, required=False)
 
         # Create Message Threads Collection
         databases.create_collection(
@@ -103,6 +118,48 @@ def create_collections():
         databases.create_datetime_attribute(DATABASE_ID, MESSAGE_THREADS_COLLECTION, 'last_reply_at', required=True)
         databases.create_string_attribute(DATABASE_ID, MESSAGE_THREADS_COLLECTION, 'participant_ids', 255, required=True, array=True)
         databases.create_string_attribute(DATABASE_ID, MESSAGE_THREADS_COLLECTION, 'ai_participants', 255, required=False, array=True)
+
+        # Create Attachments Collection
+        databases.create_collection(
+            database_id=DATABASE_ID,
+            collection_id=ATTACHMENTS_COLLECTION,
+            name='Attachments',
+        )
+
+        # Attachments Attributes
+        databases.create_string_attribute(DATABASE_ID, ATTACHMENTS_COLLECTION, 'type', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, ATTACHMENTS_COLLECTION, 'url', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, ATTACHMENTS_COLLECTION, 'name', 255, required=False)
+        databases.create_integer_attribute(DATABASE_ID, ATTACHMENTS_COLLECTION, 'size', required=False)
+        databases.create_string_attribute(DATABASE_ID, ATTACHMENTS_COLLECTION, 'message_id', 255, required=False)
+
+        # Create Reactions Collection
+        databases.create_collection(
+            database_id=DATABASE_ID,
+            collection_id=REACTIONS_COLLECTION,
+            name='Reactions',
+        )
+
+        # Reactions Attributes
+        databases.create_string_attribute(DATABASE_ID, REACTIONS_COLLECTION, 'emoji', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, REACTIONS_COLLECTION, 'message_id', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, REACTIONS_COLLECTION, 'user_id', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, REACTIONS_COLLECTION, 'user_name', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, REACTIONS_COLLECTION, 'channel_id', 255, required=False)
+
+        # Create Presence Collection
+        databases.create_collection(
+            database_id=DATABASE_ID,
+            collection_id=PRESENCE_COLLECTION,
+            name='Presence',
+        )
+
+        # Presence Attributes
+        databases.create_string_attribute(DATABASE_ID, PRESENCE_COLLECTION, 'userId', 255, required=True)
+        databases.create_datetime_attribute(DATABASE_ID, PRESENCE_COLLECTION, 'lastSeen', required=False)
+        databases.create_string_attribute(DATABASE_ID, PRESENCE_COLLECTION, 'workspaceId', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, PRESENCE_COLLECTION, 'baseStatus', 255, required=False)
+        databases.create_string_attribute(DATABASE_ID, PRESENCE_COLLECTION, 'customStatus', 255, required=False)
 
         print("Successfully created all collections and attributes!")
 
@@ -136,7 +193,11 @@ def seed_sample_data(owner_id: str):
                 'name': 'general',
                 'type': 'public',
                 'members': [owner_id],
-                'last_message_at': datetime.datetime.now().isoformat()
+                'last_message_at': datetime.datetime.now().isoformat(),
+                'description': 'General discussion channel',
+                'purpose': 'Team-wide communication',
+                'topics': ['general', 'announcements'],
+                'primary_personas': []
             }
         )
 
@@ -151,7 +212,11 @@ def seed_sample_data(owner_id: str):
                 'personality': 'Helpful and friendly AI assistant',
                 'avatar_url': 'https://example.com/avatar.png',
                 'conversation_style': 'casual',
-                'knowledge_base': ['general', 'tech', 'productivity']
+                'knowledge_base': ['general', 'tech', 'productivity'],
+                'greeting': 'Hello! How can I help you today?',
+                'role': 'General Assistant',
+                'opinions': ['Productivity is important', 'Teamwork makes the dream work'],
+                'ai_user_id': 'ai_assistant_1'
             }
         )
 
@@ -168,7 +233,9 @@ def seed_sample_data(owner_id: str):
                 'content': 'Welcome to your new workspace! I\'m here to help you get started.',
                 'mentions': [owner_id],
                 'ai_context': 'workspace_creation',
-                'ai_prompt': 'Generate a friendly welcome message'
+                'ai_prompt': 'Generate a friendly welcome message',
+                'sender_name': ai_persona['name'],
+                'attachments': []
             }
         )
 

@@ -5,17 +5,33 @@
     import { Button } from '$lib/components/ui/button';
     import { debounce } from 'lodash-es';
     import type { PageData } from './$types';
+    import type { Message } from '$lib/types';
 
     export let data: PageData;
 
     let searchInput = $page.url.searchParams.get('q') || '';
     let isSearching = false;
+    let searchResults: Message[] = [];
 
     // Debounced search function for instant search
-    const debouncedSearch = debounce((value: string) => {
-        const url = new URL(window.location.href);
-        url.searchParams.set('q', value);
-        goto(url.toString(), { replaceState: true });
+    const debouncedSearch = debounce(async (value: string) => {
+        if (!value || value.length < 2) {
+            searchResults = [];
+            return;
+        }
+
+        isSearching = true;
+        try {
+            const response = await fetch(`/api/search?q=${encodeURIComponent(value)}`);
+            if (!response.ok) throw new Error('Search failed');
+            const data = await response.json();
+            searchResults = data.hits || [];
+        } catch (error) {
+            console.error('Search error:', error);
+            searchResults = [];
+        } finally {
+            isSearching = false;
+        }
     }, 300);
 
     // Handle input changes for instant search
@@ -26,14 +42,21 @@
     }
 
     // Handle search button click for full search
-    function handleSearchClick() {
+    async function handleSearchClick() {
+        if (!searchInput || searchInput.length < 2) return;
+        
         isSearching = true;
-        const url = new URL(window.location.href);
-        url.searchParams.set('q', searchInput);
-        goto(url.toString())
-            .finally(() => {
-                isSearching = false;
-            });
+        try {
+            const response = await fetch(`/api/search?q=${encodeURIComponent(searchInput)}`);
+            if (!response.ok) throw new Error('Search failed');
+            const data = await response.json();
+            searchResults = data.hits || [];
+        } catch (error) {
+            console.error('Search error:', error);
+            searchResults = [];
+        } finally {
+            isSearching = false;
+        }
     }
 </script>
 
@@ -55,15 +78,11 @@
         </Button>
     </div>
 
-    {#if data.error}
-        <div class="text-destructive">{data.error}</div>
-    {/if}
-
     <div class="space-y-4">
-        {#if data.messages.length === 0}
+        {#if searchResults.length === 0}
             <p class="text-muted-foreground">No messages found</p>
         {:else}
-            {#each data.messages as message}
+            {#each searchResults as message}
                 <div class="border rounded-lg p-4">
                     <p class="text-sm text-muted-foreground">
                         {new Date(message.$createdAt).toLocaleString()}

@@ -43,40 +43,31 @@ function createMessageStore() {
         },
         
         // Add a new message
-        addMessage: (message: Message) => {
+        addMessage: async (message: Message) => {
             update(messages => {
-                // Check if message already exists
-                const exists = messages.some(m => m.$id === message.$id);
-                if (exists) {
-                    // If it exists, update it if the new message is newer
-                    return messages.map(m => 
-                        m.$id === message.$id && new Date(message.$updatedAt) > new Date(m.$updatedAt)
-                            ? message 
-                            : m
-                    );
+                // Check if message already exists to prevent duplicates
+                if (messages.some(m => m.$id === message.$id)) {
+                    return messages;
                 }
-                // If it doesn't exist, add it and sort
-                const updatedMessages = [...messages, message];
-                return updatedMessages.sort((a, b) => 
-                    new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime()
-                );
+                return [...messages, message];
             });
         },
 
         // Update an existing message
-        updateMessage: (messageId: string, updates: Partial<Message>) => {
-            update(messages => 
-                messages.map(msg => 
-                    msg.$id === messageId 
-                        ? { ...msg, ...updates, $updatedAt: new Date().toISOString() }
-                        : msg
-                )
-            );
+        updateMessage: async (messageId: string, updatedMessage: Message) => {
+            update(messages => {
+                const index = messages.findIndex(m => m.$id === messageId);
+                if (index === -1) return messages;
+                
+                const newMessages = [...messages];
+                newMessages[index] = { ...newMessages[index], ...updatedMessage };
+                return newMessages;
+            });
         },
 
         // Delete a message
-        deleteMessage: (messageId: string) => {
-            update(messages => messages.filter(msg => msg.$id !== messageId));
+        deleteMessage: async (messageId: string) => {
+            update(messages => messages.filter(m => m.$id !== messageId));
         },
 
         // Add or update a reaction
@@ -113,7 +104,40 @@ function createMessageStore() {
         // Clear all messages (only on workspace/channel change)
         clearAll: () => {
             set([]);
-        }
+        },
+
+        // Batch operations for better performance
+        batchUpdate: async (operations: Array<{type: 'add' | 'update' | 'delete', message: Message}>) => {
+            update(messages => {
+                const newMessages = [...messages];
+                
+                operations.forEach(op => {
+                    switch (op.type) {
+                        case 'add':
+                            if (!newMessages.some(m => m.$id === op.message.$id)) {
+                                newMessages.push(op.message);
+                            }
+                            break;
+                        case 'update':
+                            const index = newMessages.findIndex(m => m.$id === op.message.$id);
+                            if (index !== -1) {
+                                newMessages[index] = { ...newMessages[index], ...op.message };
+                            }
+                            break;
+                        case 'delete':
+                            const deleteIndex = newMessages.findIndex(m => m.$id === op.message.$id);
+                            if (deleteIndex !== -1) {
+                                newMessages.splice(deleteIndex, 1);
+                            }
+                            break;
+                    }
+                });
+                
+                return newMessages;
+            });
+        },
+        
+        reset: () => set([])
     };
 }
 
@@ -121,9 +145,17 @@ export const messageStore = createMessageStore();
 
 // Helper function to create a derived store for a specific channel
 export function getChannelMessages(channelId: string) {
-    return derived(messageStore, $messages => 
-        $messages
-            .filter(msg => msg.channel_id === channelId)
-            .sort((a, b) => new Date(a.$createdAt).getTime() - new Date(b.$createdAt).getTime())
-    );
+    return derived(messageStore, $messages => {
+        // Use a Set for faster lookups when filtering
+        const channelMessages = $messages.filter(msg => msg.channel_id === channelId);
+        
+        // Use native sort for better performance
+        channelMessages.sort((a, b) => {
+            const aTime = new Date(a.$createdAt).getTime();
+            const bTime = new Date(b.$createdAt).getTime();
+            return aTime - bTime;
+        });
+        
+        return channelMessages;
+    });
 } 

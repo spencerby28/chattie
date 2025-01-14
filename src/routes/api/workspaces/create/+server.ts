@@ -16,12 +16,10 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
     const description = data.description || '';
     const visibility = data.visibility;
     const useAI = url.searchParams.get('ai') === 'true';
-    console.log(data)
 
     if (!name) {
         throw error(400, 'Workspace name is required');
     }
-    console.log('Creating workspace:', name, description, visibility);
 
     try {
         const appwrite = createAdminClient();
@@ -49,59 +47,8 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
         );
         workspaceId = workspace.$id;
 
-        // Create storage bucket for workspace
-        await appwrite.storage.createBucket(
-            workspaceId,
-            name,
-            visibility === 'private' ? [
-                Permission.read(Role.user(locals.user.$id)),
-                Permission.write(Role.user(locals.user.$id)),
-                Permission.delete(Role.user(locals.user.$id))
-            ] : [
-                Permission.read(Role.users()),
-                Permission.write(Role.users()),
-                Permission.delete(Role.user(locals.user.$id))
-            ],
-            true // Enable file security
-        );
-
-        // Create default channels
-        const defaultChannels = ['general', 'announcements', 'random', 'help'];
-        const channelIds = [];
-        for (const channelName of defaultChannels) {
-            const channel = await appwrite.databases.createDocument(
-                'main',
-                'channels',
-                ID.unique(),
-                {
-                    name: channelName,
-                    workspace_id: workspaceId,
-                    type: 'public',
-                    members: [locals.user.$id]
-                },
-                visibility === 'private' ? [
-                    Permission.read(Role.user(locals.user.$id)),
-                    Permission.write(Role.user(locals.user.$id)),
-                    Permission.delete(Role.user(locals.user.$id))
-                ] : [
-                    Permission.read(Role.label(workspaceId)),
-                    Permission.write(Role.label(workspaceId)), 
-                    Permission.delete(Role.user(locals.user.$id))
-                ]
-            );
-            channelIds.push(channel.$id);
-        }
-        
-        const account = await appwrite.users.get(locals.user.$id);
-
-        console.log('updating labels with channels:', channelIds);
-        await appwrite.users.updateLabels(
-            account.$id,
-            [...(account.labels || []), ...channelIds, workspaceId]
-        );
-
-        // Send request to Python server only if AI is enabled and in dev mode
         if (dev && useAI) {
+            // Only create workspace and call localhost in dev mode with AI enabled
             try {
                 const response = await fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`);
                 if (!response.ok) {
@@ -110,6 +57,57 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
             } catch (e) {
                 console.error('Failed to connect to Python server:', e);
             }
+        } else {
+            // Create storage bucket for workspace
+            await appwrite.storage.createBucket(
+                workspaceId,
+                name,
+                visibility === 'private' ? [
+                    Permission.read(Role.user(locals.user.$id)),
+                    Permission.write(Role.user(locals.user.$id)),
+                    Permission.delete(Role.user(locals.user.$id))
+                ] : [
+                    Permission.read(Role.users()),
+                    Permission.write(Role.users()),
+                    Permission.delete(Role.user(locals.user.$id))
+                ],
+                true // Enable file security
+            );
+
+            // Create default channels
+            const defaultChannels = ['general', 'announcements', 'random', 'help'];
+            const channelIds = [];
+            for (const channelName of defaultChannels) {
+                const channel = await appwrite.databases.createDocument(
+                    'main',
+                    'channels',
+                    ID.unique(),
+                    {
+                        name: channelName,
+                        workspace_id: workspaceId,
+                        type: 'public',
+                        members: [locals.user.$id]
+                    },
+                    visibility === 'private' ? [
+                        Permission.read(Role.user(locals.user.$id)),
+                        Permission.write(Role.user(locals.user.$id)),
+                        Permission.delete(Role.user(locals.user.$id))
+                    ] : [
+                        Permission.read(Role.label(workspaceId)),
+                        Permission.write(Role.label(workspaceId)), 
+                        Permission.delete(Role.user(locals.user.$id))
+                    ]
+                );
+                channelIds.push(channel.$id);
+            }
+            
+            const account = await appwrite.users.get(locals.user.$id);
+
+            console.log('updating labels with channels:', channelIds);
+            await appwrite.users.updateLabels(
+                account.$id,
+                [...(account.labels || []), ...channelIds, workspaceId]
+            );
         }
 
         return new Response(JSON.stringify({ workspaceId }), {

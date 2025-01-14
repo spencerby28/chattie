@@ -9,6 +9,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import Avatar from "$lib/components/ui/avatar/Avatar.svelte";
     import { Progress } from "$lib/components/ui/progress";
+    import { goto } from '$app/navigation';
 
     // Hardcoded avatar options
     const defaultAvatars = [
@@ -100,6 +101,12 @@
         return storage.getFileView('avatars', avatarId);
     }
 
+    function handleContinue() {
+        if (selectedAvatar) {
+            goto('/');
+        }
+    }
+
     onMount(async () => {
         const session = await fetch('/api/session').then(res => res.json());
         if (session.session) {
@@ -146,7 +153,7 @@
                             <Avatar 
                                 src={getAvatarUrl(avatarId)}
                                 name="Default Avatar"
-                                size="full"
+                                size="xl"
                             />
                         </button>
                     {/each}
@@ -202,7 +209,7 @@
                                 <Avatar 
                                     src={getAvatarUrl('cc7f49c5-b0ba-4caa-8293-cbd1ea7153dc')}
                                     name="Austen Avatar"
-                                    size="full"
+                                    size="xl"
                                 />
                             </button>
                         {/if}
@@ -223,9 +230,8 @@
                 </div>
             </Card.Content>
         </Card.Root>
-
         <div class="flex justify-end">
-            <Button variant="default" href="/" disabled={!selectedAvatar}>
+            <Button variant="default" disabled={!selectedAvatar} on:click={handleContinue}>
                 Continue to Workspaces
             </Button>
         </div>

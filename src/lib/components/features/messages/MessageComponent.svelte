@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { Message, SimpleMember, Reaction } from '$lib/types';
+	import type { Message, SimpleMember, StandardizedReaction } from '$lib/types';
 	import * as Popover from "$lib/components/ui/popover";
 	import * as ContextMenu from "$lib/components/ui/context-menu";
 	import MessageActions from '../MessageActions.svelte';
+	import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
+
 	import { createEventDispatcher } from 'svelte';
 	import { page } from '$app/stores';
-	import { messageStore } from '$lib/stores/messages';
-	import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
 	import { avatarStore } from '$lib/stores/avatars';
 	import { reactionsStore } from '$lib/stores/reactions';
 	import { MessageSquare, Download } from 'lucide-svelte';
@@ -14,69 +14,61 @@
 	import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
 	import { Client, Storage } from 'appwrite';
 	import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public';
+
 	export let message: Message;
 	export let user: SimpleMember;
 	export let memberData: SimpleMember[] = [];
-	export let reactions: Reaction[] = [];
+	export let reactions: StandardizedReaction[] = [];
+	
+	// highlightVersion: a numeric counter that increments each time
+	// the parent wants to highlight this message again.
+	export let highlightVersion: number | undefined;
 
-	const dispatch = createEventDispatcher();
-
+	let isHighlighted = false;
 	let hoveredMessageId: string | null = null;
 	let isDropdownOpen = false;
 	let activeMessageId: string | null = null;
 
-	// Get workspace ID from page params
-	const workspaceId = message.workspace_id;
+	const dispatch = createEventDispatcher();
 
-	// Initialize Appwrite client based on message type
-	const appwrite = message.type === 'dm' ? 
-		createBrowserClient() :
-		(() => {
-			const client = new Client()
-				.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-				.setProject(PUBLIC_APPWRITE_PROJECT);
-			return {
-				storage: new Storage(client)
-			};
-		})();
-
-	// Subscribe to reactions store for this message
+	// For the reaction store
 	$: messageReactions = $reactionsStore[message.$id] || [];
 	$: currentReactions = messageReactions.length > 0 ? messageReactions : reactions;
 
-	// Helper function to get member name
-	function getMemberName(userId: string): string {
-		return memberData.find(m => m.id === userId)?.name || userId;
-	}
+	// Setup Appwrite client if needed
+	const workspaceId = message.workspace_id;
+	const appwrite = message.type === 'dm'
+		? createBrowserClient()
+		: (() => {
+			const client = new Client()
+				.setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
+				.setProject(PUBLIC_APPWRITE_PROJECT);
+			return { storage: new Storage(client) };
+		})();
 
-	function getRelativeTime(timestamp: string): string {
-		const messageTime = new Date(timestamp);
-		const now = new Date();
-		const diffSeconds = Math.floor((now.getTime() - messageTime.getTime()) / 1000);
-		const diffDays = Math.floor(diffSeconds / (24 * 60 * 60));
-		const isToday = messageTime.toDateString() === now.toDateString();
-		const isYesterday = new Date(now.setDate(now.getDate() - 1)).toDateString() === messageTime.toDateString();
+	// If the message is a file, create preview/download URLs
+	$: messageSender = memberData.find((m) => m.id === message.sender_id);
+	$: filePreviewUrl =
+		message.sender_type === 'file'
+			? appwrite.storage.getFileView(workspaceId, message.$id).toString()
+			: null;
 
-		if (diffSeconds < 30) {
-			return 'now';
-		} else if (diffSeconds < 60) {
-			return `${diffSeconds}s`;
-		} else if (diffSeconds < 600) { // 10 minutes
-			return `${Math.floor(diffSeconds / 60)}m`;
-		} else if (isToday) {
-			return messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-		} else if (isYesterday) {
-			return 'Yesterday';
-		} else if (diffDays < 7) {
-			return messageTime.toLocaleDateString([], { weekday: 'long' });
-		} else {
-			return messageTime.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: '2-digit' });
-		}
+	/**
+	 * When highlightVersion changes (even if it's the same messageId),
+	 * we trigger the highlight again for a fresh glow animation.
+	 */
+	$: if (highlightVersion !== undefined) {
+		// Each time highlightVersion is updated, set isHighlighted = true
+		isHighlighted = true;
+		// Then fade highlight after a short delay
+		setTimeout(() => {
+			isHighlighted = false;
+		}, 2000);
 	}
 
 	async function handleReactionClick(reaction: any) {
 		if (!reaction.$id || !reaction.userIds?.includes(user.id)) return;
-		
+
 		try {
 			await fetch(`/api/reactions/update`, {
 				method: 'POST',
@@ -110,20 +102,49 @@
 		}
 	}
 
-	// Find the message sender's data from memberData
-	$: messageSender = memberData.find(m => m.id === message.sender_id);
+	function getMemberName(userId: string): string {
+		return memberData.find((m) => m.id === userId)?.name || userId;
+	}
 
-	$: filePreviewUrl = message.sender_type === 'file' ? 
-		appwrite.storage.getFileView(workspaceId, message.$id).toString() : null;
+	function getRelativeTime(timestamp: string): string {
+		const messageTime = new Date(timestamp);
+		const now = new Date();
+		const diffSeconds = Math.floor((now.getTime() - messageTime.getTime()) / 1000);
+		const diffDays = Math.floor(diffSeconds / (24 * 60 * 60));
+
+		const isToday = messageTime.toDateString() === now.toDateString();
+		const isYesterday =
+			new Date(now.setDate(now.getDate() - 1)).toDateString() ===
+			messageTime.toDateString();
+
+		if (diffSeconds < 30) return 'now';
+		if (diffSeconds < 60) return `${diffSeconds}s`;
+		if (diffSeconds < 600) return `${Math.floor(diffSeconds / 60)}m`;
+		if (isToday) {
+			return messageTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		} else if (isYesterday) {
+			return 'Yesterday';
+		} else if (diffDays < 7) {
+			return messageTime.toLocaleDateString([], { weekday: 'long' });
+		} else {
+			return messageTime.toLocaleDateString([], {
+				month: 'numeric',
+				day: 'numeric',
+				year: '2-digit'
+			});
+		}
+	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div 
-	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200"
-	on:mouseenter={() => hoveredMessageId = message.$id}
-	on:mouseleave={() => hoveredMessageId = null}
+<!-- Markup -->
+<div
+	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200 overflow-visible {isHighlighted ? 'highlight-message' : ''}"
+	on:mouseenter={() => (hoveredMessageId = message.$id)}
+	on:mouseleave={() => (hoveredMessageId = null)}
 >
 	<div class="absolute inset-0 group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 opacity-0 group-hover:opacity-40 rounded-lg transition-opacity duration-200"></div>
+	
+	<!-- Avatar -->
 	<div class="flex-shrink-0 pt-0.5 relative z-[1]">
 		<Avatar
 			src={messageSender?.avatarId ? avatarStore.getAvatarUrl(messageSender.avatarId) : undefined}
@@ -132,15 +153,22 @@
 			size="lg"
 		/>
 	</div>
-	<div class="flex-1 relative z-[1]">
+
+	<!-- Content -->
+	<div class="flex-1 relative z-[1] pr-[100px]">
 		<div class="flex flex-col">
 			<span class="font-semibold">{message.sender_name}</span>
 		</div>
+		<!-- If file -->
 		{#if message.sender_type === 'file'}
 			<div class="mt-2">
-				<img src={filePreviewUrl} alt="File preview" class="max-w-[300px] rounded-lg shadow-md" />
+				<img
+					src={filePreviewUrl}
+					alt="File preview"
+					class="max-w-[300px] rounded-lg shadow-md"
+				/>
 				<div class="mt-4">
-					<button 
+					<button
 						on:click={downloadFile}
 						class="flex items-center text-sm gap-2 px-2 py-1 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors w-fit"
 					>
@@ -155,6 +183,7 @@
 			<p class="mt-1">{message.content}</p>
 		{/if}
 
+		<!-- Reactions -->
 		{#if currentReactions.length > 0}
 			<div class="flex flex-wrap gap-1 mt-1">
 				<ContextMenu.Root>
@@ -162,8 +191,8 @@
 						<div class="flex flex-wrap gap-1">
 							{#each currentReactions as reaction}
 								{#if reaction.userIds?.length > 0}
-									<button 
-										class={`px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer ${reaction.userIds?.includes(user.id) ? 'bg-accent' : ''}`}
+									<button
+										class="px-2 py-0.5 bg-accent/50 rounded text-sm hover:bg-accent transition-colors cursor-pointer {reaction.userIds?.includes(user.id) ? 'bg-accent' : ''}"
 										on:click={() => handleReactionClick(reaction)}
 									>
 										<span class="inline-flex items-center gap-1">
@@ -213,23 +242,26 @@
 			</div>
 		{/if}
 
+		<!-- Thread replies -->
 		{#if message.thread_id && message.thread_count !== undefined && message.thread_count > 0}
-		
-			<button 
+			<button
 				on:click={() => goto(`/workspaces/${message.workspace_id}/channels/${message.thread_id}?thread=true`)}
 				class="inline-flex items-center gap-2 mt-2 px-2 py-1 text-sm text-blue-500 hover:text-foreground hover:bg-accent rounded-md transition-colors"
 			>
 				<MessageSquare class="w-4 h-4" />
-				<span class= ''>
+				<span>
 					{message.thread_count} {message.thread_count === 1 ? 'reply' : 'replies'}
 				</span>
 			</button>
-		
 		{/if}
 	</div>
 
+	<!-- Right-side actions -->
 	<div class="absolute right-2 top-2 flex flex-col items-end gap-1 z-[1]">
-		<div class="{isDropdownOpen && activeMessageId === message.$id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity hover:bg-accent rounded-lg">
+		<!-- Message actions dropdown -->
+		<div
+			class="{isDropdownOpen && activeMessageId === message.$id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity hover:bg-accent rounded-lg"
+		>
 			<MessageActions
 				{message}
 				{user}
@@ -242,6 +274,8 @@
 				on:startChannel={handleMessageAction}
 			/>
 		</div>
+
+		<!-- Timestamp -->
 		<div class="text-sm text-accent-foreground pr-2">
 			{#if getRelativeTime(message.$createdAt) === new Date(message.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
 				<span class="w-[90px] text-right inline-block">
@@ -264,6 +298,38 @@
 </div>
 
 <style>
+	/* Highlight animation */
+	.highlight-message {
+		position: relative;
+		z-index: 0;
+		overflow: visible;
+	}
+
+	.highlight-message::before {
+		content: '';
+		position: absolute;
+		inset: -2px;
+		background: linear-gradient(to right, rgb(96, 165, 250), rgb(192, 132, 252));
+		opacity: 0;
+		border-radius: 8px;
+		z-index: -1;
+		animation: glow 2s ease-out;
+		pointer-events: none;
+	}
+
+	@keyframes glow {
+		0%, 50% {
+			opacity: 0.5;
+			box-shadow: 0 0 20px rgba(96, 165, 250, 0.5),
+			            0 0 40px rgba(192, 132, 252, 0.3);
+		}
+		100% {
+			opacity: 0;
+			box-shadow: none;
+		}
+	}
+
+	/* Mentions inside rendered HTML */
 	:global(.prose .mention) {
 		color: rgb(59 130 246);
 		cursor: pointer;

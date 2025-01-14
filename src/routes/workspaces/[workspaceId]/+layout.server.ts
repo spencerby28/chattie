@@ -41,6 +41,7 @@ export const load = (async ({ locals, params, ...event }) => {
 		const memberData = await Promise.all(memberPromises);
 
 		// Get all messages for this workspace
+		/*
 		const messagesResponse = await client.databases.listDocuments(
 			'main', 
 			'messages',
@@ -50,6 +51,7 @@ export const load = (async ({ locals, params, ...event }) => {
 				Query.limit(100)
 			]
 		);
+		*/
 
 		// Filter channels based on type and membership
 		const filteredChannels = workspace.channels?.filter((channel: any) => {
@@ -58,7 +60,7 @@ export const load = (async ({ locals, params, ...event }) => {
 		}) || [];
 
 		return {
-			messages: messagesResponse.documents as Message[],
+			//messages: messagesResponse.documents as Message[],
 			channels: filteredChannels,
 			workspace,
 			memberData

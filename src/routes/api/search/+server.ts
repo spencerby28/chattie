@@ -1,36 +1,31 @@
-import { error, json } from '@sveltejs/kit';
-import { createAdminClient } from '$lib/appwrite/appwrite-server';
-import { Query } from 'appwrite';
+import { MEILISEARCH_URL, MEILISEARCH_ADMIN_API_KEY } from '$env/static/private';
+import { MeiliSearch } from 'meilisearch';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ url, locals }) => {
-    if (!locals.user) {
-        throw error(401, 'Unauthorized');
-    }
+const client = new MeiliSearch({
+  host: MEILISEARCH_URL,
+  apiKey: MEILISEARCH_ADMIN_API_KEY
+});
 
-    const searchQuery = url.searchParams.get('q');
-    
-    if (!searchQuery) {
-        return json([]);
-    }
+export const POST: RequestHandler = async ({ request }) => {
+  const { query, channels } = await request.json();
 
-    const { databases } = createAdminClient();
-    
-    try {
-        const messages = await databases.listDocuments(
-            'main',
-            'messages',
-            [
-                Query.search('content', searchQuery),
-                Query.limit(10)
-            ]
-        );
-        
-        return json(messages.documents);
-    } catch (e) {
-        console.error('Search error:', e);
-        throw error(500, {
-            message: 'Failed to search messages. Please try again.'
-        });
-    }
+  if (!query || query.length < 2) {
+    return json({ hits: [] });
+  }
+
+  try {
+    const searchResults = await client.index('messages').search(query, {
+      limit: 10,
+      rankingScoreThreshold: 0.5,
+      filter: channels?.length ? [`channel_id IN ${JSON.stringify(channels)}`] : undefined
+    });
+    console.log(searchResults);
+
+    return json(searchResults);
+  } catch (error) {
+    console.error('Meilisearch error:', error);
+    return json({ error: 'Search failed' }, { status: 500 });
+  }
 };

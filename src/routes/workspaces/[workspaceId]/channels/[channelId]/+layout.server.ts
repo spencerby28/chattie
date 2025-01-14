@@ -16,6 +16,7 @@ export const load = (async ({ locals, params, ...event }) => {
     const client = createSessionClient(event);
 
     // Get messages for this channel only
+    /*
     const messagesResponse = await client.databases.listDocuments(
       'main', 
       'messages',
@@ -25,6 +26,7 @@ export const load = (async ({ locals, params, ...event }) => {
         Query.limit(50)
       ]
     );
+    */
 
     // Get workspace document to get channels
     const workspace = await client.databases.getDocument('main', 'workspaces', params.workspaceId);
@@ -36,7 +38,7 @@ export const load = (async ({ locals, params, ...event }) => {
     }) || [];
 
     return {
-      messages: messagesResponse.documents as Message[],
+    //  messages: messagesResponse.documents as Message[],
       channels: filteredChannels
     };
 

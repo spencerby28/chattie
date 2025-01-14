@@ -1,0 +1,16 @@
+2025-01-13 18:46:08,503 - pinecone_plugin_interface.logging - INFO - Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-13 18:46:08,503 - pinecone_plugin_interface.logging - INFO - Looking for plugins in pinecone_plugins.inference
+2025-01-13 18:46:08,511 - pinecone_plugin_interface.logging - INFO - Installing plugin inference into Pinecone
+2025-01-13 18:46:08,680 - pinecone_plugin_interface.logging - INFO - Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-13 18:46:08,680 - pinecone_plugin_interface.logging - INFO - Looking for plugins in pinecone_plugins.inference
+2025-01-13 18:46:08,682 - __main__ - INFO - Starting conversation in dog-lovers with personas: ['ExoticEric', 'BiPetual_Bob']
+2025-01-13 18:46:08,682 - __main__ - ERROR - Error in channel conversation: '$id'
+2025-01-13 18:46:08,682 - __main__ - INFO - Starting conversation in cat-lovers with personas: ['BiPetual_Bob', 'NoPets_Nancy']
+2025-01-13 18:46:08,682 - __main__ - ERROR - Error in channel conversation: '$id'
+2025-01-13 18:46:08,682 - __main__ - INFO - Starting conversation in pet-care with personas: ['ExoticEric', 'NoPets_Nancy', 'CatChampion_Carol']
+2025-01-13 18:46:08,682 - __main__ - ERROR - Error in channel conversation: '$id'
+2025-01-13 18:46:08,682 - __main__ - INFO - Starting conversation in pet-training with personas: ['CatChampion_Carol', 'DogDevotee_Danny']
+2025-01-13 18:46:08,682 - __main__ - ERROR - Error in channel conversation: '$id'
+2025-01-13 18:46:08,682 - __main__ - INFO - Starting conversation in pet-adoption with personas: ['DogDevotee_Danny', 'BiPetual_Bob']
+2025-01-13 18:46:08,682 - __main__ - ERROR - Error in channel conversation: '$id'
+2025-01-13 18:46:08,683 - __main__ - ERROR - Error populating workspace conversations: '$id'

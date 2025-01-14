@@ -198,45 +198,54 @@ export class RealtimeService {
 	}
 
 	private handleMessageEvent(eventType: string, payload: Message) {
+		const startTime = performance.now();
+		console.log('[RealtimeService] Handling message event:', { eventType });
+
 		switch (eventType) {
 			case 'create':
-				messageStore.addMessage(payload);
-				this.updateUnreadCount(payload.channel_id);
-				this.checkMentions(payload);
-				// Get channel members and send notification to others
-				const channel = get(channelStore).channels.find((c: Channel) => c.$id === payload.channel_id);
-				if (channel) {
-					const members = get(memberStore);
-					members.forEach((member: SimpleMember) => {
-						// Don't notify message sender
-						if (member.id !== payload.user_id) {
-							toast(`New message in #${channel.name}`, {
-								description: payload.content,
-								action: {
-									label: 'View',
-									onClick: () => goto(`/workspaces/${channel.workspace_id}/channels/${channel.$id}`)
-								}
-							});
-						}
-					});
-				}
+				// Batch these operations to run in parallel
+				Promise.all([
+					// Add to message store
+					messageStore.addMessage(payload),
+					// Update unread count
+					this.updateUnreadCount(payload.channel_id),
+					// Check mentions
+					payload.mentions?.length ? this.checkMentions(payload) : Promise.resolve(),
+					// Add to recent activity
+					this.addToRecentActivity('message', payload)
+				]).then(() => {
+					const totalTime = performance.now() - startTime;
+					console.log(`[RealtimeService] Message create handled in ${totalTime}ms`);
+				});
 				break;
+
 			case 'update':
-				messageStore.updateMessage(payload.$id, payload);
+				Promise.all([
+					messageStore.updateMessage(payload.$id, payload),
+					this.addToRecentActivity('message', payload)
+				]).then(() => {
+					const totalTime = performance.now() - startTime;
+					console.log(`[RealtimeService] Message update handled in ${totalTime}ms`);
+				});
 				break;
+
 			case 'delete':
-				messageStore.deleteMessage(payload.$id);
+				Promise.all([
+					messageStore.deleteMessage(payload.$id),
+					this.addToRecentActivity('message', payload)
+				]).then(() => {
+					const totalTime = performance.now() - startTime;
+					console.log(`[RealtimeService] Message delete handled in ${totalTime}ms`);
+				});
 				break;
 		}
-
-		this.addToRecentActivity('message', payload);
 	}
 
 	private handleReactionEvent(eventType: string, payload: any) {
 		console.log('[RealtimeService] Handling reaction event:', { 
 			eventType, 
-			payload,
-			rawPayload: JSON.stringify(payload, null, 2)  // Log the full payload structure
+				payload,
+				rawPayload: JSON.stringify(payload, null, 2)  // Log the full payload structure
 		});
 		
 		// Validate the payload has the expected fields
@@ -331,7 +340,7 @@ export class RealtimeService {
 					this.reinitialize().catch(error => {
 						console.error('[RealtimeService] Failed to reinitialize after channel creation:', error);
 					});
-				}, 500); // Small delay to ensure label update completes
+				}, 1000); // Small delay to ensure label update completes
 				break;
 			case 'update':
 				channelStore.updateChannel(payload.$id, payload);

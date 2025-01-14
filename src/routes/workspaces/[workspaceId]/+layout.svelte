@@ -10,23 +10,27 @@
 	import { presenceService } from '$lib/services/presence';
 	import { presenceStore } from '$lib/stores/presence';
 
-	// Initialize member store with data from the server
-	$: if ($page.data.memberData) {
-		memberStore.updateMembers($page.data.memberData);
-	}
+	onMount(() => {
+		// Initialize member store with data from the server
+		if ($page.data.memberData) {
+			console.log('[WorkspaceLayout] memberData ran', $page.data.memberData);
+			memberStore.updateMembers($page.data.memberData);
+		}
 
-	// Initialize message store with workspace messages
-	$: if ($page.data.messages) {
-		messageStore.initializeForWorkspace($page.data.messages);
-	}
+		// Initialize message store with workspace messages 
+		if ($page.data.messages) {
+			messageStore.initializeForWorkspace($page.data.messages);
+		}
 
-	// Initialize channel store with workspace channels only on workspace change
-	$: if ($page.data.channels && $page.params.workspaceId !== $channelStore.currentWorkspaceId) {
-		channelStore.setChannels($page.data.channels);
-	}
+		// Initialize channel store with workspace channels
+		if ($page.data.channels && $page.params.workspaceId !== $channelStore.currentWorkspaceId) {
+			channelStore.setChannels($page.data.channels);
+		}
+	});
 
 	// Use the store value instead of direct page data
 	$: members = $memberStore;
+	$: console.log('[WorkspaceLayout] members', members);
 
 	// Get realtime service instance
 	const realtime = RealtimeService.getInstance();
@@ -61,6 +65,7 @@
 		}
 
 		if ($page.data.user) {
+			
 			presenceService.initialize($page.data.user.$id);
 			presenceStore.setInitialState($page.data.members);
 		}

@@ -82,3 +82,9 @@ export interface Reaction extends Models.Document {
     channel_id: string;
 }
 
+export interface StandardizedReaction {
+    emoji: string;
+    userIds: string[];
+    $id?: string;
+}
+

@@ -1,23 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import MessageList from '$lib/components/features/MessageList.svelte';
-	import MessageComposer from '$lib/components/features/MessageComposer.svelte';
 	import type { Message } from '$lib/types';
 	import { messageStore } from '$lib/stores/messages';
-	import type { Channel } from '$lib/types';
 	import { channelStore } from '$lib/stores/channels';
-	import ReplyBox from '$lib/components/features/ReplyBox.svelte';
 	import RichMessageComposer from '$lib/components/features/messages/RichMessageComposer.svelte';
 	import { createBrowserClient } from '$lib/appwrite/appwrite-browser.js';
 	import { onMount } from 'svelte';
 	import { memberStore } from '$lib/stores/members';
+	import { Search } from 'lucide-svelte';
+	import { searchOpen } from '$lib/components/features/search/search';
 	
+	export let data;
+
 	onMount(() => {
 		const { account } = createBrowserClient();
 		account.get();
 	});
-
-	export let data;
 
 	// Initialize or update messages from server data
 	$: if (data.messages?.length) {
@@ -25,8 +24,8 @@
 	}
 
 	$: currentChannel = $channelStore.channels.find(channel => channel.$id === $page.params.channelId);
-	$: console.log('channelstore', $channelStore.channels)
 	$: members = $memberStore;
+	$: console.log('members:', members);
 
 	$: channelTitle = (() => {
 		if (!currentChannel) return '';
@@ -42,7 +41,6 @@
 		}
 		return currentChannel.name;
 	})();
-	$: console.log('channelTitle', currentChannel)
 
 	function handleBackToChannel() {
 		window.history.back();
@@ -68,21 +66,18 @@
 					#{channelTitle}
 				{/if}
 			</h1>
+
 		</div>
 	</div>
 
 	<!-- Message List - Takes remaining height minus header and composer -->
 	<div class="flex-1 min-h-0 overflow-hidden">
-		<MessageList messages={data.messages as Message[]} user={$page.data.user} hasMore={true} />
+		<MessageList messages={data.messages as Message[]} user={$page.data.user} />
 	</div>
 
 	<!-- Message Composer - Fixed height at bottom -->
 	<div class="bg-background dark:bg-background">
 		<RichMessageComposer  />
-		<!--
-		<MessageComposer />
-		<ReplyBox />
-		-->
 	</div>
 	
 </div> 

@@ -2,12 +2,16 @@
   import { page } from '$app/stores';
   import { Button } from "$lib/components/ui/button";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-  import { UserCircle, Sun, Moon } from 'lucide-svelte';
+  import { UserCircle, Sun, Moon, Search as SearchIcon } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
   import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
   import { mode } from '$lib/stores/mode';
   import { presenceStore } from '$lib/stores/presence';
+
+  // Import our global search store & initialization
+  import { searchOpen, initializeSearch } from '$lib/components/features/search/search';
+  import Search from '$lib/components/features/search/Search.svelte';
 
   let fps = 0;
   let frameCount = 0;
@@ -16,7 +20,10 @@
   let isDarkMode = true;
   let avatarUrl: string | null = null;
 
-  // Update avatar URL whenever user data changes
+  // Derived from user presence
+  $: userPresence = $page.data.user ? $presenceStore[$page.data.user.$id] : null;
+
+  // Update avatar URL on data changes
   $: {
     if ($page.data.user?.prefs?.avatarId) {
       const { storage } = createBrowserClient();
@@ -25,9 +32,6 @@
       avatarUrl = null;
     }
   }
-
-  // Get current user's presence
-  $: userPresence = $page.data.user ? $presenceStore[$page.data.user.$id] : null;
 
   function updateFPS() {
     frameCount++;
@@ -46,14 +50,20 @@
     windowWidth = window.innerWidth;
   }
 
+
   onMount(() => {
-    handleResize(); // Set initial width
+    // Initialize search watchers once globally
+    initializeSearch();
+
+    handleResize();
     window.addEventListener('resize', handleResize);
     requestAnimationFrame(updateFPS);
 
     // Check system preference on mount
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    isDarkMode = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && prefersDark);
+    isDarkMode =
+      localStorage.getItem('theme') === 'dark' ||
+      (!localStorage.getItem('theme') && prefersDark);
     updateTheme();
 
     // Watch for system theme changes
@@ -68,6 +78,11 @@
       window.removeEventListener('resize', handleResize);
     };
   });
+
+  // Reinitialize search when workspace changes
+  $: if ($page.params.workspaceId) {
+    initializeSearch();
+  }
 
   function toggleTheme() {
     isDarkMode = !isDarkMode;
@@ -93,6 +108,10 @@
     }
   }
 
+  // Manually open search
+  function openSearch() {
+    searchOpen.set(true);
+  }
 </script>
 
 <header class="h-14 border-b flex items-center px-4 justify-between bg-background">
@@ -118,6 +137,18 @@
       {:else}
         <Moon class="w-5 h-5" />
       {/if}
+    </button>
+
+    <button
+      class="flex items-center gap-2 px-4 py-1 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors min-w-[200px]"
+      on:click={openSearch}
+      aria-label="Open search"
+    >
+      <SearchIcon class="w-4 h-4" />
+      <span class="text-sm flex-1 text-left">Search</span>
+      <kbd class="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+        <span class="text-xs">⌘</span>K
+      </kbd>
     </button>
 
     {#if $page.data.user}
@@ -165,4 +196,7 @@
       <a href="/debugLogin" class="text-blue-600 hover:text-blue-800">Log in</a>
     {/if}
   </div>
+
+  <!-- The global Search Dialog is rendered here -->
+  <Search />
 </header>
