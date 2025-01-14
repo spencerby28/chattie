@@ -14,6 +14,10 @@
 		onFileUpload: () => void;
 	}>();
 
+	$effect(() => {
+		console.log('Dropdown open state changed:', dropdownOpen);
+	});
+
 	const buttons = [
 		/*
 		{
@@ -77,6 +81,17 @@
 			})
 			.run();
 	}
+
+	function triggerMention() {
+		console.log('Triggering mention with editor:', tipex);
+		tipex?.chain()
+			.focus()
+			.insertContent('@')
+			.run();
+		tipex?.commands.insertContent(' ');
+		tipex?.commands.moveLeft(1);
+		console.log('Mention triggered, editor state:', tipex?.getJSON());
+	}
 </script>
 
 <div class="flex gap-4">
@@ -117,32 +132,21 @@
 	>
 		<Paperclip class="h-4 w-4 invert" />
 	</Button>
-<!--
-	<DropdownMenu.Root bind:onOpenChange={dropdownOpen}>
-		<DropdownMenu.Trigger>
-			<Button
-				class={cn(
-					buttonVariants({ 
-						variant: "outline",
-						size: "sm"
-					}),
-					"hover:bg-gradient-to-r hover:from-blue-400/60 hover:to-purple-600/60"
-				)}
-				title="Mention"
-				type="button"
-			>
-				<AtSign class="h-4 w-4 invert" />
-			</Button>
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content>
-			{#each members as member}
-				<DropdownMenu.Item on:click={() => insertMention(member)}>
-					{member.name}
-				</DropdownMenu.Item>
-			{/each}
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
-	-->
+
+	<Button
+		on:click={triggerMention}
+		class={cn(
+			buttonVariants({ 
+				variant: "outline",
+				size: "sm"
+			}),
+			"hover:bg-gradient-to-r hover:from-blue-400/60 hover:to-purple-600/60"
+		)}
+		title="Mention"
+		type="button"
+	>
+		<AtSign class="h-4 w-4 invert" />
+	</Button>
 </div>
 
 <style>

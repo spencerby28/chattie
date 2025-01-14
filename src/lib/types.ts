@@ -42,6 +42,7 @@ export interface SimpleMember {
     name: string;
     avatarId: string | null;
     avatarUrl: string | null;
+    bot?: boolean;
 }
 
 export interface AiPersona extends Models.Document {

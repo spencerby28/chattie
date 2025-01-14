@@ -21,24 +21,29 @@ export const load = (async ({ locals, params, ...event }) => {
 
 		// Get workspace document
 		const workspace = await databases.getDocument('main', 'workspaces', params.workspaceId);
-
+		console.log('Loaded workspace:', workspace);
+		console.log('Workspace members:', workspace.members);
 		// Fetch member data
 		const memberPromises = workspace.members.map(async (memberId: string) => {
 			try {
+				console.log('Fetching user data for:', memberId);
 				const user = await users.get(memberId);
 				const prefs = user.prefs || {};
+				console.log('User data fetched:', user);
 				return {
 					id: user.$id,
 					name: user.name || user.email,
-					avatarId: prefs.avatarId || null
+					avatarId: prefs.avatarId || null,
+					bot: user.email?.endsWith('@chattie.local') || false
 				};
 			} catch (e) {
 				console.error(`Error fetching user ${memberId}:`, e);
-				return { id: memberId, name: 'Unknown User', avatarId: null };
+				return { id: memberId, name: 'Unknown User', avatarId: null, bot: false };
 			}
 		});
 
 		const memberData = await Promise.all(memberPromises);
+		console.log('Final memberData:', memberData);
 
 		// Get all messages for this workspace
 		/*

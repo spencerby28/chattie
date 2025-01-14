@@ -13,8 +13,10 @@
 	onMount(() => {
 		// Initialize member store with data from the server
 		if ($page.data.memberData) {
-			console.log('[WorkspaceLayout] memberData ran', $page.data.memberData);
+			console.log('[WorkspaceLayout] Loading memberData:', $page.data.memberData);
 			memberStore.updateMembers($page.data.memberData);
+		} else {
+			console.log('[WorkspaceLayout] No memberData found in page data');
 		}
 
 		// Initialize message store with workspace messages 
@@ -30,7 +32,7 @@
 
 	// Use the store value instead of direct page data
 	$: members = $memberStore;
-	$: console.log('[WorkspaceLayout] members', members);
+	$: console.log('[WorkspaceLayout] Current members in store:', members);
 
 	// Get realtime service instance
 	const realtime = RealtimeService.getInstance();

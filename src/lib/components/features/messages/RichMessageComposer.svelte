@@ -13,7 +13,13 @@
 	import { page } from '$app/stores';
 	import type { SimpleMember } from '$lib/types';
 	import UploadFile from '$lib/modal/UploadFile.svelte';
-	
+	import { Extension as TiptapExtension } from '@tiptap/core';
+	import type { SuggestionOptions } from '@tiptap/suggestion';
+	import suggestion from '@tiptap/suggestion';
+	import { memberStore } from '$lib/stores/members';
+	import * as Command from "$lib/components/ui/command";
+	import * as Popover from "$lib/components/ui/popover";
+
 	//import '@friendofsvelte/tipex/styles/Tipex.css';
 	//import '@friendofsvelte/tipex/styles/ProseMirror.css';
 	import '@friendofsvelte/tipex/styles/CodeBlock.css';
@@ -21,19 +27,241 @@
 
 	let dropdownOpen = $state(false);
 	let fileUploadOpen = $state(false);
-	let members = $derived(($page.data.workspace?.memberData || []) as SimpleMember[]); 
+	let members = $derived($memberStore); 
 	let workspaceId = $derived($page.params.workspaceId);
 	let channelId = $derived($page.params.channelId);
-	
+	let suggestionPopoverOpen = $state(false);
+	let slashCommandPopoverOpen = $state(false);
+
 	// Check if we're in a thread from URL params
 	let isThread = $derived(new URLSearchParams($page.url.search).get('thread') === 'true');
 	
 	let body = ''
 	let editor: Editor | undefined = $state();
-	let activeHoverMember: { id: string; name: string } | null = $state(null);
-	let hoverCardAnchor: HTMLElement | null = $state(null);
+	let currentRange: any = null;
 
 	const htmlContent = $derived(editor?.getHTML());
+
+	$effect(() => {
+		console.log('Members updated:', members);
+	});
+
+	// Create suggestion plugin
+	const suggestionConfig: Partial<SuggestionOptions> = {
+		char: '@',
+		command: ({ editor, range, props }) => {
+			console.log('Mention command called with props:', props);
+			editor
+				.chain()
+				.focus()
+				.insertContentAt(range, [
+					{
+						type: 'mention',
+						attrs: props
+					}
+				])
+				.run();
+			suggestionPopoverOpen = false;
+		},
+		allow: ({ editor, range }) => {
+			console.log('Checking if mention is allowed at range:', range);
+			return true;
+		},
+		items: ({ query }: { query: string }) => {
+			console.log('Filtering members with query:', query);
+			console.log('Available members:', members);
+			return members.filter(member => 
+				member.name.toLowerCase().includes(query.toLowerCase())
+			);
+		},
+		render: () => {
+			return {
+				onStart: (props: any) => {
+					console.log('Suggestion started with props:', props);
+					suggestionPopoverOpen = true;
+					currentRange = props.range;
+					currentQuery = props.query || '';
+					
+					return () => {
+						suggestionPopoverOpen = false;
+						currentQuery = '';
+					};
+				},
+				onUpdate: (props: any) => {
+					currentRange = props.range;
+					currentQuery = props.query || '';
+				},
+				onKeyDown: (props: any) => {
+					if (props.event.key === 'Enter' && filteredMembers.length > 0) {
+						handleMemberSelect(filteredMembers[0]);
+						return true;
+					}
+					return false;
+				},
+				onExit: () => {
+					suggestionPopoverOpen = false;
+					currentQuery = '';
+				},
+			};
+		},
+	};
+
+	const slashCommandConfig: Partial<SuggestionOptions> = {
+		char: '/',
+		command: ({ editor, range, props }) => {
+			console.log('Slash command called with props:', props);
+			// Handle slash command execution
+			slashCommandPopoverOpen = false;
+		},
+		allow: ({ editor, range }) => {
+			console.log('Checking if slash command is allowed at range:', range);
+			return true;
+		},
+		items: ({ query }: { query: string }) => {
+			const commands = [
+				{ name: 'summarize', description: 'Summarize the conversation history' },
+				{ name: 'analyze', description: 'Analyze the sentiment and key topics' },
+				{ name: 'chat', description: 'Start a conversation with the AI assistant' }
+			];
+			return commands.filter(cmd => 
+				cmd.name.toLowerCase().includes(query.toLowerCase())
+			);
+		},
+		render: () => {
+			return {
+				onStart: (props: any) => {
+					console.log('Slash command started with props:', props);
+					slashCommandPopoverOpen = true;
+					currentRange = props.range;
+					currentQuery = props.query || '';
+					
+					return () => {
+						slashCommandPopoverOpen = false;
+						currentQuery = '';
+					};
+				},
+				onUpdate: (props: any) => {
+					currentRange = props.range;
+					currentQuery = props.query || '';
+				},
+				onKeyDown: (props: any) => {
+					if (props.event.key === 'Enter') {
+						// Handle command selection
+						return true;
+					}
+					return false;
+				},
+				onExit: () => {
+					slashCommandPopoverOpen = false;
+					currentQuery = '';
+				},
+			};
+		},
+	};
+
+	// Add currentQuery state
+	let currentQuery = $state('');
+	let filteredMembers = $derived(
+		members
+			.filter(member => {
+				// Filter out current user
+				if (member.id === $page.data.user?.$id) return false;
+				
+				// Check if name matches query
+				if (!member.name.toLowerCase().includes(currentQuery.toLowerCase())) return false;
+				
+				// Check if member is already mentioned
+				if (editor) {
+					const content = editor.getJSON();
+					const existingMentions = findMentionsInContent(content);
+					if (existingMentions.includes(member.id)) return false;
+				}
+				
+				return true;
+			})
+	);
+
+	// Add helper function to find mentions in content
+	function findMentionsInContent(content: any): string[] {
+		const mentions: string[] = [];
+		
+		function traverse(node: any) {
+			if (node.type === 'mention' && node.attrs?.id) {
+				mentions.push(node.attrs.id);
+			}
+			if (node.content) {
+				node.content.forEach(traverse);
+			}
+		}
+		
+		if (content.content) {
+			content.content.forEach(traverse);
+		}
+		
+		return mentions;
+	}
+
+	// Create mention suggestion extension
+	const MentionSuggestion = TiptapExtension.create({
+		name: 'mention-suggestion',
+		addOptions() {
+			return {
+				suggestion: {
+					...suggestionConfig,
+					editor: null as any,
+				},
+			}
+		},
+		addProseMirrorPlugins() {
+			return [
+				suggestion({
+					...this.options.suggestion,
+					editor: this.editor,
+				}),
+			]
+		},
+	});
+
+	// Create slash command suggestion extension
+	const SlashCommandSuggestion = TiptapExtension.create({
+		name: 'slash-command-suggestion',
+		addOptions() {
+			return {
+				suggestion: {
+					...slashCommandConfig,
+					editor: null as any,
+				},
+			}
+		},
+		addProseMirrorPlugins() {
+			return [
+				suggestion({
+					...this.options.suggestion,
+					editor: this.editor,
+				}),
+			]
+		},
+	});
+
+	function handleMemberSelect(member: SimpleMember) {
+		if (!editor || !currentRange) return;
+		
+		editor
+			.chain()
+			.focus()
+			.insertContentAt(currentRange, [
+				{
+					type: 'mention',
+					attrs: {
+						id: member.id,
+						name: member.name
+					}
+				}
+			])
+			.run();
+			
+		suggestionPopoverOpen = false;
+	}
 
 	// Create custom extension to handle Enter key
 	const CustomKeymap = Extension.create({
@@ -108,52 +336,14 @@
 		}
 	});
 
-	// Create extension to handle mention hover events
-	const MentionHoverExtension = Extension.create({
-		name: 'mentionHover',
-
-		addProseMirrorPlugins() {
-			return [
-				new Plugin({
-					props: {
-						handleDOMEvents: {
-							mouseover(view: EditorView, event: MouseEvent) {
-								const target = event.target as HTMLElement;
-								if (target.hasAttribute('data-mention')) {
-									const id = target.getAttribute('data-mention-id');
-									const name = target.getAttribute('data-mention-name');
-									if (id && name) {
-										activeHoverMember = { id, name };
-										hoverCardAnchor = target;
-									}
-								}
-								return false;
-							},
-							mouseout(view: EditorView, event: MouseEvent) {
-								const target = event.target as HTMLElement;
-								if (target.hasAttribute('data-mention')) {
-									setTimeout(() => {
-										if (!document.querySelector('.hover-card:hover')) {
-											activeHoverMember = null;
-											hoverCardAnchor = null;
-										}
-									}, 100);
-								}
-								return false;
-							}
-						}
-					}
-				})
-			];
-		}
-	});
 
 	// Add custom extensions to default extensions
 	const extensions = [
 		...defaultExtensions,
 		CustomKeymap,
 		MentionNode,
-		MentionHoverExtension
+	//	SlashCommandSuggestion,
+		MentionSuggestion,
 	];
 
 	function handleSend(content?: string) {
@@ -188,67 +378,143 @@
 		}
 	}
 
-	function handleMentionClick(id: string | undefined) {
-		if (!id) return;
-		console.log('Opening DM with user:', id);
-		activeHoverMember = null;
-		hoverCardAnchor = null;
-	}
 </script>
 <div class="w-full flex flex-col">
-	<Tipex
-		{body}
-		{extensions}
-		bind:tipex={editor}
-		class={cn(
-			// Base styles
-			'min-h-[120x] resize-none bg-muted relative border-t-2 border-border transition-all duration-300 outline-none',
-			// Override ALL focus and outline states
-			'[&.focused.focal]:ring-0 [&.focused.focal]:ring-offset-0 [&.focused.focal]:border-transparent [&.focused.focal]:outline-none',
-			'[&.focused]:transition-all [&.focused]:duration-300 [&.focused]:translate-y-[-2px] [&.focused]:shadow-lg [&]:outline-none',
-			'[&_.ProseMirror]:outline-none [&_.ProseMirror]:focus:outline-none',
-			'[&_.tipex-editor-section]:outline-none [&_.tipex-editor-section]:focus:outline-none',
-			// Editor section styles
-			'[&_.tipex-editor-section]:px-3 [&_.tipex-editor-section]:pt-4 [&_.tipex-editor-section]:bg-background [&_.tipex-editor-section]:h-[110px]',
-			'[&_.ProseMirror]:text-foreground [&_.ProseMirror_p]:m-0 [&_.ProseMirror]:h-full',
-			// Controls section
-			'[&_.tipex-controls]:bg-gradient-to-r [&_.tipex-controls]:from-blue-400/60 [&_.tipex-controls]:to-purple-600/60 [&_.tipex-controls]:border-t [&_.tipex-controls]:border-border [&_.tipex-controls]:outline-none',
-			// Utility button styles
-			'[&_.tipex-edit-button]:bg-muted [&_.tipex-edit-button]:text-accent-foreground',
-			'[&_.tipex-edit-button]:px-2 [&_.tipex-edit-button]:py-2 [&_.tipex-edit-button]:rounded-md',
-			'[&_.tipex-edit-button]:disabled:opacity-50 [&_.tipex-edit-button]:outline-none',
-			'[&_.tipex-button-extra]:ml-2',
-			// Controller styles
-			'[&_.tipex-controller]:bg-gradient-to-r [&_.tipex-controller]:from-blue-400/60 [&_.tipex-controller]:to-purple-600/60 [&_.tipex-controller]:border-t [&_.tipex-controller]:border-border [&_.tipex-controller]:outline-none',
-			'[&_.tipex-controller]:p-2 [&_.tipex-controller]:flex [&_.tipex-controller]:items-center',
-			'[&_.tipex-controller]:justify-between',
-			'[&_.tipex-basic-controller-wrapper]:h-0 [&_.tipex-basic-controller-wrapper]:flex [&_.tipex-basic-controller-wrapper]:items-center [&_.tipex-basic-controller-wrapper]:justify-center'
-		)}
-	>
-		{#snippet foot(tipex)}
-			{#if tipex?.isFocused || dropdownOpen}
-				<!--svelte-ignore a11y_no_static_element_interactions-->
-				<div 
-					class="flex items-center justify-between px-2 py-2 bg-gradient-to-r from-blue-400/60 to-purple-600/60"
-					onmousedown={(e) => e.preventDefault()}
-				>
-					<Control 
-						{tipex} 
-						{members} 
-						{dropdownOpen} 
-						onFileUpload={() => fileUploadOpen = true}
-					/>
-					<Button
-						on:click={() => handleSend()}
-						class="bg-black text-white hover:bg-black/90 mr-4"
-						disabled={!tipex?.getText()?.trim()}
+	<div class="relative w-full">
+		<Tipex
+			{body}
+			{extensions}
+			bind:tipex={editor}
+			class={cn(
+				// Base styles
+				'min-h-[120x] resize-none bg-muted relative border-t-2 border-border transition-all duration-300 outline-none',
+				// Override ALL focus and outline states
+				'[&.focused.focal]:ring-0 [&.focused.focal]:ring-offset-0 [&.focused.focal]:border-transparent [&.focused.focal]:outline-none',
+				'[&.focused]:transition-all [&.focused]:duration-300 [&.focused]:translate-y-[-2px] [&.focused]:shadow-lg [&]:outline-none',
+				'[&_.ProseMirror]:outline-none [&_.ProseMirror]:focus:outline-none',
+				'[&_.tipex-editor-section]:outline-none [&_.tipex-editor-section]:focus:outline-none',
+				// Editor section styles
+				'[&_.tipex-editor-section]:px-3 [&_.tipex-editor-section]:pt-4 [&_.tipex-editor-section]:bg-background [&_.tipex-editor-section]:h-[110px]',
+				'[&_.ProseMirror]:text-foreground [&_.ProseMirror_p]:m-0 [&_.ProseMirror]:h-full',
+				// Controls section
+				'[&_.tipex-controls]:bg-gradient-to-r [&_.tipex-controls]:from-blue-400/60 [&_.tipex-controls]:to-purple-600/60 [&_.tipex-controls]:border-t [&_.tipex-controls]:border-border [&_.tipex-controls]:outline-none',
+				// Utility button styles
+				'[&_.tipex-edit-button]:bg-muted [&_.tipex-edit-button]:text-accent-foreground',
+				'[&_.tipex-edit-button]:px-2 [&_.tipex-edit-button]:py-2 [&_.tipex-edit-button]:rounded-md',
+				'[&_.tipex-edit-button]:disabled:opacity-50 [&_.tipex-edit-button]:outline-none',
+				'[&_.tipex-button-extra]:ml-2',
+				// Controller styles
+				'[&_.tipex-controller]:bg-gradient-to-r [&_.tipex-controller]:from-blue-400/60 [&_.tipex-controller]:to-purple-600/60 [&_.tipex-controller]:border-t [&_.tipex-controller]:border-border [&_.tipex-controller]:outline-none',
+				'[&_.tipex-controller]:p-2 [&_.tipex-controller]:flex [&_.tipex-controller]:items-center',
+				'[&_.tipex-controller]:justify-between',
+				'[&_.tipex-basic-controller-wrapper]:h-0 [&_.tipex-basic-controller-wrapper]:flex [&_.tipex-basic-controller-wrapper]:items-center [&_.tipex-basic-controller-wrapper]:justify-center'
+			)}
+		>
+			{#snippet foot(tipex)}
+				{#if tipex?.isFocused || dropdownOpen}
+					<!--svelte-ignore a11y_no_static_element_interactions-->
+					<div 
+						class="flex items-center justify-between px-2 py-2 bg-gradient-to-r from-blue-400/60 to-purple-600/60"
+						onmousedown={(e) => e.preventDefault()}
 					>
-						Send Message
-					</Button>
+						<Control 
+							{tipex} 
+							{members} 
+							{dropdownOpen} 
+							onFileUpload={() => fileUploadOpen = true}
+						/>
+						<Button
+							on:click={() => handleSend()}
+							class="bg-black text-white hover:bg-black/90 mr-4"
+							disabled={!tipex?.getText()?.trim()}
+						>
+							Send Message
+						</Button>
+					</div>
+				{/if}
+			{/snippet}
+		</Tipex>
+
+		{#if suggestionPopoverOpen}
+			<div 
+				class="absolute left-0 bottom-full z-50 border border-border bg-popover text-popover-foreground shadow-md rounded-md mx-3 p-2 mb-1 min-w-[200px] w-fit"
+			>
+				<div class="text-xs font-semibold text-muted-foreground mb-2 px-2">MENTION:</div>
+				{#if filteredMembers.length === 0}
+					<div class="p-2 text-sm text-muted-foreground">
+						No members found
+					</div>
+				{:else}
+					<div class="max-h-[180px] overflow-y-auto">
+						{#each filteredMembers as member}
+							<button
+								class="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 transition-colors whitespace-nowrap"
+								onmousedown={(e) => {
+									e.preventDefault(); // Prevent focus loss
+									handleMemberSelect(member);
+								}}
+							>
+								{#if member.bot}
+									<div class="flex items-center bg-gradient-to-r from-blue-400/60 to-purple-600/60 text-white rounded px-2 py-0.5">
+										<span class="text-[10px] font-medium mr-1.5">AI</span>
+										<span class="text-sm">{member.name}</span>
+									</div>
+								{:else}
+									<span class="flex-1">{member.name}</span>
+								{/if}
+							</button>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		{#if slashCommandPopoverOpen}
+			<div 
+				class="absolute left-0 bottom-full z-50 border border-border bg-popover text-popover-foreground shadow-md rounded-md mx-3 p-2 mb-1 min-w-[200px] w-fit"
+			>
+				<div class="text-xs font-semibold text-muted-foreground mb-2 px-2">COMMANDS:</div>
+				<div class="max-h-[180px] overflow-y-auto">
+					<button
+						class="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 transition-colors whitespace-nowrap"
+						onmousedown={(e) => {
+							e.preventDefault();
+							// Handle command select
+						}}
+					>
+						<div class="flex flex-col">
+							<span class="font-medium">/summarize</span>
+							<span class="text-xs text-muted-foreground">Summarize the conversation history</span>
+						</div>
+					</button>
+					<button
+						class="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 transition-colors whitespace-nowrap"
+						onmousedown={(e) => {
+							e.preventDefault();
+							// Handle command select
+						}}
+					>
+						<div class="flex flex-col">
+							<span class="font-medium">/analyze</span>
+							<span class="text-xs text-muted-foreground">Analyze the sentiment and key topics</span>
+						</div>
+					</button>
+					<button
+						class="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground flex items-center gap-2 transition-colors whitespace-nowrap"
+						onmousedown={(e) => {
+							e.preventDefault();
+							// Handle command select
+						}}
+					>
+						<div class="flex flex-col">
+							<span class="font-medium">/chat</span>
+							<span class="text-xs text-muted-foreground">Start a conversation with the AI assistant</span>
+						</div>
+					</button>
 				</div>
-			{/if}
-		{/snippet}
-	</Tipex>
+			</div>
+		{/if}
+	</div>
 </div>
 
 <UploadFile
@@ -258,33 +524,7 @@
 	{workspaceId}
 />
 
-{#if activeHoverMember && hoverCardAnchor}
-	<HoverCard.Root open={true}>
-		<HoverCard.Trigger asChild>
-			<div class="fixed opacity-0" style="pointer-events: none;">
-				{@html hoverCardAnchor.outerHTML}
-			</div>
-		</HoverCard.Trigger>
-		<HoverCard.Content
-			class="w-80 hover-card"
-			style="position: fixed; top: {hoverCardAnchor.getBoundingClientRect().bottom + 5}px; left: {hoverCardAnchor.getBoundingClientRect().left}px;"
-		>
-			<div class="flex justify-between space-x-4">
-				<div class="space-y-1">
-					<h4 class="text-sm font-semibold">{activeHoverMember.name}</h4>
-					<div class="flex items-center pt-2">
-						<button
-							class="text-xs text-blue-500 hover:text-blue-600"
-							onclick={() => handleMentionClick(activeHoverMember?.id)}
-						>
-							Send direct message
-						</button>
-					</div>
-				</div>
-			</div>
-		</HoverCard.Content>
-	</HoverCard.Root>
-{/if}
+
 
 <style>
 	:global(.ProseMirror .mention) {
@@ -315,41 +555,19 @@
 		border-radius: 0 !important;
 	}
 
-	:global(.tipex-editor::before) {
-		content: '';
+	:global(.mention-suggestion-list) {
 		position: absolute;
+		top: 0;
 		left: 0;
 		right: 0;
-		top: 0;
-		height: 3px;
-		z-index: 100;
-		opacity: 0;
-		background: linear-gradient(
-			90deg,
-			rgb(96 165 250) 0%,
-			rgb(129 140 248) 20%,
-			rgb(147 51 234) 50%,
-			rgb(129 140 248) 80%,
-			rgb(96 165 250) 100%
-		);
-		background-size: 300% 100%;
-		animation: gradient 3s ease infinite;
-		transition: opacity 0.3s ease;
+		z-index: 1000;
 	}
 
-	:global(.tipex-editor.focused::before) {
-		opacity: 1;
+	:global(.mention-suggestion-list button) {
+		transition: all 0.2s ease;
 	}
 
-	@keyframes gradient {
-		0% {
-			background-position: 0% 50%;
-		}
-		50% {
-			background-position: 100% 50%;
-		}
-		100% {
-			background-position: 0% 50%;
-		}
+	:global(.mention-suggestion-list button:hover) {
+		transform: translateX(2px);
 	}
 </style>
