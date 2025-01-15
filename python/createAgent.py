@@ -25,6 +25,11 @@ from titanGenerate import generate_images, OBJECTS, generate_profile_prompt
 from PIL import Image
 from io import BytesIO
 import langwatch
+import aiofiles
+import aiofiles.os
+from asyncio import Lock
+from datetime import datetime
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -35,6 +40,9 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger('chattie_agent')
+
+# Global workspace creation locks
+workspace_locks = {}
 
 # Load environment variables
 load_dotenv()
@@ -251,300 +259,188 @@ async def create_initial_message(channel_id: str, workspace_id: str, ai_user_id:
         raise
 
 async def create_workspace(description: str, workspace_id: str, api_key: str):
+    """Create a new workspace. Each workspace_id is guaranteed to be unique."""
     logger.info("=== Starting Workspace Creation ===")
     logger.info("Workspace ID: %s", workspace_id)
     logger.info("Description: %s", description)
     
-    # Create test_data directory if it doesn't exist
-    os.makedirs('test_data', exist_ok=True)
-    logger.debug("Ensured test_data directory exists")
-    
-    # Initialize test data structure
-    test_data = {
-        "workspace_id": workspace_id,
-        "users": [],
-        "channels": [],
-        "initial_messages": {},
-        "conversation_responses": {},
-        "mappings": {
-            "persona_ids": {},
-            "channel_ids": {},
-            "ai_user_ids": {},
+    try:
+        # Create test_data directory if it doesn't exist
+        await aiofiles.os.makedirs('test_data', exist_ok=True)
+        
+        # Initialize test data structure
+        test_data = {
+            "workspace_id": workspace_id,
+            "users": [],
+            "channels": [],
+            "initial_messages": {},
+            "conversation_responses": {},
+            "mappings": {
+                "persona_ids": {},
+                "channel_ids": {},
+                "ai_user_ids": {},
+            }
         }
-    }
-    logger.debug("Initialized test data structure")
-    
-    # Generate personas first
-    logger.info("Generating personas with OpenAI for workspace: %s", workspace_id)
-    personas_prompt = PERSONA_GENERATION_PROMPT.format(
-        num_personas=5,
-        description=description
-    )
-    logger.debug("Generated persona prompt (first 100 chars): %s", personas_prompt[:100])
-    
-    personas_json = await generate_with_openai(personas_prompt, api_key)
-    personas = json.loads(personas_json)
-    logger.info("Successfully generated %d personas", len(personas))
-    
-    # Store each persona in Appwrite
-    stored_personas = []
-    ai_user_ids = []  # Track all AI user IDs
-    
-    for idx, persona in enumerate(personas, 1):
-        try:
-            logger.info("Processing persona %d/%d: %s", idx, len(personas), persona['name'])
-            logger.debug("Persona details - Role: %s, Style: %s", 
-                        persona['role'], persona['conversation_style'])
-            
-            # Create an AI user for this specific persona
-            ai_user_id = await create_ai_user(persona['name'], workspace_id)
-            ai_user_ids.append(ai_user_id)
-            logger.info("Created AI user ID: %s for persona: %s", ai_user_id, persona['name'])
-            
-            # Generate and store avatar
-            avatar_file_id = await generate_and_store_avatar(storage, persona, workspace_id)
-            if avatar_file_id:
-                # Update user preferences with the avatar file ID
-                users.update_prefs(
-                    user_id=ai_user_id,
-                    prefs={'avatarId': avatar_file_id}
-                )
-                logger.info("Updated user preferences with avatar: %s", avatar_file_id)
-            
-            # Save AI user ID mapping and user info
-            test_data["mappings"]["ai_user_ids"][persona['name']] = ai_user_id
-            test_data["users"].append({
-                "name": persona['name'],
-                "ai_user_id": ai_user_id,
-                "email": f"{persona['name'].lower().replace(' ', '_')}.{workspace_id}@chattie.local",
-                "personality": persona['personality'],
-                "conversation_style": persona['conversation_style'],
-                "knowledge_base": persona['knowledge_base'],
-                "role": persona['role'],
-                "greeting": persona['greeting'],
-                "opinions": persona.get('opinions', []),
-                "disagreements": persona.get('disagreements', []),
-                "debate_style": persona.get('debate_style', ''),
-                "triggers": persona.get('triggers', []),
-                "catchphrases": persona.get('catchphrases', []),
-                "communication_quirks": persona.get('communication_quirks', []),
-                "temperature": persona.get('temperature', 0.7)
-            })
-            logger.debug("Added persona data to test_data structure")
-            
-            # Prepare the persona data according to our schema
-            persona_data = {
-                'workspace_id': workspace_id,
-                'name': persona['name'],
-                'personality': persona['personality'],
-                'avatar_url': f"https://api.dicebear.com/7.x/avataaars/svg?seed={persona['name']}",
-                'conversation_style': persona['conversation_style'],
-                'knowledge_base': persona['knowledge_base'],
-                'greeting': persona['greeting'],
-                'role': persona['role'],
-                'opinions': persona.get('opinions', []),
-                'disagreements': persona.get('disagreements', []),
-                'debate_style': persona.get('debate_style', ''),
-                'triggers': persona.get('triggers', []),
-                'catchphrases': persona.get('catchphrases', []),
-                'communication_quirks': persona.get('communication_quirks', []),
-                'temperature': persona.get('temperature', 0.7),
-                'ai_user_id': ai_user_id,
-            }
-            
-            logger.info("Storing persona in Appwrite: %s", persona['name'])
-            stored_persona = databases.create_document(
-                database_id=DATABASE_ID,
-                collection_id=AI_PERSONAS_COLLECTION,
-                document_id=ai_user_id,
-                data=persona_data,
-                permissions=[
-                    Permission.read(Role.users()),
-                    Permission.write(Role.user(ai_user_id)),
-                    Permission.update(Role.user(ai_user_id)),
-                    Permission.delete(Role.user(workspace_id)),
-                    Permission.read(Role.label(ai_user_id))
-                ]
-            )
-            
-            logger.info("Successfully stored persona: %s with ID: %s", 
-                       persona['name'], stored_persona['$id'])
-            
-            # Save persona ID mapping
-            test_data["mappings"]["persona_ids"][persona['name']] = stored_persona['$id']
-            stored_personas.append(stored_persona)
-            
-        except Exception as e:
-            logger.error("Failed to store persona %s: %s", persona['name'], str(e))
-            logger.exception(e)
-    
-    # Generate channels
-    logger.info("Generating channels with OpenAI for workspace: %s", workspace_id)
-    channels_prompt = CHANNEL_GENERATION_PROMPT.format(
-        description=description
-    )
-    logger.debug("Generated channels prompt (first 100 chars): %s", channels_prompt[:100])
-    
-    channels_json = await generate_with_openai(channels_prompt, api_key)
-    channels = json.loads(channels_json)
-    logger.info("Successfully generated %d channels", len(channels))
-    
-    # Store channels in Appwrite and create initial messages
-    stored_channels = []
-    for idx, channel in enumerate(channels, 1):
-        try:
-            logger.info("Processing channel %d/%d: %s", idx, len(channels), channel['name'])
-            logger.debug("Channel details - Description: %s", channel['description'][:100])
-            
-            # Include all AI persona users as members
-            ai_members = ai_user_ids
-            
-            # Prepare channel data according to our schema
-            channel_data = {
-                'workspace_id': workspace_id,
-                'name': channel['name'].lower().replace(' ', '-'),
-                'type': 'public',
-                'members': ai_members,
-                'description': channel['description'],
-                'purpose': channel.get('purpose', ''),
-                'topics': channel.get('topics', []),
-                'debate_topics': channel.get('debate_topics', []),
-                'last_message_at': None,
-                'primary_personas': [persona['name'] for persona in personas]
-            }
-            
-            logger.info("Storing channel in Appwrite: %s", channel_data['name'])
-            stored_channel = databases.create_document(
-                database_id=DATABASE_ID,
-                collection_id=CHANNELS_COLLECTION,
-                document_id=ID.unique(),
-                data=channel_data,
-                permissions=[
-                    Permission.read(Role.users()),
-                    Permission.write(Role.users()),
-                    *[Permission.write(Role.user(user_id)) for user_id in ai_user_ids],
-                    Permission.update(Role.user(workspace_id)),
-                    Permission.delete(Role.user(workspace_id))
-                ]
-            )
-            logger.info("Successfully stored channel: %s with ID: %s", 
-                       channel_data['name'], stored_channel['$id'])
-            
-            # Save channel with its ID to test data
-            test_data["channels"].append({
-                "name": channel['name'],
-                "$id": stored_channel['$id'],
-                "description": channel['description'],
-                "purpose": channel.get('purpose', ''),
-                "topics": channel.get('topics', []),
-                "debate_topics": channel.get('debate_topics', []),
-                "conversation_tone": channel.get('conversation_tone', 'mixed'),
-                "expected_conflict_points": channel.get('expected_conflict_points', []),
-                "type": "public",
-                "members": ai_members,
-                "primary_personas": [persona['name'] for persona in personas],
-                "workspace_id": workspace_id
-            })
-            logger.debug("Added channel data to test_data structure")
-            
-            # Save channel ID mapping
-            test_data["mappings"]["channel_ids"][channel['name']] = stored_channel['$id']
-            stored_channels.append(stored_channel)
-            
-        except Exception as e:
-            logger.error("Failed to store channel %s: %s", channel['name'], str(e))
-            logger.exception(e)
-    
-    # Update workspace members with channel access - moved outside the loop
-    async def update_workspace_members():
-        try:
-            logger.info("Starting workspace member updates for workspace: %s", workspace_id)
-            
-            # First get the workspace document to get the owner_id
-            workspace = databases.get_document(
-                database_id=DATABASE_ID,
-                collection_id='workspaces',
-                document_id=workspace_id
-            )
-            owner_id = workspace['owner_id']
-            logger.debug("Retrieved workspace owner ID: %s", owner_id)
-            
-            # Get all channels for the workspace
-            channels = databases.list_documents(
-                database_id=DATABASE_ID,
-                collection_id=CHANNELS_COLLECTION,
-                queries=[
-                    Query.equal('workspace_id', workspace_id)
-                ]
-            )
-            
-            channel_ids = [channel['$id'] for channel in channels['documents']]
-            logger.info("Found %d channels for workspace", len(channel_ids))
-            
-            # Combine AI users, workspace owner, and bot user (only once)
-            all_member_ids = [*ai_user_ids, owner_id, 'bot']
-            logger.info("Updating workspace with %d total members", len(all_member_ids))
-            
-            # Update workspace members array with AI personas and bot (only once)
-            workspace_data = {
-                'members': list(set([*workspace.get('members', []), *ai_user_ids, 'bot']))
-            }
-            logger.debug("Updating workspace document with %d members", 
-                       len(workspace_data['members']))
-            
-            databases.update_document(
-                database_id=DATABASE_ID,
-                collection_id='workspaces',
-                document_id=workspace_id,
-                data=workspace_data
-            )
-            # Update each member's labels with all channel IDs
-            for member_id in all_member_ids:
-                logger.debug("Processing member: %s", member_id)
-                # Get existing labels first
-                user = users.get(member_id)
-                existing_labels = user.get('labels', [])
+        
+        # Create workspace document
+        workspace_data = {
+            'id': workspace_id,
+            'description': description,
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
+        }
+        
+        workspace = databases.create_document(
+            database_id=DATABASE_ID,
+            collection_id='workspaces',
+            document_id=workspace_id,
+            data=workspace_data,
+            permissions=[
+                Permission.read(Role.users()),
+                Permission.update(Role.user(workspace_id))
+            ]
+        )
+        
+        # Generate personas
+        logger.info("Generating personas with OpenAI for workspace: %s", workspace_id)
+        personas_prompt = PERSONA_GENERATION_PROMPT.format(
+            num_personas=5,
+            description=description
+        )
+        
+        personas_json = await generate_with_openai(personas_prompt, api_key)
+        personas = json.loads(personas_json)
+        logger.info("Successfully generated %d personas", len(personas))
+        
+        # Store each persona in Appwrite
+        stored_personas = []
+        ai_user_ids = []  # Track all AI user IDs
+        
+        for idx, persona in enumerate(personas, 1):
+            try:
+                logger.info("Processing persona %d/%d: %s", idx, len(personas), persona['name'])
                 
-                # Combine existing labels with new channel IDs
-                updated_labels = list(set(existing_labels + channel_ids))
+                # Create an AI user for this specific persona
+                ai_user_id = await create_ai_user(persona['name'], workspace_id)
+                ai_user_ids.append(ai_user_id)
                 
-                logger.info("Updating labels for member: %s", member_id)
-                users.update_labels(
-                    user_id=member_id,
-                    labels=updated_labels
+                # Generate and store avatar
+                avatar_file_id = await generate_and_store_avatar(storage, persona, workspace_id)
+                if avatar_file_id:
+                    users.update_prefs(
+                        user_id=ai_user_id,
+                        prefs={'avatarId': avatar_file_id}
+                    )
+                
+                # Store persona data
+                persona_data = {
+                    'workspace_id': workspace_id,
+                    'name': persona['name'],
+                    'personality': persona['personality'],
+                    'avatar_url': f"https://api.dicebear.com/7.x/avataaars/svg?seed={persona['name']}",
+                    'conversation_style': persona['conversation_style'],
+                    'knowledge_base': persona['knowledge_base'],
+                    'greeting': persona['greeting'],
+                    'role': persona['role'],
+                    'opinions': persona.get('opinions', []),
+                    'disagreements': persona.get('disagreements', []),
+                    'debate_style': persona.get('debate_style', ''),
+                    'triggers': persona.get('triggers', []),
+                    'catchphrases': persona.get('catchphrases', []),
+                    'communication_quirks': persona.get('communication_quirks', []),
+                    'temperature': persona.get('temperature', 0.7),
+                    'ai_user_id': ai_user_id,
+                }
+                
+                stored_persona = databases.create_document(
+                    database_id=DATABASE_ID,
+                    collection_id=AI_PERSONAS_COLLECTION,
+                    document_id=ai_user_id,
+                    data=persona_data,
+                    permissions=[
+                        Permission.read(Role.users()),
+                        Permission.write(Role.user(ai_user_id)),
+                        Permission.update(Role.user(ai_user_id)),
+                        Permission.delete(Role.user(workspace_id)),
+                        Permission.read(Role.label(ai_user_id))
+                    ]
                 )
-            logger.info("Completed workspace member updates")
-            
-        except Exception as e:
-            logger.error("Error in workspace member updates: %s", str(e))
-            logger.exception(e)
-    
-    # Call update_workspace_members once after all channels are created
-    await update_workspace_members()
-    
-    # Save test data to file
-    logger.info("Saving test data to test_data/responses.json")
-    with open('test_data/responses.json', 'w') as f:
-        json.dump(test_data, f, indent=4)
-    logger.debug("Successfully saved test data to file")
-    
-    logger.info("Workspace creation completed - Personas: %d, Channels: %d", 
-                len(stored_personas), len(stored_channels))
-
-    # Start autonomous conversations in background task
-    logger.info("Starting autonomous conversations in background")
-    from autonomous_conversation import populate_workspace_conversations
-    asyncio.create_task(populate_workspace_conversations(workspace_id))
-    
-    logger.info("=== Workspace Creation Complete ===")
-    return {
-        'workspace_id': workspace_id,
-        'personas': stored_personas,
-        'channels': stored_channels,
-        'workspace_theme': description,
-        'status': 'success',
-        'message': 'Workspace created successfully. Autonomous conversations starting in background.'
-    }
+                
+                # Update test data
+                test_data["mappings"]["ai_user_ids"][persona['name']] = ai_user_id
+                test_data["users"].append({
+                    "name": persona['name'],
+                    "ai_user_id": ai_user_id,
+                    **persona
+                })
+                stored_personas.append(stored_persona)
+                
+            except Exception as e:
+                logger.error(f"Error creating persona {persona['name']}: {str(e)}")
+                continue
+        
+        # Generate and store channels
+        logger.info("Generating channels with OpenAI for workspace: %s", workspace_id)
+        channels_prompt = CHANNEL_GENERATION_PROMPT.format(description=description)
+        channels_json = await generate_with_openai(channels_prompt, api_key)
+        channels = json.loads(channels_json)
+        
+        stored_channels = []
+        for channel in channels:
+            try:
+                channel_data = {
+                    'workspace_id': workspace_id,
+                    'name': channel['name'].lower().replace(' ', '-'),
+                    'type': 'public',
+                    'members': ai_user_ids,
+                    'description': channel['description'],
+                    'purpose': channel.get('purpose', ''),
+                    'topics': channel.get('topics', []),
+                    'debate_topics': channel.get('debate_topics', []),
+                    'last_message_at': None,
+                    'primary_personas': [persona['name'] for persona in personas]
+                }
+                
+                stored_channel = databases.create_document(
+                    database_id=DATABASE_ID,
+                    collection_id=CHANNELS_COLLECTION,
+                    document_id=ID.unique(),
+                    data=channel_data,
+                    permissions=[
+                        Permission.read(Role.users()),
+                        Permission.write(Role.users()),
+                        *[Permission.write(Role.user(user_id)) for user_id in ai_user_ids],
+                        Permission.update(Role.user(workspace_id)),
+                        Permission.delete(Role.user(workspace_id))
+                    ]
+                )
+                
+                test_data["channels"].append(stored_channel)
+                stored_channels.append(stored_channel)
+                
+            except Exception as e:
+                logger.error(f"Error creating channel {channel['name']}: {str(e)}")
+                continue
+        
+        # Save test data to file
+        async with aiofiles.open('test_data/responses.json', 'w') as f:
+            await f.write(json.dumps(test_data, indent=4))
+        
+        # Start autonomous conversations in background
+        asyncio.create_task(populate_workspace_conversations(workspace_id))
+        
+        return {
+            'workspace_id': workspace_id,
+            'personas': stored_personas,
+            'channels': stored_channels,
+            'workspace_theme': description,
+            'status': 'success',
+            'message': 'Workspace created successfully. Autonomous conversations starting in background.'
+        }
+        
+    except Exception as e:
+        logger.error(f"Error creating workspace {workspace_id}: {str(e)}")
+        raise
 
 async def handle_request(request):
     logger.info("Received workspace creation request")

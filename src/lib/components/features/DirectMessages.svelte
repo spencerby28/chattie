@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-
-	import type { Channel, SimpleMember } from '$lib/types';
+	import { memberStore } from '$lib/stores/members';
+	import type { Channel } from '$lib/types';
 
 	const currentUser = $page.data.user;
 
@@ -12,8 +12,9 @@
 
 	$: otherUsers = dmChannels.map((channel: Channel) => {
 		const otherId = channel.members.find((id) => id !== currentUser.$id);
-		return $page.data.workspace.memberData.find((m: SimpleMember) => m.id === otherId);
+		return $memberStore.find((m) => m.id === otherId);
 	});
+	$: console.log($memberStore.members);
 </script>
 
 <div class="space-y-2">

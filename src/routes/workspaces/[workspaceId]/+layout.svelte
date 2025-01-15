@@ -34,6 +34,16 @@
 	$: members = $memberStore;
 	$: console.log('[WorkspaceLayout] Current members in store:', members);
 
+	// Reset stores when workspace changes
+	$: if ($page.params.workspaceId) {
+		console.log('[WorkspaceLayout] Workspace changed, resetting stores');
+		memberStore.updateMembers([]); // Clear the store first
+		if ($page.data.memberData) {
+			console.log('[WorkspaceLayout] Loading new memberData:', $page.data.memberData);
+			memberStore.updateMembers($page.data.memberData);
+		}
+	}
+
 	// Get realtime service instance
 	const realtime = RealtimeService.getInstance();
 	const connectionState = realtime.getConnectionState();

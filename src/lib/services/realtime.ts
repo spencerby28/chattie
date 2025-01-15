@@ -371,63 +371,45 @@ export class RealtimeService {
 			case 'update':
 				// Update member store with new members and ensure avatars are initialized
 				if (payload.members) {
-					const currentMembers = get(memberStore);
-					const currentMemberIds = new Set(currentMembers.map(m => m.id));
-					const newMemberIds = new Set(payload.members);
-					
-					// Only fetch details for members that aren't already in the store
-					const membersToFetch = payload.members.filter(id => !currentMemberIds.has(id));
-					const membersToRemove = currentMembers.filter(m => !newMemberIds.has(m.id));
-					
-					if (membersToFetch.length > 0) {
-						Promise.all(
-							membersToFetch.map(async (memberId) => {
-								try {
-									const response = await fetch('/api/user', {
-										method: 'POST',
-										headers: {
-											'Content-Type': 'application/json'
-										},
-										body: JSON.stringify({ userId: memberId })
-									});
+					// Do a full refresh of members instead of merging
+					Promise.all(
+						payload.members.map(async (memberId) => {
+							try {
+								const response = await fetch('/api/user', {
+									method: 'POST',
+									headers: {
+										'Content-Type': 'application/json'
+									},
+									body: JSON.stringify({ userId: memberId })
+								});
 
-									if (!response.ok) {
-										throw new Error('Failed to fetch user');
-									}
-
-									const user = await response.json();
-									const avatarId = user.prefs?.avatarId;
-									const avatarUrl = avatarId ? avatarStore.getAvatarUrl(avatarId) : null;
-
-									return {
-										id: memberId,
-										name: user.name,
-										avatarId: avatarId,
-										avatarUrl
-									} as SimpleMember;
-								} catch (error) {
-									console.error(`Failed to fetch user details for ${memberId}:`, error);
-									return null;
+								if (!response.ok) {
+									throw new Error('Failed to fetch user');
 								}
-							})
-						)
-						.then((newMembers) => {
-							const validNewMembers = newMembers.filter((m): m is SimpleMember => m !== null);
-							// Keep existing members that are still valid and add new ones
-							const updatedMembers = [
-								...currentMembers.filter(m => !membersToRemove.some(rm => rm.id === m.id)),
-								...validNewMembers
-							];
-							memberStore.updateMembers(updatedMembers);
+
+								const user = await response.json();
+								const avatarId = user.prefs?.avatarId;
+								const avatarUrl = avatarId ? avatarStore.getAvatarUrl(avatarId) : null;
+
+								return {
+									id: memberId,
+									name: user.name,
+									avatarId: avatarId,
+									avatarUrl
+								} as SimpleMember;
+							} catch (error) {
+								console.error(`Failed to fetch user details for ${memberId}:`, error);
+								return null;
+							}
 						})
-						.catch((error) => {
-							console.error('Failed to update members:', error);
-						});
-					} else if (membersToRemove.length > 0) {
-						// If we only need to remove members, do that without fetching
-						const updatedMembers = currentMembers.filter(m => !membersToRemove.some(rm => rm.id === m.id));
-						memberStore.updateMembers(updatedMembers);
-					}
+					)
+					.then((members) => {
+						const validMembers = members.filter((m): m is SimpleMember => m !== null);
+						memberStore.updateMembers(validMembers);
+					})
+					.catch((error) => {
+						console.error('Failed to update members:', error);
+					});
 				}
 				
 				toast('Workspace Updated', {

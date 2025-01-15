@@ -13,6 +13,7 @@
   // Import our global search store & initialization
   import { searchOpen, initializeSearch } from '$lib/components/features/search/search';
   import Search from '$lib/components/features/search/Search.svelte';
+  import { aiInitStore } from '$lib/stores/ai-initialization';
 
   let fps = 0;
   let frameCount = 0;
@@ -122,6 +123,18 @@
     <!--
     <span class="text-sm text-gray-500">Width: {windowWidth}px</span>
     -->
+    {#if $aiInitStore.isInitializing}
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+        <span class="text-sm font-medium">
+          {#if $aiInitStore.currentStep}
+            {$aiInitStore.currentStep}
+          {:else}
+            Initializing AI workspace...
+          {/if}
+        </span>
+      </div>
+    {/if}
   </div>
 
   <div class="flex items-center gap-4">

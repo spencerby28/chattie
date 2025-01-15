@@ -6,6 +6,8 @@
     import { goto } from '$app/navigation';
     import { dev } from '$app/environment';
     import { RealtimeService } from '$lib/services/realtime';
+    import { aiInitStore } from '$lib/stores/ai-initialization';
+    import { toast } from "svelte-sonner";
 
     export let open = false;
     export let onOpenChange: (open: boolean) => void;
@@ -43,12 +45,48 @@
             }
 
             const { workspaceId } = await response.json();
-            onOpenChange(false);
             
-            // Navigate with reinitialize flag to ensure new permissions are loaded
-            await goto(`/workspaces/${workspaceId}?reinitialize=true`);
+            toast.success("Workspace Creation Started", {
+                description: "See header for updates on the creation progress"
+            });
+
+            if (useAI) {
+                // Start the initialization animation first
+                aiInitStore.startInitialization(workspaceId);
+                // Then close the modal
+                onOpenChange(false);
+                
+                // Poll for completion
+                const checkCompletion = async () => {
+                    try {
+                        const statusResponse = await fetch(`/api/workspaces/${workspaceId}/status`);
+                        const status = await statusResponse.json();
+                        
+                        if (status.isComplete) {
+                            aiInitStore.complete(workspaceId);
+                            // Only navigate when complete
+                            await goto(`/workspaces/${workspaceId}?reinitialize=true`);
+                        } else {
+                            // Check again in 5 seconds
+                            setTimeout(checkCompletion, 5000);
+                        }
+                    } catch (error) {
+                        console.error('Error checking workspace status:', error);
+                    }
+                };
+                
+                // Start polling
+                setTimeout(checkCompletion, 5000);
+            } else {
+                // For non-AI workspaces, navigate immediately
+                onOpenChange(false);
+                await goto(`/workspaces/${workspaceId}?reinitialize=true`);
+            }
         } catch (error) {
             console.error('Error creating workspace:', error);
+            if (useAI) {
+                aiInitStore.reset();
+            }
         } finally {
             loading = false;
         }

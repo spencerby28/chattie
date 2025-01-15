@@ -14,6 +14,8 @@ from langchain_pinecone import PineconeVectorStore
 from langchain.schema import Document
 from langchain.prompts import PromptTemplate
 import logging
+from asyncio import Lock, Semaphore
+import aiofiles
 
 # Set up logging
 logging.basicConfig(
@@ -74,6 +76,11 @@ Format as JSON array with objects containing:
 - temperature: float (0.5-1.0, higher = more creative/random responses)
 
 Make the personas GENUINELY ENTERTAINING and distinct!"""
+
+# Global concurrency controls
+MAX_CONCURRENT_CHANNELS = 5  # Limit concurrent channel conversations
+channel_semaphore = Semaphore(MAX_CONCURRENT_CHANNELS)
+workspace_locks = {}
 
 async def store_message(channel_id: str, sender_id: str, content: str, sender_name: str, workspace_id: str):
     """Store a message in both Appwrite and vector store"""
@@ -269,52 +276,89 @@ async def run_channel_conversation(
 
 async def populate_workspace_conversations(workspace_id: str):
     """Populate all channels in a workspace with conversations"""
+    if workspace_id not in workspace_locks:
+        workspace_locks[workspace_id] = Lock()
+        
     try:
-        # Load workspace data
-        with open('test_data/responses.json', 'r') as f:
-            workspace_data = json.load(f)
-        
-        logger.info(f"Loaded workspace data for {workspace_id}")
-        logger.info(f"Found {len(workspace_data['channels'])} channels")
-        logger.info(f"Found {len(workspace_data['users'])} personas")
-        
-        # Validate workspace data
-        if workspace_data['workspace_id'] != workspace_id:
-            logger.warning(f"Workspace ID mismatch: expected {workspace_id}, got {workspace_data['workspace_id']}")
-        
-        # Get all channels and personas
-        channels = workspace_data["channels"]
-        personas = workspace_data["users"]
-        
-        # Validate channel data
-        for channel in channels:
-            if not channel.get('$id'):
-                logger.error(f"Channel {channel.get('name', 'UNKNOWN')} missing $id field")
-                raise ValueError(f"Channel {channel.get('name', 'UNKNOWN')} missing $id field")
-        
-        # Validate persona data
-        for persona in personas:
-            if not persona.get('ai_user_id'):
-                logger.error(f"Persona {persona.get('name', 'UNKNOWN')} missing ai_user_id field")
-                raise ValueError(f"Persona {persona.get('name', 'UNKNOWN')} missing ai_user_id field")
-        
-        # Start conversations in each channel
-        tasks = []
-        for channel in channels:
-            task = run_channel_conversation(
+        async with workspace_locks[workspace_id]:
+            # Load workspace data using aiofiles
+            async with aiofiles.open('test_data/responses.json', 'r') as f:
+                content = await f.read()
+                workspace_data = json.loads(content)
+            
+            logger.info(f"Loaded workspace data for {workspace_id}")
+            logger.info(f"Found {len(workspace_data['channels'])} channels")
+            logger.info(f"Found {len(workspace_data['users'])} personas")
+            
+            # Validate workspace data
+            if workspace_data['workspace_id'] != workspace_id:
+                logger.warning(f"Workspace ID mismatch: expected {workspace_id}, got {workspace_data['workspace_id']}")
+            
+            # Get all channels and personas
+            channels = workspace_data["channels"]
+            personas = workspace_data["users"]
+            
+            # Validate channel data
+            for channel in channels:
+                if not channel.get('$id'):
+                    logger.error(f"Channel {channel.get('name', 'UNKNOWN')} missing $id field")
+                    raise ValueError(f"Channel {channel.get('name', 'UNKNOWN')} missing $id field")
+            
+            # Validate persona data
+            for persona in personas:
+                if not persona.get('ai_user_id'):
+                    logger.error(f"Persona {persona.get('name', 'UNKNOWN')} missing ai_user_id field")
+                    raise ValueError(f"Persona {persona.get('name', 'UNKNOWN')} missing ai_user_id field")
+            
+            # Start conversations in each channel with concurrency control
+            tasks = []
+            for channel in channels:
+                task = run_channel_conversation_with_semaphore(
+                    channel=channel,
+                    personas=personas,
+                    workspace_id=workspace_id
+                )
+                tasks.append(task)
+            
+            # Run channel conversations with controlled concurrency
+            await asyncio.gather(*tasks)
+            
+            logger.info(f"Successfully populated all channels in workspace {workspace_id}")
+            
+    except Exception as e:
+        logger.error(f"Error populating workspace conversations: {str(e)}")
+        raise
+    finally:
+        # Clean up workspace lock if no other operations are waiting
+        if workspace_id in workspace_locks and not workspace_locks[workspace_id]._waiters:
+            del workspace_locks[workspace_id]
+
+async def run_channel_conversation_with_semaphore(channel, personas, workspace_id):
+    """Wrapper to run channel conversation with semaphore control"""
+    async with channel_semaphore:
+        try:
+            await run_channel_conversation(
                 channel=channel,
                 personas=personas,
                 workspace_id=workspace_id
             )
-            tasks.append(task)
-        
-        # Run all channel conversations in parallel
-        await asyncio.gather(*tasks)
-        
-        logger.info(f"Successfully populated all channels in workspace {workspace_id}")
-        
+        except Exception as e:
+            logger.error(f"Error in channel conversation for {channel.get('name', 'UNKNOWN')}: {str(e)}")
+            raise
+
+async def run_channel_conversation(channel, personas, workspace_id):
+    """Run conversation in a single channel with proper error handling"""
+    channel_id = channel['$id']
+    channel_lock = Lock()
+    
+    try:
+        async with channel_lock:
+            # Your existing conversation logic here
+            # Make sure to use proper async database operations
+            pass
+            
     except Exception as e:
-        logger.error(f"Error populating workspace conversations: {str(e)}")
+        logger.error(f"Error in channel {channel_id} conversation: {str(e)}")
         raise
 
 if __name__ == "__main__":

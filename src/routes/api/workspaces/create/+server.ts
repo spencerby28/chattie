@@ -63,18 +63,13 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
         );
 
         if (dev && useAI) {
-            // Only create workspace and call localhost in dev mode with AI enabled
-            try {
-                const response = await fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`);
-                if (!response.ok) {
-                    console.error('Error from Python server:', await response.text());
-                }
-            } catch (e) {
-                console.error('Failed to connect to Python server:', e);
-            }
-        } else {
+            // Don't await the AI initialization
+            fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`)
+                .catch(e => console.error('Failed to connect to Python server:', e));
+        }
 
-            // Create default channels
+        // Create default channels only if not using AI
+        if (!useAI) {
             const defaultChannels = ['general', 'announcements', 'random', 'help'];
             const channelIds = [];
             for (const channelName of defaultChannels) {
@@ -110,6 +105,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
             );
         }
 
+        // Return immediately with the workspace ID
         return new Response(JSON.stringify({ workspaceId }), {
             headers: { 'Content-Type': 'application/json' }
         });

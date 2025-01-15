@@ -17,6 +17,8 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from appwrite.query import Query
 from collections import deque
+from asyncio import Queue, Lock
+from collections import defaultdict
 
 # Set up logging
 logging.basicConfig(
@@ -44,7 +46,8 @@ retriever = document_vectorstore.as_retriever()
 llm = ChatOpenAI(temperature=0.7, model_name="gpt-4")
 
 # Message queue for each channel
-channel_queues = {}
+channel_queues = defaultdict(Queue)
+channel_locks = defaultdict(Lock)
 
 class PersonaManager:
     def __init__(self):
@@ -185,32 +188,83 @@ async def process_message_queue(channel_id, persona_manager):
         await asyncio.sleep(2)  # Natural conversation pacing
 
 async def store_message(channel_id, workspace_id, sender_id, content, sender_name, thread_id=None):
-    message = {
-        'channel_id': channel_id,
-        'workspace_id': workspace_id,
-        'sender_type': 'ai_persona',
-        'sender_id': sender_id,
-        'content': content,
-        'sender_name': sender_name,
-        'edited_at': datetime.now().isoformat(),
-        'mentions': [],
-        'ai_context': None,
-        'thread_id': thread_id,
-        'thread_count': None,
-        'attachments': []
-    }
-    
-    return await database.create_document(
-        database_id='main',
-        collection_id='messages',
-        document_id=ID.unique(),
-        data=message,
-        permissions=[
-            Permission.read(Role.label(channel_id)),
-            Permission.write(Role.user(sender_id)),
-            Permission.delete(Role.user(sender_id))
-        ]
-    )
+    async with channel_locks[channel_id]:
+        try:
+            message = {
+                'channel_id': channel_id,
+                'workspace_id': workspace_id,
+                'sender_type': 'ai_persona',
+                'sender_id': sender_id,
+                'content': content,
+                'sender_name': sender_name,
+                'edited_at': datetime.now().isoformat(),
+                'mentions': [],
+                'ai_context': None,
+                'thread_id': thread_id,
+                'thread_count': None,
+                'attachments': []
+            }
+            
+            # Get current channel state
+            channel = await database.get_document(
+                database_id='main',
+                collection_id='channels',
+                document_id=channel_id
+            )
+            
+            # Create message document
+            stored_message = await database.create_document(
+                database_id='main',
+                collection_id='messages',
+                document_id=ID.unique(),
+                data=message,
+                permissions=[
+                    Permission.read(Role.label(channel_id)),
+                    Permission.write(Role.user(sender_id)),
+                    Permission.delete(Role.user(sender_id))
+                ]
+            )
+            
+            # Update channel's last_message_at atomically
+            await database.update_document(
+                database_id='main',
+                collection_id='channels',
+                document_id=channel_id,
+                data={
+                    'last_message_at': message['edited_at']
+                }
+            )
+            
+            return stored_message
+            
+        except Exception as e:
+            logger.error(f"Error storing message in channel {channel_id}: {str(e)}")
+            raise
+
+async def process_channel_queue(channel_id: str):
+    """Process messages for a channel in order"""
+    queue = channel_queues[channel_id]
+    while True:
+        try:
+            message_data = await queue.get()
+            try:
+                async with channel_locks[channel_id]:
+                    # Process message here
+                    await store_message(
+                        channel_id=message_data['channel_id'],
+                        workspace_id=message_data['workspace_id'],
+                        sender_id=message_data['sender_id'],
+                        content=message_data['content'],
+                        sender_name=message_data['sender_name'],
+                        thread_id=message_data.get('thread_id')
+                    )
+            except Exception as e:
+                logger.error(f"Error processing message in channel {channel_id}: {str(e)}")
+            finally:
+                queue.task_done()
+        except Exception as e:
+            logger.error(f"Error in channel queue processor for {channel_id}: {str(e)}")
+            await asyncio.sleep(1)  # Prevent tight loop on persistent errors
 
 async def handle_message(request):
     try:
@@ -220,11 +274,15 @@ async def handle_message(request):
         # Skip if message is from an AI persona
         if data.get('sender_type') == 'ai_persona':
             return web.Response(text='Skipping AI persona message', status=200)
-            
+        
+        channel_id = data['channel_id']
+        
+        # Ensure channel queue processor is running
+        if channel_id not in channel_queues:
+            asyncio.create_task(process_channel_queue(channel_id))
+        
         # Add message to channel queue
-        if data['channel_id'] not in channel_queues:
-            channel_queues[data['channel_id']] = deque()
-        channel_queues[data['channel_id']].append(data)
+        await channel_queues[channel_id].put(data)
         
         return web.Response(text='Message queued successfully', status=200)
         
