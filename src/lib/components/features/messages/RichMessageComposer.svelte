@@ -459,6 +459,11 @@
 										<span class="text-[10px] font-medium mr-1.5">AI</span>
 										<span class="text-sm">{member.name}</span>
 									</div>
+								{:else if member.id === 'bot'}
+									<div class="flex items-center bg-chattie-bg text-white rounded px-2 py-0.5 ring-1 ring-white/10">
+										<span class="text-[10px] font-medium mr-1.5">AI</span>
+										<span class="text-sm">{member.name}</span>
+									</div>
 								{:else}
 									<span class="flex-1">{member.name}</span>
 								{/if}

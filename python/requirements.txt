@@ -1,2 +1,4 @@
 appwrite==7.0.1
-python-dotenv==1.0.0 
+python-dotenv==1.0.0
+matplotlib>=3.7.1
+numpy>=1.24.3 

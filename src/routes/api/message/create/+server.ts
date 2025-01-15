@@ -33,6 +33,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             edited_at: new Date().toISOString(),
         };
 
+        // Check if message starts with /chat
+        const isPrivateChat = 
+                             content.startsWith('/summarize') || 
+                             content.startsWith('/analyze');
+
+        // Set permissions based on message type
+        let permissions = [];
+        if (isPrivateChat) {
+            // For private chat, only allow the sender to read/write/delete
+            permissions = [
+                Permission.read(Role.user(locals.user.$id)),
+                Permission.write(Role.user(locals.user.$id)),
+                Permission.delete(Role.user(locals.user.$id))
+            ];
+        } else {
+            // For regular messages, use channel-wide permissions
+            permissions = [
+                Permission.read(Role.label(channelId)),
+                Permission.write(Role.user(locals.user.$id)),
+                Permission.delete(Role.user(locals.user.$id))
+            ];
+        }
+
         // If this is a message in a thread channel, increment the thread count on the original message
         if (isThread) {
             console.log('[message/create] creating message in thread', channelId);
@@ -65,11 +88,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             'messages',
             ID.unique(),
             messageData,
-            [
-                Permission.read(Role.label(channelId)),
-                Permission.write(Role.user(locals.user.$id)),
-                Permission.delete(Role.user(locals.user.$id))
-            ]
+            permissions
         );
         console.log(`[message/create] Message created in ${performance.now() - createStartTime}ms:`, message);
         

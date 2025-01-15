@@ -180,7 +180,7 @@
 		{:else if message.content.startsWith('<')}
 			<div class="mt-1 prose prose-sm max-w-none [&_.mention]:text-blue-500 [&_.mention]:bg-blue-500/10 [&_.mention]:rounded [&_.mention]:px-1">{@html message.content}</div>
 		{:else}
-			<p class="mt-1">{message.content}</p>
+			<p class="mt-1 whitespace-pre-line">{message.content}</p>
 		{/if}
 
 		<!-- Reactions -->

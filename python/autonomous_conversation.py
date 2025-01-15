@@ -150,7 +150,7 @@ Topics: {channel_topics}
 Chat:
 {previous_messages}
 
-Give a brief in-character response:""",
+Give a brief in-character response. DO NOT include your name in the response:""",
             input_variables=[
                 "name", "personality", "conversation_style", "knowledge",
                 "role", "opinions", "disagreements", "debate_style", 
@@ -227,6 +227,7 @@ async def run_channel_conversation(
             workspace_id=workspace_id
         )
         
+        # Store message in history without any name prefix
         previous_messages.append(f"{starter['name']}: {greeting}")
         
         # Run conversation for specified number of turns
@@ -242,6 +243,7 @@ async def run_channel_conversation(
                             temperature=persona.get("temperature", 0.7)
                         )
                         
+                        # Store the raw response without any name prefix
                         await store_message(
                             channel_id=channel_id,
                             sender_id=persona["ai_user_id"],

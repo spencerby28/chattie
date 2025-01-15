@@ -13,12 +13,12 @@
 
     // Hardcoded avatar options
     const defaultAvatars = [
-        'acd1b47b-923a-4b3b-b3d5-4f8477322ec4',
-        'b028239c-6769-4386-8c9c-f55161b2c6ef', 
-        'c907105b-3c66-4a41-af4f-769751568740',
-        'c491e057-dd58-4d22-85c2-0801d469319b',
-        'f509c043-1ac3-4640-ac6f-5e2b5d09c3bf',
-        '00fbfeee-b33b-4eb3-b793-72806baa1038'
+        'db3b77f7-d4f3-44e3-b940-696012ac2040',
+        'a5cb1902-6c3e-463f-acc8-55f480a12b23', 
+        '937bb454-585d-49b5-b1f0-fda41e137824',
+        '78663099-e7bb-4772-b99e-a6553764fc1a',
+        'b72170d3-5dc2-4238-87d0-7d1299232451',
+        '6858db1b-951c-4722-bf6e-a9d931a4499b'
     ];
 
     let selectedAvatar: string | null = null;
@@ -202,12 +202,12 @@
                         </button>
                         {#if showAusten}
                             <button
-                                class="relative aspect-square w-24 rounded-xl overflow-hidden hover:ring-2 hover:ring-primary transition-all
-                                       {selectedAvatar === 'cc7f49c5-b0ba-4caa-8293-cbd1ea7153dc' ? 'ring-2 ring-primary' : ''}"
-                                on:click={() => handleAvatarSelection('cc7f49c5-b0ba-4caa-8293-cbd1ea7153dc')}
+                                class="relative aspect-square rounded-xl hover:ring-2 hover:ring-primary transition-all
+                                       {selectedAvatar === 'f7f14697-8c86-4682-821c-f1b0c6691a3a' ? 'ring-2 ring-primary' : ''}"
+                                on:click={() => handleAvatarSelection('f7f14697-8c86-4682-821c-f1b0c6691a3a')}
                             >
                                 <Avatar 
-                                    src={getAvatarUrl('cc7f49c5-b0ba-4caa-8293-cbd1ea7153dc')}
+                                    src={getAvatarUrl('f7f14697-8c86-4682-821c-f1b0c6691a3a')}
                                     name="Austen Avatar"
                                     size="xl"
                                 />

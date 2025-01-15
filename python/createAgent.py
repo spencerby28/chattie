@@ -9,9 +9,11 @@ import certifi
 from appwrite.client import Client
 from appwrite.services.databases import Databases
 from appwrite.services.users import Users
+from appwrite.services.storage import Storage
 from appwrite.id import ID
 from appwrite.permission import Permission
 from appwrite.role import Role
+from appwrite.input_file import InputFile
 import secrets
 import string
 import logging
@@ -19,6 +21,9 @@ import sys
 import random
 from openai import AsyncOpenAI
 from appwrite.query import Query
+from titanGenerate import generate_images, OBJECTS, generate_profile_prompt
+from PIL import Image
+from io import BytesIO
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -47,6 +52,7 @@ logger.info("Appwrite admin client initialized")
 # Initialize Database and Users services
 databases = Databases(client)
 users = Users(client)
+storage = Storage(client)
 
 # Database and Collection IDs
 DATABASE_ID = 'main'
@@ -160,7 +166,7 @@ async def generate_with_openai(prompt: str, api_key: str) -> str:
     try:
         logger.debug("Sending prompt to OpenAI API (first 100 chars): %s", prompt[:100])
         response = await client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
@@ -287,6 +293,16 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
             ai_user_ids.append(ai_user_id)
             logger.info("Created AI user ID: %s for persona: %s", ai_user_id, persona['name'])
             
+            # Generate and store avatar
+            avatar_file_id = await generate_and_store_avatar(storage, persona, workspace_id)
+            if avatar_file_id:
+                # Update user preferences with the avatar file ID
+                users.update_prefs(
+                    user_id=ai_user_id,
+                    prefs={'avatarId': avatar_file_id}
+                )
+                logger.info("Updated user preferences with avatar: %s", avatar_file_id)
+            
             # Save AI user ID mapping and user info
             test_data["mappings"]["ai_user_ids"][persona['name']] = ai_user_id
             test_data["users"].append({
@@ -325,7 +341,7 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
                 'catchphrases': persona.get('catchphrases', []),
                 'communication_quirks': persona.get('communication_quirks', []),
                 'temperature': persona.get('temperature', 0.7),
-                'ai_user_id': ai_user_id
+                'ai_user_id': ai_user_id,
             }
             
             logger.info("Storing persona in Appwrite: %s", persona['name'])
@@ -457,13 +473,13 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
             channel_ids = [channel['$id'] for channel in channels['documents']]
             logger.info("Found %d channels for workspace", len(channel_ids))
             
-            # Combine AI users and workspace owner (only once)
-            all_member_ids = [*ai_user_ids, owner_id]
+            # Combine AI users, workspace owner, and bot user (only once)
+            all_member_ids = [*ai_user_ids, owner_id, 'bot']
             logger.info("Updating workspace with %d total members", len(all_member_ids))
             
-            # Update workspace members array with AI personas (only once)
+            # Update workspace members array with AI personas and bot (only once)
             workspace_data = {
-                'members': list(set([*workspace.get('members', []), *ai_user_ids]))
+                'members': list(set([*workspace.get('members', []), *ai_user_ids, 'bot']))
             }
             logger.debug("Updating workspace document with %d members", 
                        len(workspace_data['members']))
@@ -474,7 +490,6 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
                 document_id=workspace_id,
                 data=workspace_data
             )
-            
             # Update each member's labels with all channel IDs
             for member_id in all_member_ids:
                 logger.debug("Processing member: %s", member_id)
@@ -575,6 +590,124 @@ async def main():
     while True:
         await asyncio.sleep(3600)
         logger.debug("Server heartbeat")
+
+async def generate_and_store_avatar(storage: Storage, persona: dict, workspace_id: str) -> str:
+    """
+    Generate and store an AI avatar for a persona in Appwrite Storage based on their attributes.
+    
+    Args:
+        storage: Appwrite Storage service instance
+        persona: Dictionary containing persona attributes
+        workspace_id: ID of the workspace
+        
+    Returns:
+        str: ID of the stored file in Appwrite
+    """
+    logger.info(f"Generating personalized avatar for persona: {persona['name']}")
+    
+    try:
+        # 1. Create a personalized prompt based on persona attributes
+        personality_traits = persona['personality'].lower()
+        role = persona['role'].lower()
+        conversation_style = persona['conversation_style'].lower()
+        
+        # Map personality traits to safe, positive descriptors
+        style_mapping = {
+            'formal': 'business attire, confident pose',
+            'professional': 'polished appearance, warm expression',
+            'casual': 'relaxed style, approachable look',
+            'friendly': 'welcoming smile, bright eyes',
+            'analytical': 'thoughtful expression, smart attire',
+            'creative': 'artistic style, imaginative look',
+            'tech': 'modern style, innovative look',
+            'academic': 'scholarly appearance, wise expression'
+        }
+        
+        # Find matching style descriptors
+        style_elements = []
+        for key, value in style_mapping.items():
+            if key in personality_traits or key in conversation_style or key in role:
+                style_elements.append(value)
+        
+        # If no specific style matches, use default professional style
+        if not style_elements:
+            style_elements = ['professional appearance, friendly expression']
+            
+        # Create a safe but personalized prompt
+        prompt = (
+            f"Professional portrait in minimalist cartoon style, "
+            f"{', '.join(style_elements[:2])}, "  # Limit to 2 style elements
+            "clean background, high quality digital art"
+        )
+        
+        logger.debug(f"Generated prompt: {prompt}")
+        logger.debug(f"Prompt length: {len(prompt)} characters")
+        
+        try:
+            # First attempt with personalized prompt
+            generated_images = generate_images(
+                prompt=prompt,
+                num_images=1,
+                seed=random.randint(1000, 9999),
+                width=512,
+                height=512,
+                cfg_scale=8,
+                quality="standard"
+            )
+        except Exception as img_error:
+            logger.warning(f"Failed with personalized prompt: {str(img_error)}. Trying fallback prompt...")
+            # Fallback to a very safe, generic prompt
+            fallback_prompt = "Simple professional headshot avatar, minimalist cartoon style, neutral background"
+            generated_images = generate_images(
+                prompt=fallback_prompt,
+                num_images=1,
+                seed=random.randint(1000, 9999),
+                width=512,
+                height=512,
+                cfg_scale=8,
+                quality="standard"
+            )
+        
+        if not generated_images:
+            raise Exception("No image generated")
+            
+        # Convert PNG bytes to WebP
+        image_bytes = generated_images[0]
+        image = Image.open(BytesIO(image_bytes))
+        
+        # Create a BytesIO object to store the WebP image
+        webp_buffer = BytesIO()
+        # Convert to WebP with high quality
+        image.save(webp_buffer, format="WebP", quality=90, method=6)
+        webp_bytes = webp_buffer.getvalue()
+        
+        # 3. Create a unique filename
+        filename = f"{persona['name'].lower().replace(' ', '_')}_{workspace_id}_avatar.webp"
+        
+        # 4. Store in Appwrite Storage using InputFile
+        logger.info(f"Storing avatar in Appwrite bucket: {filename}")
+        
+        # Create the file using InputFile
+        input_file = InputFile.from_bytes(
+            webp_bytes,
+            filename=filename
+        )
+
+        file_id = ID.unique()
+        
+        result = storage.create_file(
+            bucket_id='avatars',
+            file_id=file_id,
+            file=input_file,
+        )
+        
+        logger.info(f"Successfully stored avatar with ID: {file_id}")
+        return file_id
+        
+    except Exception as e:
+        logger.error(f"Failed to generate/store avatar for {persona['name']}: {str(e)}")
+        logger.exception(e)
+        return None
 
 if __name__ == "__main__":
     logger.info("=== Application Starting ===")

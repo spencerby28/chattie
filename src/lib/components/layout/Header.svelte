@@ -2,7 +2,8 @@
   import { page } from '$app/stores';
   import { Button } from "$lib/components/ui/button";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-  import { UserCircle, Sun, Moon, Search as SearchIcon } from 'lucide-svelte';
+  import * as AlertDialog from "$lib/components/ui/alert-dialog";
+  import { UserCircle, Sun, Moon, Search as SearchIcon, Bot } from 'lucide-svelte';
   import { onMount } from 'svelte';
   import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
   import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
@@ -19,6 +20,7 @@
   let windowWidth: number;
   let isDarkMode = true;
   let avatarUrl: string | null = null;
+  let showAIDialog = false;
 
   // Derived from user presence
   $: userPresence = $page.data.user ? $presenceStore[$page.data.user.$id] : null;
@@ -49,7 +51,6 @@
   function handleResize() {
     windowWidth = window.innerWidth;
   }
-
 
   onMount(() => {
     // Initialize search watchers once globally
@@ -124,6 +125,14 @@
   </div>
 
   <div class="flex items-center gap-4">
+    <button
+      class="flex items-center gap-2 px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-800/30 transition-colors"
+      on:click={() => showAIDialog = true}
+    >
+      <Bot class="w-4 h-4" />
+      <span class="text-sm">AI ON</span>
+    </button>
+
     <button 
       class="flex items-center gap-2 px-2 py-1 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
       on:click={toggleTheme}
@@ -199,4 +208,40 @@
 
   <!-- The global Search Dialog is rendered here -->
   <Search />
+
+  <!-- AI Commands Dialog -->
+  <AlertDialog.Root open={showAIDialog}>
+    <AlertDialog.Content>
+      <AlertDialog.Header>
+        <AlertDialog.Title>AI Commands Available</AlertDialog.Title>
+        <AlertDialog.Description>
+          <div class="space-y-4 mt-2">
+            <div class="space-y-2">
+              <h2 class="font-semibold">/analyze</h2>
+              <p class="text-sm text-muted-foreground">Analyze the current conversation or selected text for key insights and patterns.</p>
+            </div>
+            
+            <div class="space-y-2">
+              <h2 class="font-semibold">/summarize</h2>
+              <p class="text-sm text-muted-foreground">Generate a concise summary of the conversation or selected content.</p>
+            </div>
+            <div class="space-y-2">
+              <h2 class="font-semibold">@AI User</h2>
+              <p class="text-sm text-muted-foreground">Mention the AI user in your message to get personalized assistance with your tasks.</p>
+            </div>
+
+            <div class="space-y-2">
+              <h2 class="font-semibold">@Chattie Bot</h2>
+              <p class="text-sm text-muted-foreground">Mention Chattie Bot to ask general questions and get helpful responses.</p>
+            </div>
+          </div>
+        </AlertDialog.Description>
+      </AlertDialog.Header>
+      <AlertDialog.Footer>
+        <AlertDialog.Cancel on:click={() => showAIDialog = false}>
+          Got it
+        </AlertDialog.Cancel>
+      </AlertDialog.Footer>
+    </AlertDialog.Content>
+  </AlertDialog.Root>
 </header>

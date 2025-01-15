@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
                 ai_persona: description,
                 message_frequency: 5,
                 owner_id: locals.user.$id,
-                members: [locals.user.$id]
+                members: [locals.user.$id, 'bot']
             },
             visibility === 'private' ? [
                 Permission.read(Role.user(locals.user.$id)),
@@ -47,6 +47,21 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
         );
         workspaceId = workspace.$id;
 
+        await appwrite.storage.createBucket(
+            workspaceId,
+            name,
+            visibility === 'private' ? [
+                Permission.read(Role.user(locals.user.$id)),
+                Permission.write(Role.user(locals.user.$id)),
+                Permission.delete(Role.user(locals.user.$id))
+            ] : [
+                Permission.read(Role.users()),
+                Permission.write(Role.users()),
+                Permission.delete(Role.user(locals.user.$id))
+            ],
+            true // Enable file security
+        );
+
         if (dev && useAI) {
             // Only create workspace and call localhost in dev mode with AI enabled
             try {
@@ -58,21 +73,6 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
                 console.error('Failed to connect to Python server:', e);
             }
         } else {
-            // Create storage bucket for workspace
-            await appwrite.storage.createBucket(
-                workspaceId,
-                name,
-                visibility === 'private' ? [
-                    Permission.read(Role.user(locals.user.$id)),
-                    Permission.write(Role.user(locals.user.$id)),
-                    Permission.delete(Role.user(locals.user.$id))
-                ] : [
-                    Permission.read(Role.users()),
-                    Permission.write(Role.users()),
-                    Permission.delete(Role.user(locals.user.$id))
-                ],
-                true // Enable file security
-            );
 
             // Create default channels
             const defaultChannels = ['general', 'announcements', 'random', 'help'];
