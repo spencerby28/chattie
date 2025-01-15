@@ -1,0 +1,4676 @@
+Directory structure:
+└── examples/
+    ├── __init__.py
+    ├── azure_openai_stream_bot.py
+    ├── batch_evaluation.ipynb
+    ├── batch_evalutation.py
+    ├── crewai_bot.py
+    ├── custom_evaluation_bot.py
+    ├── dspy_bot.py
+    ├── dspy_visualization.ipynb
+    ├── evaluation_manual_call.py
+    ├── fastapi_app.py
+    ├── generic_bot.py
+    ├── generic_bot_async_streaming.py
+    ├── generic_bot_exception.py
+    ├── generic_bot_rag.py
+    ├── generic_bot_rag_expected_output.py
+    ├── generic_bot_rag_multithreaded.py
+    ├── generic_bot_span_context_manager.py
+    ├── generic_bot_span_low_level.py
+    ├── generic_bot_streaming.py
+    ├── generic_bot_sync_function.py
+    ├── generic_bot_update_metadata_later.py
+    ├── guardrails.py
+    ├── guardrails_parallel.py
+    ├── guardrails_without_tracing.py
+    ├── haystack_bot.py
+    ├── langchain_bot.py
+    ├── langchain_bot_with_memory.py
+    ├── langchain_rag_bot.py
+    ├── langchain_rag_bot_vertex_ai.py
+    ├── langchain_rag_bot_with_threads.py
+    ├── langgraph_rag_bot_with_threads.py
+    ├── litellm_bot.py
+    ├── openai_bot.py
+    ├── openai_bot_disable_trace.py
+    ├── openai_bot_function_call.py
+    ├── openai_bot_rag.py
+    ├── openai_bot_sampling_rate.py
+    ├── span_evaluation.py
+    ├── streamlit_openai_assistants_api_bot.py
+    ├── weaviate_dspy_visualization.ipynb
+    ├── data/
+    │   └── rag_dspy_bot.json
+    ├── legacy/
+    │   ├── legacy_langchain_pydantic_bot.py
+    │   ├── poetry.lock
+    │   ├── poetry.toml
+    │   └── pyproject.toml
+    ├── opentelemetry/
+    │   ├── openinference_dspy_bot.py
+    │   ├── openinference_haystack.py
+    │   ├── openinference_langchain_bot.py
+    │   ├── openinference_openai_assistants_api_bot.py
+    │   ├── openinference_openai_bot.py
+    │   ├── openllmetry_anthropic_bot.py
+    │   ├── openllmetry_langchain_bot.py
+    │   ├── openllmetry_openai_bot.py
+    │   └── traditional_instrumentation_fastapi_app.py
+    └── weaviate_setup/
+        ├── Weaviate-Import.ipynb
+        ├── docker-compose.yml
+        └── .gitignore
+
+
+Files Content:
+
+================================================
+File: python-sdk/examples/azure_openai_stream_bot.py
+================================================
+import os
+from typing import Optional
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+from openai import AzureOpenAI
+
+import langwatch
+
+client = AzureOpenAI(
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    api_version="2024-02-01",
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),  # type: ignore
+)
+langwatch.api_key = os.getenv("LANGWATCH_API_KEY")
+
+
+@langwatch.span(type="rag")
+def retrieve(query: Optional[str] = None):
+    search_results = [
+        {
+            "id": "result_1",
+            "content": "This is the first result",
+        },
+        {
+            "id": "result_2",
+            "content": "This is the second result",
+        },
+    ]
+
+    langwatch.get_current_span().update(
+        contexts=[
+            RAGChunk(
+                document_id=docs["id"],
+                content=docs["content"],
+            )
+            for docs in search_results
+        ],
+    )
+
+    return search_results
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    langwatch.get_current_trace().update(
+        trace_id=message.id,
+        metadata={"user_id": message.author},
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo-0613",
+        messages=[
+            {
+                "role": "system",
+                "content": "come up with a query for searching the database based on user question, 3 words max",
+            },
+            {"role": "user", "content": message.content},
+        ],
+    )
+
+    query = completion.choices[0].message.content
+    search_results = retrieve(query=query)
+    results = "\n".join([f"{docs['id']}: {docs['content']}" for docs in search_results])
+
+    completion = client.chat.completions.create(
+        model="gpt-35-turbo-0613",
+        messages=[
+            {
+                "role": "system",
+                "content": f"""
+                    You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.
+
+                    We just made a search in the database for {query} and found {len(search_results)} results. Here they are, use that to help answering user:
+
+                    {results}
+                """,
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    for part in completion:
+        if len(part.choices) == 0:
+            continue
+
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/batch_evaluation.ipynb
+================================================
+"""
+# LangWatch Batch Evaluation Cookbook
+
+## Step 1: Define our LLM pipeline
+
+Let's create a simple RAG pipeline using LangChain, guaranteeing that we can get the output and the retrieved documents used during generation.
+"""
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from langchain.prompts import ChatPromptTemplate
+
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_core.vectorstores.base import VectorStoreRetriever
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.tools import BaseTool, StructuredTool, tool
+
+
+loader = WebBaseLoader("https://docs.langwatch.ai")
+docs = loader.load()
+documents = RecursiveCharacterTextSplitter(
+    chunk_size=1000, chunk_overlap=200
+).split_documents(docs)
+
+vector = FAISS.from_documents(documents, OpenAIEmbeddings())
+retriever = vector.as_retriever()
+
+retrieved_documents = []
+
+# Wrap the FAISS retriever so that we can capture which documents were used to generate the response
+class RetrieverToolWithCapture(BaseTool):
+    def _run(self, *args, **kwargs):
+        global retrieved_documents
+        documents = retriever.get_relevant_documents(*args, **kwargs)
+        retrieved_documents = documents
+
+        return documents
+
+tools = [
+    RetrieverToolWithCapture(
+        name="langwatch_search",
+        description="Search for information about LangWatch. For any questions about LangWatch, use this tool if you didn't already"
+    )
+]
+model = ChatOpenAI(model="gpt-4o-mini")
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a helpful assistant that only reply in short tweet-like responses, use tools only once.\n\n{agent_scratchpad}",
+        ),
+        ("human", "{question}"),
+    ]
+)
+agent = create_tool_calling_agent(model, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=False)  # type: ignore
+
+output = executor.invoke({"question": "What is LangWatch?"})["output"]
+
+print("")
+print("retrieved_documents:", [ d.page_content for d in retrieved_documents])
+print("output:", output)
+
+"""
+## Step 2: Run the Batch Evaluation Experiment
+
+Now we can use the dataset we have from LangWatch to run a batch evaluation experiment through our LLM pipeline, to see the results and tweak it for optimizations.
+"""
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from langwatch.batch_evaluation import BatchEvaluation, DatasetEntry
+
+
+def callback(entry: DatasetEntry):
+    output = executor.invoke({"question": entry.input})["output"]
+
+    return {"output": output, "contexts": [d.page_content for d in retrieved_documents]}
+
+
+# Instantiate the BatchEvaluation object
+evaluation = BatchEvaluation(
+    dataset="langwatch-rag",
+    evaluations=["answer-relevancy","openai-moderation","faithfulness"],
+    callback=callback,
+)
+
+# Run the evaluation
+results = evaluation.run()
+results.df
+
+================================================
+File: python-sdk/examples/batch_evalutation.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+from langwatch.batch_evaluation import BatchEvaluation, DatasetEntry
+
+
+def callback(entry: DatasetEntry):
+    # generate messages for entry.input using your LLM
+    # input_data = entry.get("input")
+    # Assuming entry contains an "input" field
+
+    # Process the input data using your LLM and generate a response
+    # response = f"Generated response for input: {input_data}"
+    # print(response)
+    # return {"output": response}
+
+    return {"output": "Hello! How can I help you today?"}
+
+
+# Instantiate the BatchEvaluation object
+evaluation = BatchEvaluation(
+    dataset="",  # Provide the actual dataset name here
+    evaluations=[""],  # Provide the actual evaluations here
+    callback=callback,
+)
+
+# Run the evaluation
+results = evaluation.run()
+
+
+================================================
+File: python-sdk/examples/crewai_bot.py
+================================================
+import sys
+import subprocess
+
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
+try:
+    import crewai
+    from openinference.instrumentation.crewai import CrewAIInstrumentor
+    import duckduckgo_search
+except ImportError:
+    # Poetry doesn't allow installing crewai without increasing the min python version to 3.10, so we install it manually
+    print("Installing crewai...")
+    install("crewai")
+    install("openinference-instrumentation-crewai")
+    install("duckduckgo-search")
+    print("crewai installed successfully.")
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+import langwatch
+from crewai import Agent, Task, Crew
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+from openinference.instrumentation.crewai import CrewAIInstrumentor
+from openinference.instrumentation.langchain import LangChainInstrumentor
+from openinference.instrumentation import using_attributes
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{langwatch.endpoint}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+
+CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
+LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+
+from langchain_community.tools import DuckDuckGoSearchRun
+
+search_tool = DuckDuckGoSearchRun()
+
+agent1 = Agent(
+    llm="openai/gpt-4o-mini",
+    role="first agent",
+    goal="who is {input}?",
+    backstory="agent backstory",
+    verbose=True,
+    tools=[search_tool],
+)
+
+task1 = Task(
+    expected_output="a short biography of {input}",
+    description="a short biography of {input}",
+    agent=agent1,
+)
+
+agent2 = Agent(
+    llm="openai/gpt-4o-mini",
+    role="second agent",
+    goal="summarize the short bio for {input} and if needed do more research",
+    backstory="agent backstory",
+    verbose=True,
+)
+
+task2 = Task(
+    description="a tldr summary of the short biography",
+    expected_output="5 bullet point summary of the biography",
+    agent=agent2,
+    context=[task1],
+)
+
+my_crew = Crew(agents=[agent1, agent2], tasks=[task1, task2])
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    with using_attributes(
+        user_id="123",
+        tags=["tag-1", "tag-2"],
+    ):
+        msg = cl.Message(
+            content="",
+        )
+
+        crew = my_crew.kickoff(inputs={"input": message.content})
+
+        await msg.stream_token(str(crew.raw))
+
+        await msg.update()
+
+
+================================================
+File: python-sdk/examples/custom_evaluation_bot.py
+================================================
+import json
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+import langwatch
+
+client = OpenAI()
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    final_message = ""
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            final_message += token
+            await msg.stream_token(token)
+
+    useful_message_evaluation(question=message.content, answer=final_message)
+
+    await msg.update()
+
+
+@langwatch.span(type="evaluation")
+def useful_message_evaluation(question: str, answer: str):
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "Please evaluate the following question and answer pair. Return a score between 0 and 100, where 0 is not useful and 100 is very useful.",
+            },
+            {"role": "user", "content": f"Question: {question}\nAnswer: {answer}"},
+        ],
+        tools=[
+            {
+                "type": "function",
+                "function": {
+                    "name": "useful_message_evaluation",
+                    "description": "Evaluate the usefulness of a question and answer pair.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "reasoning": {
+                                "type": "string",
+                                "description": "Use this field to think through the reasoning for the score.",
+                            },
+                            "score": {
+                                "type": "integer",
+                                "description": "The score of the question and answer pair.",
+                            },
+                        },
+                        "required": ["reasoning", "score"],
+                    },
+                },
+            }
+        ],
+        tool_choice={
+            "type": "function",
+            "function": {
+                "name": "useful_message_evaluation",
+            },
+        },
+    )
+
+    tool_message = completion.choices[0].message.tool_calls[0]  # type: ignore
+    arguments = json.loads(tool_message.function.arguments)
+
+    langwatch.get_current_span().add_evaluation(
+        name="Useful Message Evaluation",
+        passed=arguments["score"] > 50,
+        score=arguments["score"],
+        details=arguments["reasoning"],
+    )
+
+
+================================================
+File: python-sdk/examples/dspy_bot.py
+================================================
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+import dspy
+
+
+lm = dspy.LM("openai/gpt-4o-mini", api_key=os.environ["OPENAI_API_KEY"])
+
+colbertv2_wiki17_abstracts = dspy.ColBERTv2(
+    url="http://20.102.90.50:2017/wiki17_abstracts"
+)
+
+dspy.settings.configure(lm=lm, rm=colbertv2_wiki17_abstracts)
+
+
+class GenerateAnswer(dspy.Signature):
+    """Answer questions with short factoid answers."""
+
+    context = dspy.InputField(desc="may contain relevant facts")
+    question = dspy.InputField()
+    answer = dspy.OutputField(desc="often between 1 and 5 words")
+
+
+class RAG(dspy.Module):
+    def __init__(self, num_passages=3):
+        super().__init__()
+
+        self.retrieve = dspy.Retrieve(k=num_passages)
+        self.generate_answer = dspy.ChainOfThought(GenerateAnswer)
+
+    def forward(self, question):
+        context = self.retrieve(question).passages  # type: ignore
+        prediction = self.generate_answer(question=question, context=context)
+        return dspy.Prediction(answer=prediction.answer)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_dspy()
+
+    msg = cl.Message(
+        content="",
+    )
+
+    program = RAG()
+    program.load(
+        f"{os.path.dirname(os.path.abspath(__file__))}/data/rag_dspy_bot.json",
+        use_legacy_loading=True,
+    )
+    program = program.reset_copy()
+    prediction = program(question=message.content)
+
+    await msg.stream_token(prediction.answer)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/dspy_visualization.ipynb
+================================================
+"""
+# LangWatch DSPy Visualizer
+
+This notebook shows an example of a simple DSPy optimization process integrated with LangWatch for training visualization and debugging.
+
+[<img align="center" src="https://colab.research.google.com/assets/colab-badge.svg" />](https://colab.research.google.com/github/langwatch/langwatch/blob/main/python-sdk/examples/dspy_visualization.ipynb)
+"""
+
+# Install langwatch along with dspy for the visualization
+!pip install dspy-ai langwatch
+
+"""
+## Preparing the LLM
+"""
+
+import os
+from getpass import getpass
+
+os.environ["OPENAI_API_KEY"] = getpass("Enter your OPENAI_API_KEY: ")
+
+import dspy
+import openai
+
+llm = dspy.OpenAI(
+    model="gpt-4o-mini",
+    max_tokens=2048,
+    temperature=0,
+    api_key=os.environ["OPENAI_API_KEY"]
+)
+
+print("LLM test response:", llm("hello there"))
+
+colbertv2_wiki17_abstracts = dspy.ColBERTv2(url='http://20.102.90.50:2017/wiki17_abstracts')
+dspy.settings.configure(lm=llm, rm=colbertv2_wiki17_abstracts)
+
+"""
+## Preparing the Dataset
+"""
+
+from dspy.datasets import HotPotQA
+
+# Load the dataset.
+dataset = HotPotQA(train_seed=1, train_size=32, eval_seed=2023, dev_size=50, test_size=0)
+
+# Tell DSPy that the 'question' field is the input. Any other fields are labels and/or metadata.
+trainset = [x.with_inputs('question') for x in dataset.train]
+devset = [x.with_inputs('question') for x in dataset.dev]
+
+len(trainset), len(devset)
+
+"""
+## Defining the model
+"""
+
+class GenerateAnswer(dspy.Signature):
+    """Answer questions with short factoid answers."""
+
+    context = dspy.InputField(desc="may contain relevant facts")
+    question = dspy.InputField()
+    answer = dspy.OutputField(desc="often between 1 and 5 words")
+
+
+class RAG(dspy.Module):
+    def __init__(self, num_passages=3):
+        super().__init__()
+
+        self.retrieve = dspy.Retrieve(k=num_passages)
+        self.generate_answer = dspy.ChainOfThought(GenerateAnswer)
+
+    def forward(self, question):
+        context = self.retrieve(question).passages
+        prediction = self.generate_answer(context=context, question=question)
+        return dspy.Prediction(context=context, answer=prediction.answer)
+
+
+dev_example = devset[18]
+print(f"[Devset] Question: {dev_example.question}")
+print(f"[Devset] Answer: {dev_example.answer}")
+print(f"[Devset] Relevant Wikipedia Titles: {dev_example.gold_titles}")
+
+generate_answer = RAG()
+
+pred = generate_answer(question=dev_example.question)
+
+# Print the input and the prediction.
+print(f"[Prediction] Question: {dev_example.question}")
+print(f"[Prediction] Predicted Answer: {pred.answer}")
+
+"""
+## Login to LangWatch
+"""
+
+import langwatch
+
+langwatch.login()
+
+"""
+## Start Training Session!
+"""
+
+from dspy.teleprompt import MIPROv2
+import dspy.evaluate
+
+# Define our metric validation
+def validate_context_and_answer(example, pred, trace=None):
+    answer_EM = dspy.evaluate.answer_exact_match(example, pred)
+    answer_PM = dspy.evaluate.answer_passage_match(example, pred)
+    return answer_EM and answer_PM
+
+# Set up a MIPROv2 optimizer, which will compile our RAG program.
+optimizer = MIPROv2(metric=validate_context_and_answer, prompt_model=llm, task_model=llm, num_candidates=2, init_temperature=0.7)
+
+# Initialize langwatch for this run, to track the optimizer compilation
+langwatch.dspy.init(experiment="my-awesome-experiment", optimizer=optimizer)
+
+# Compile
+compiled_rag = optimizer.compile( RAG(),
+    trainset=trainset,
+    num_batches=10,
+    max_bootstrapped_demos=3,
+    max_labeled_demos=5,
+    eval_kwargs=dict(num_threads=16, display_progress=True, display_table=0),
+)
+
+compiled_rag
+
+compiled_rag.save("optimized_model.json")
+
+================================================
+File: python-sdk/examples/evaluation_manual_call.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+
+client = OpenAI()
+
+import langwatch
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    full_response = ""
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            full_response += token
+            await msg.stream_token(token)
+
+    answer_relevancy = langwatch.get_current_span().evaluate(
+        "ragas/answer_relevancy",
+        name="Manually Called Answer Relevancy",
+        input=message.content,
+        output=full_response,
+        settings={
+            "max_tokens": 512,
+        },
+    )
+
+    langwatch.get_current_span().add_evaluation(
+        name="Useful Message Evaluation",
+        passed=True,
+        score=99,
+        details="This is a custom manual evaluation",
+    )
+
+    await msg.stream_token(
+        f"Answer Relevancy: {answer_relevancy.score} {answer_relevancy.details if answer_relevancy.details else ''}"
+    )
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/fastapi_app.py
+================================================
+from dotenv import load_dotenv
+from fastapi.responses import StreamingResponse
+from fastapi.testclient import TestClient
+
+load_dotenv()
+
+from fastapi import FastAPI
+from openai import OpenAI
+from pydantic import BaseModel
+
+client = OpenAI()
+
+import langwatch
+
+app = FastAPI()
+
+
+class EndpointParams(BaseModel):
+    input: str
+
+
+class CompletionStreaming:
+    @langwatch.trace(name="fastapi_sample_endpoint")
+    async def execute(self, input: str):
+        langwatch.get_current_trace().autotrack_openai_calls(client)
+
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+                },
+                {"role": "user", "content": input},
+            ],
+            stream=True,
+        )
+
+        for chunk in completion:
+            content = chunk.choices[0].delta.content
+            if content is not None:
+                yield content
+
+
+@app.post("/")
+async def fastapi_sample_endpoint(params: EndpointParams):
+    return StreamingResponse(CompletionStreaming().execute(params.input))  # type: ignore
+
+
+def call_fastapi_sample_endpoint(input: str) -> str:
+    test_client = TestClient(app)
+    response = test_client.post("/", json={"input": input})
+
+    return response.text
+
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+
+    # Test one llm call before starting the server
+    print(call_fastapi_sample_endpoint("Hello, world!"))
+
+    port = int(os.environ.get("PORT", 9000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
+
+================================================
+File: python-sdk/examples/generic_bot.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@langwatch.span(type="llm")
+def generate(message: str):
+    time.sleep(1)  # generating the message...
+
+    generated_message = "Hello there! How can I help?"
+
+    langwatch.get_current_span().update(model="custom_model")
+
+    return generated_message
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    langwatch.get_current_trace().update(
+        metadata={"user_id": "123", "question_id": "456", "labels": ["some-label"]}
+    )
+
+    generated_message = generate(message.content)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_async_streaming.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@langwatch.span(type="llm")
+async def stream_tokens(tokens: list[str]):
+    langwatch.get_current_span().update(model="custom_model")
+    for token in tokens:
+        yield token
+
+
+@langwatch.trace()
+async def generate(message: str):
+    time.sleep(0.5)  # generating the message...
+
+    async for token in stream_tokens(["Hello", " there! "]):
+        yield token
+
+    time.sleep(0.5)  # generating the message...
+
+    async for token in stream_tokens(["How", " can", " I", " help?"]):
+        yield token
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    async for token in generate(message.content):
+        await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_exception.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@langwatch.span(type="llm")
+def generate(message: str):
+    time.sleep(1)  # generating the message...
+
+    raise Exception("This exception will be captured by LangWatch automatically")
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    generated_message = generate(message.content)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_rag.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@langwatch.span(type="llm")
+def generate(contexts: list[str], message: str):
+    time.sleep(1)  # generating the message...
+
+    generated_message = "Hello there! How can I help?"
+
+    langwatch.get_current_span().update(model="custom_model")
+
+    return generated_message
+
+
+@langwatch.span(type="rag")
+def retrieve(message: str):
+    time.sleep(0.5)
+    contexts = ["context1", "context2"]
+
+    langwatch.get_current_span().update(contexts=contexts)
+
+    return contexts
+
+
+@langwatch.span()
+def rag(message: str):
+    contexts = retrieve(message)
+    return generate(contexts, message)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    generated_message = rag(message.content)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_rag_expected_output.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    trace = langwatch.trace()
+
+    # Create two spans, one for the RAG, and one for the "LLM call" inside it
+    rag_span = trace.span(type="rag", input=message.content)
+    contexts = ["context1", "context2"]
+    rag_span.update(contexts=contexts)
+
+    llm_span = rag_span.span(type="llm", input=str(contexts) + " " + message.content)
+    generated_message = "Hello there! How can I help?"
+    llm_span.end(output=generated_message)
+    rag_span.end(output=generated_message)
+
+    # Set what is the expected output of the trace, to be used on evaluations like Ragas Correctness
+    trace.update(
+        expected_output="Hello there! How can I be helpful?"
+    )
+
+    # Send the trace in the background
+    trace.deferred_send_spans()
+    # OR send the trace synchonously to be sure before generating the url, maybe a better option
+    # trace.send_spans()
+
+    public_url = trace.share() # it works even before the trace was fully synced, but users might take a second to see on the UI
+    print("See the trace at:", public_url)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_rag_multithreaded.py
+================================================
+import time
+import uuid
+from dotenv import load_dotenv
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import contextvars
+import chainlit as cl
+import langwatch
+
+load_dotenv()
+
+# langwatch.debug = True
+
+
+@langwatch.trace()
+@langwatch.span(type="llm")
+def generate(question_id: str, contexts: list[str], message: str):
+    langwatch.get_current_trace().update(trace_id=question_id)
+
+    time.sleep(1)  # generating the message...
+    generated_message = "Hello there! How can I help?"
+    langwatch.get_current_span().update(model="custom_model")
+    return generated_message
+
+
+@langwatch.trace()
+@langwatch.span(type="rag")
+def retrieve(question_id: str, message: str):
+    langwatch.get_current_trace().update(trace_id=question_id)
+
+    time.sleep(0.5)
+    contexts = ["context1", "context2"]
+    langwatch.get_current_span().update(contexts=contexts)
+    return contexts
+
+
+@langwatch.span()
+def parallel_rag(question_id: str, message: str):
+    langwatch.get_current_trace().update(trace_id=question_id)
+
+    # Create a ThreadPoolExecutor to run tasks in parallel
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Submit retrieve task
+        retrieve_future = executor.submit(retrieve, question_id, message)
+
+        # Wait for retrieve to complete and then submit generate
+        contexts = retrieve_future.result()
+        generate_future = executor.submit(generate, question_id, contexts, message)
+
+        # Get the final result
+        return generate_future.result()
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    msg = cl.Message(content="")
+
+    question_id = str(uuid.uuid4())
+    # Since this is already in an async context, we can run the synchronous
+    # parallel_rag in a thread pool to not block
+    generated_message = await cl.make_async(parallel_rag)(question_id, message.content)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_span_context_manager.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    with langwatch.trace() as trace:
+        with trace.span(
+            type="llm",
+            input=message.content,
+        ) as span:
+            time.sleep(1)  # generating the message...
+            generated_message = "Hello there! How can I help from context manager?"
+
+            span.update(output=generated_message)
+
+        await msg.stream_token(generated_message)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_span_low_level.py
+================================================
+import time
+import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    trace = langwatch.trace(
+        trace_id=uuid.uuid4(),
+    )
+    span = trace.span(
+        type="span",
+        input=message.content,
+    )
+    nested_span = span.span(
+        type="llm", input=message.content, model="openai/gpt-4o-mini"
+    )
+
+    time.sleep(1)  # generating the message...
+    generated_message = "Hello there! How can I help from low level?"
+
+    nested_span.end(output=generated_message)
+    span.end()
+
+    trace.deferred_send_spans()
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_streaming.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@langwatch.span(type="llm")
+def stream_tokens(tokens: list[str]):
+    langwatch.get_current_span().update(model="custom_model")
+    for token in tokens:
+        yield token
+
+
+@langwatch.trace()
+def generate(message: str):
+    time.sleep(0.5)  # generating the message...
+
+    for token in stream_tokens(["Hello", " there! "]):
+        yield token
+
+    time.sleep(0.5)  # generating the message...
+
+    for token in stream_tokens(["How", " can", " I", " help?"]):
+        yield token
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    for token in generate(message.content):
+        await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_sync_function.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@langwatch.trace(type="llm")
+def generate(message: str):
+    time.sleep(1)  # generating the message...
+
+    generated_message = "Hello there! How can I help?"
+
+    langwatch.get_current_span().update(model="custom_model")
+
+    return generated_message
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    generated_message = generate(message.content)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/generic_bot_update_metadata_later.py
+================================================
+import time
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import langwatch
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    trace = langwatch.trace()
+
+    # Create two spans, one for the RAG, and one for the "LLM call" inside it
+    rag_span = trace.span(type="rag", input=message.content)
+    contexts = ["context1", "context2"]
+    rag_span.update(contexts=contexts)
+
+    llm_span = rag_span.span(type="llm", input=str(contexts) + " " + message.content)
+    generated_message = "Hello there! How can I help?"
+    llm_span.end(output=generated_message)
+    rag_span.end(output=generated_message)
+
+    trace.send_spans()
+
+    # At a later point, update the trace with expected_output
+    time.sleep(3)
+    id = trace.trace_id
+
+    trace = langwatch.trace(trace_id=id)
+
+    trace.update(
+        expected_output="Hello there! How can I be helpful?",
+        metadata={"labels": ["test"]},
+    )
+    trace.send_spans()
+    public_url = (
+        trace.share()
+    )  # it works even before the trace was fully synced, but users might take a second to see on the UI
+    print("See the trace at:", public_url)
+
+    await msg.stream_token(generated_message)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/guardrails.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+
+client = OpenAI()
+
+import langwatch
+import langwatch.guardrails
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    jailbreak_guardrail = langwatch.get_current_span().evaluate(
+        "jailbreak-detection", as_guardrail=True, input=message.content
+    )
+    if not jailbreak_guardrail.passed:
+        await msg.stream_token(f"I'm sorry, I can't help you with that.")
+        await msg.update()
+        return
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/guardrails_parallel.py
+================================================
+import asyncio
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import AsyncOpenAI
+
+client = AsyncOpenAI()
+
+import langwatch.openai
+import langwatch.guardrails
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    jailbreak_guardrail = asyncio.create_task(
+        langwatch.get_current_span().async_evaluate(
+            "jailbreak-detection", as_guardrail=True, input=message.content
+        )
+    )
+    off_topic_guardrail = asyncio.create_task(
+        langwatch.get_current_span().async_evaluate(
+            "off-topic-evaluator", as_guardrail=True, input=message.content
+        )
+    )
+
+    async def has_guardrails_failed():
+        if jailbreak_guardrail.done():
+            result = await jailbreak_guardrail
+            if not result.passed:
+                await msg.stream_token(f"I'm sorry, I can't help you with that.")
+                await msg.update()
+                return True
+
+        if off_topic_guardrail.done():
+            result = await off_topic_guardrail
+            if not result.passed:
+                await msg.stream_token(f"I'm sorry, I can't help you with that.")
+                await msg.update()
+                return True
+
+        return False
+
+    completion = await client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant",  # that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    accumulated = []
+    async for part in completion:
+        if await has_guardrails_failed():
+            return
+
+        if token := part.choices[0].delta.content or "":
+            accumulated.append(token)
+
+        if off_topic_guardrail.done() and jailbreak_guardrail.done():
+            for token in accumulated:
+                await msg.stream_token(token)
+            accumulated = []
+
+    await asyncio.gather(jailbreak_guardrail, off_topic_guardrail)
+    if await has_guardrails_failed():
+        return
+    for token in accumulated:
+        await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/guardrails_without_tracing.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+
+client = OpenAI()
+
+import langwatch.guardrails
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    jailbreak_guardrail = langwatch.guardrails.evaluate(
+        "jailbreak-detection", input=message.content
+    )
+    if not jailbreak_guardrail.passed:
+        await msg.stream_token(f"I'm sorry, I can't help you with that.")
+        await msg.update()
+        return
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/haystack_bot.py
+================================================
+from typing import List
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+
+from haystack import Pipeline, Document, component
+from haystack.utils import Secret
+from haystack.document_stores.in_memory import InMemoryDocumentStore
+from haystack.components.retrievers.in_memory import InMemoryBM25Retriever
+from haystack.components.generators import OpenAIGenerator
+from haystack.components.builders.prompt_builder import PromptBuilder
+
+import os
+import langwatch
+
+
+# Haystack pipeline
+
+# Write documents to InMemoryDocumentStore
+document_store = InMemoryDocumentStore()
+document_store.write_documents(
+    [
+        Document(content="My name is Jean and I live in Paris."),
+        Document(content="My name is Mark and I live in Berlin."),
+        Document(content="My name is Giorgio and I live in Rome."),
+    ]
+)
+
+# Build a RAG pipeline
+prompt_template = """
+Given these documents, answer the question.
+Documents:
+{% for doc in documents %}
+    {{ doc.content }}
+{% endfor %}
+Question: {{question}}
+Answer:
+"""
+
+
+class TrackedInMemoryBM25Retriever(InMemoryBM25Retriever):
+    @langwatch.span(type="rag")
+    @component.output_types(documents=List[Document])
+    def run(self, query: str, **kwargs):
+        results = super().run(query, **kwargs)
+        langwatch.get_current_span().update(
+            contexts=[
+                RAGChunk(
+                    document_id=document.id,
+                    content=document.content or "",
+                )
+                for document in results["documents"]
+            ]
+        )
+        return results
+
+
+retriever = TrackedInMemoryBM25Retriever(document_store=document_store)
+
+
+class TrackedPromptBuilder(PromptBuilder):
+    @langwatch.span()
+    @component.output_types(prompt=str)
+    def run(self, template=None, template_variables=None, **kwargs):
+        return super().run(template, template_variables, **kwargs)
+
+
+prompt_builder = TrackedPromptBuilder(template=prompt_template)
+
+
+class TrackedOpenAIGenerator(OpenAIGenerator):
+    @langwatch.span(type="llm")
+    def run(self, prompt: str, **kwargs):
+        result = super().run(prompt, **kwargs)
+        langwatch.get_current_span().update(
+            model=self.model,
+            output=result["replies"][0],
+            metrics={
+                "prompt_tokens": result["meta"][0]["usage"]["prompt_tokens"],
+                "completion_tokens": result["meta"][0]["usage"]["completion_tokens"],
+            },
+        )
+        return result
+
+
+llm = TrackedOpenAIGenerator(
+    api_key=Secret.from_token(os.environ["OPENAI_API_KEY"]), model="gpt-4o-mini"
+)
+
+rag_pipeline = Pipeline()
+rag_pipeline.add_component("retriever", retriever)
+rag_pipeline.add_component("prompt_builder", prompt_builder)
+rag_pipeline.add_component("llm", llm)
+rag_pipeline.connect("retriever", "prompt_builder.documents")
+rag_pipeline.connect("prompt_builder", "llm")
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    langwatch.get_current_trace().update(
+        metadata={
+            "session_id": message.thread_id,
+            "user_id": "my-test-user",
+            "tags": ["User relevant question", "Second tag example"],
+            "metadata": {"foo": "bar"},
+        }
+    )
+
+    results = rag_pipeline.run(
+        {
+            "retriever": {"query": message.content},
+            "prompt_builder": {"question": message.content},
+        }
+    )
+
+    msg.content = results["llm"]["replies"][0]
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/langchain_bot.py
+================================================
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import StrOutputParser
+from langchain.schema.runnable import Runnable
+from langchain.schema.runnable.config import RunnableConfig
+
+import langwatch
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    model = ChatOpenAI(streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    runnable = prompt | model | StrOutputParser()
+    cl.user_session.set("runnable", runnable)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    runnable: Runnable = cl.user_session.get("runnable")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    langwatch.get_current_trace().update(
+        metadata={"customer_id": "customer_example", "labels": ["v1.0.0"]}
+    )
+
+    async for chunk in runnable.astream(
+        {"question": message.content},
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        await msg.stream_token(chunk)
+
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/langchain_bot_with_memory.py
+================================================
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.schema.runnable import Runnable, RunnableMap
+from langchain.schema.runnable.config import RunnableConfig
+from langchain.memory import ConversationBufferMemory
+
+import langwatch
+
+
+session_memories: dict = {}
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    memory = session_memories.setdefault(
+        cl.user_session.get("session_id"),
+        ConversationBufferMemory(return_messages=True, memory_key="chat_history"),
+    )
+    ingress = RunnableMap(
+        {
+            "input": lambda x: x["input"],
+            "chat_history": lambda x: memory.load_memory_variables(x)["chat_history"],
+        }
+    )
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", "You are a helpful assistant."),
+            MessagesPlaceholder(variable_name="chat_history"),
+            ("human", "{input}"),
+        ]
+    )
+    llm = ChatOpenAI(temperature=0.3, model="gpt-4o-mini", max_tokens=4096)
+    runnable = ingress | prompt | llm
+
+    cl.user_session.set("runnable", runnable)
+    cl.user_session.set("memory", memory)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    runnable: Runnable = cl.user_session.get("runnable")  # type: ignore
+    memory = cl.user_session.get("memory")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    langwatch.get_current_trace().update(
+        metadata={"customer_id": "customer_example", "labels": ["v1.0.0"]}
+    )
+
+    async for chunk in runnable.astream(
+        {"input": message.content},
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        await msg.stream_token(chunk.content)
+
+    memory.save_context({"input": message.content}, {"output": msg.content})  # type: ignore
+
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/langchain_rag_bot.py
+================================================
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import HumanMessage
+from langchain.schema.runnable.config import RunnableConfig
+
+import langwatch
+
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.tools import BaseTool, StructuredTool, tool
+
+loader = WebBaseLoader("https://docs.langwatch.ai")
+docs = loader.load()
+documents = RecursiveCharacterTextSplitter(
+    chunk_size=1000, chunk_overlap=200
+).split_documents(docs)
+vector = FAISS.from_documents(documents, OpenAIEmbeddings())
+retriever = vector.as_retriever()
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    retriever_tool = create_retriever_tool(
+        langwatch.langchain.capture_rag_from_retriever(
+            retriever,
+            lambda document: RAGChunk(
+                document_id=document.metadata["source"], content=document.page_content
+            ),
+        ),
+        "langwatch_search",
+        "Search for information about LangWatch. For any questions about LangWatch, use this tool if you didn't already",
+    )
+
+    # Alternative approach to retrievers
+    # wrapped_tool = langwatch.langchain.capture_rag_from_tool(
+    #     retriever_tool, lambda response: [RAGChunk(content=response)]
+    # )
+
+    tools = [retriever_tool]
+    model = ChatOpenAI(model="gpt-4o-mini", streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis and use tools only once.\n\n{agent_scratchpad}",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    agent = create_tool_calling_agent(model, tools, prompt)
+    executor = AgentExecutor(agent=agent, tools=tools, verbose=True)  # type: ignore
+    cl.user_session.set("agent", executor)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    agent: AgentExecutor = cl.user_session.get("agent")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    langwatch.get_current_trace().update(
+        metadata={"user_id": "user_example", "labels": ["v1.0.0"]}
+    )
+
+    async for chunk in agent.astream(
+        {
+            "question": message.content,
+            "messages": [HumanMessage(content="Hoi, dit is een test")],
+        },
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        if "output" in chunk:
+            await msg.stream_token(chunk["output"])
+        elif "actions" in chunk:
+            await msg.stream_token(chunk["actions"][0].log)
+        elif "steps" in chunk:
+            await msg.stream_token(chunk["steps"][0].observation + "\n\n")
+        else:
+            await msg.stream_token("<unammaped chunk>")
+
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/langchain_rag_bot_vertex_ai.py
+================================================
+import json
+import os
+import tempfile
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import HumanMessage
+from langchain.schema.runnable.config import RunnableConfig
+
+import langwatch
+
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.tools import BaseTool, StructuredTool, tool
+from langchain_google_vertexai import ChatVertexAI, VertexAI
+
+loader = WebBaseLoader("https://docs.langwatch.ai")
+docs = loader.load()
+documents = RecursiveCharacterTextSplitter(
+    chunk_size=1000, chunk_overlap=200
+).split_documents(docs)
+vector = FAISS.from_documents(documents, OpenAIEmbeddings())
+retriever = vector.as_retriever()
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    retriever_tool = create_retriever_tool(
+        langwatch.langchain.capture_rag_from_retriever(
+            retriever,
+            lambda document: RAGChunk(
+                document_id=document.metadata["source"], content=document.page_content
+            ),
+        ),
+        "langwatch_search",
+        "Search for information about LangWatch. For any questions about LangWatch, use this tool if you didn't already",
+    )
+
+    # Alternative approach to retrievers
+    # wrapped_tool = langwatch.langchain.capture_rag_from_tool(
+    #     retriever_tool, lambda response: [RAGChunk(content=response)]
+    # )
+
+    try:
+        credentials_json = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+        credentials_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
+        credentials_file.write(json.dumps(credentials_json))
+        credentials_file.close()
+
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_file.name
+    except:
+        pass
+
+    tools = [retriever_tool]
+    model = ChatVertexAI(
+        model_name="gemini-1.5-flash-001",
+        project=os.environ["VERTEXAI_PROJECT"],
+        location=os.environ["VERTEXAI_LOCATION"],
+        streaming=True,
+    )
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis and use tools only once.\n\n{agent_scratchpad}",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    agent = create_tool_calling_agent(model, tools, prompt)
+    executor = AgentExecutor(agent=agent, tools=tools, verbose=True)  # type: ignore
+    cl.user_session.set("agent", executor)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    agent: AgentExecutor = cl.user_session.get("agent")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    langwatch.get_current_trace().update(
+        metadata={"customer_id": "customer_example", "labels": ["v1.0.0"]}
+    )
+
+    async for chunk in agent.astream(
+        {
+            "question": message.content,
+            "messages": [HumanMessage(content="Hoi, dit is een test")],
+        },
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        if "output" in chunk:
+            await msg.stream_token(chunk["output"])
+        elif "actions" in chunk:
+            await msg.stream_token(chunk["actions"][0].log)
+        elif "steps" in chunk:
+            await msg.stream_token(chunk["steps"][0].observation + "\n\n")
+        else:
+            await msg.stream_token("<unammaped chunk>")
+
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/langchain_rag_bot_with_threads.py
+================================================
+import os
+
+os.environ["CHAINLIT_AUTH_SECRET"] = (
+    "sSgdH4IfqM/%5swBnuwNdZ8rS/VBDW-WiBF?>DW_YPPKm9p9CiO6PPm6Z4Ih7IL"
+)
+
+import datetime
+import os.path
+import pickle
+from typing import Dict, List, Optional
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import HumanMessage
+from langchain.schema.runnable.config import RunnableConfig
+
+import langwatch
+
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.tools import BaseTool, StructuredTool, tool
+import chainlit as cl
+import chainlit.data as cl_data
+from chainlit.data.utils import queue_until_user_message
+from chainlit.element import Element, ElementDict
+from chainlit.socket import persist_user_session
+from chainlit.step import StepDict
+from chainlit.types import (
+    Feedback,
+    PageInfo,
+    PaginatedResponse,
+    Pagination,
+    ThreadDict,
+    ThreadFilter,
+)
+
+loader = WebBaseLoader("https://docs.langwatch.ai")
+docs = loader.load()
+documents = RecursiveCharacterTextSplitter(
+    chunk_size=1000, chunk_overlap=200
+).split_documents(docs)
+vector = FAISS.from_documents(documents, OpenAIEmbeddings())
+retriever = vector.as_retriever()
+
+
+now = datetime.datetime.now()
+
+thread_history = [
+    {
+        "id": "test1",
+        "name": "thread 1",
+        "createdAt": now,
+        "userId": "test",
+        "userIdentifier": "admin",
+        "steps": [
+            {
+                "id": "test1",
+                "name": "test",
+                "createdAt": now,
+                "type": "user_message",
+                "output": "Message 1",
+            },
+            {
+                "id": "test2",
+                "name": "test",
+                "createdAt": now,
+                "type": "assistant_message",
+                "output": "Message 2",
+            },
+        ],
+    },
+    {
+        "id": "test2",
+        "createdAt": now,
+        "userId": "test",
+        "userIdentifier": "admin",
+        "name": "thread 2",
+        "steps": [
+            {
+                "id": "test3",
+                "createdAt": now,
+                "name": "test",
+                "type": "user_message",
+                "output": "Message 3",
+            },
+            {
+                "id": "test4",
+                "createdAt": now,
+                "name": "test",
+                "type": "assistant_message",
+                "output": "Message 4",
+            },
+        ],
+    },
+]
+deleted_thread_ids = []
+
+THREAD_HISTORY_PICKLE_PATH = os.getenv("THREAD_HISTORY_PICKLE_PATH")
+if THREAD_HISTORY_PICKLE_PATH and os.path.exists(THREAD_HISTORY_PICKLE_PATH):
+    with open(THREAD_HISTORY_PICKLE_PATH, "rb") as f:
+        thread_history = pickle.load(f)
+
+
+async def save_thread_history():
+    if THREAD_HISTORY_PICKLE_PATH:
+        # Force saving of thread history for reload when server restarts
+        await persist_user_session(
+            cl.context.session.thread_id, cl.context.session.to_persistable()
+        )
+
+        with open(THREAD_HISTORY_PICKLE_PATH, "wb") as out_file:
+            pickle.dump(thread_history, out_file)
+
+
+class TestDataLayer(cl_data.base.BaseDataLayer):
+    async def get_user(self, identifier: str):
+        return cl.PersistedUser(
+            id="test", createdAt=now.isoformat(), identifier=identifier
+        )
+
+    async def create_user(self, user: cl.User):
+        return cl.PersistedUser(
+            id="test", createdAt=now.isoformat(), identifier=user.identifier
+        )
+
+    async def update_thread(
+        self,
+        thread_id: str,
+        name: Optional[str] = None,
+        user_id: Optional[str] = None,
+        metadata: Optional[Dict] = None,
+        tags: Optional[List[str]] = None,
+    ):
+        thread = next((t for t in thread_history if t["id"] == thread_id), None)
+        if thread:
+            if name:
+                thread["name"] = name
+            if metadata:
+                thread["metadata"] = metadata
+            if tags:
+                thread["tags"] = tags
+        else:
+            thread_history.append(
+                {
+                    "id": thread_id,
+                    "name": name,
+                    "metadata": metadata,
+                    "tags": tags,
+                    "createdAt": now.isoformat(),
+                    "userId": user_id,
+                    "userIdentifier": "admin",
+                    "steps": [],
+                }
+            )
+
+    @cl_data.queue_until_user_message()
+    async def create_step(self, step_dict: StepDict):
+        thread = next(
+            (t for t in thread_history if t["id"] == step_dict.get("threadId")), None
+        )
+        if thread:
+            thread["steps"].append(step_dict)
+
+    async def get_thread_author(self, thread_id: str):
+        return "admin"
+
+    async def list_threads(
+        self, pagination: Pagination, filters: ThreadFilter
+    ) -> PaginatedResponse[ThreadDict]:
+        return PaginatedResponse(
+            data=[t for t in thread_history if t["id"] not in deleted_thread_ids],
+            pageInfo=PageInfo(hasNextPage=False, startCursor=None, endCursor=None),
+        )  # type: ignore
+
+    async def get_thread(self, thread_id: str):
+        thread = next((t for t in thread_history if t["id"] == thread_id), None)
+        if not thread:
+            return None
+        thread["steps"] = sorted(thread["steps"], key=lambda x: x["createdAt"])
+        return thread
+
+    async def delete_thread(self, thread_id: str):
+        deleted_thread_ids.append(thread_id)
+
+    async def delete_feedback(
+        self,
+        feedback_id: str,
+    ) -> bool:
+        return True
+
+    async def upsert_feedback(
+        self,
+        feedback: Feedback,
+    ) -> str:
+        return ""
+
+    @queue_until_user_message()
+    async def create_element(self, element: "Element"):
+        pass
+
+    async def get_element(
+        self, thread_id: str, element_id: str
+    ) -> Optional["ElementDict"]:
+        pass
+
+    @queue_until_user_message()
+    async def delete_element(self, element_id: str, thread_id: Optional[str] = None):
+        pass
+
+    @queue_until_user_message()
+    async def update_step(self, step_dict: "StepDict"):
+        pass
+
+    @queue_until_user_message()
+    async def delete_step(self, step_id: str):
+        pass
+
+    async def build_debug_url(self) -> str:
+        return ""
+
+
+cl_data._data_layer = TestDataLayer()
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    retriever_tool = create_retriever_tool(
+        langwatch.langchain.capture_rag_from_retriever(
+            retriever,
+            lambda document: RAGChunk(
+                document_id=document.metadata["source"], content=document.page_content
+            ),
+        ),
+        "langwatch_search",
+        "Search for information about LangWatch. For any questions about LangWatch, use this tool if you didn't already",
+    )
+
+    # Alternative approach to retrievers
+    # wrapped_tool = langwatch.langchain.capture_rag_from_tool(
+    #     retriever_tool, lambda response: [RAGChunk(content=response)]
+    # )
+
+    tools = [retriever_tool]
+    model = ChatOpenAI(streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis and use tools only once.\n\n{agent_scratchpad}",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    agent = create_tool_calling_agent(model, tools, prompt)
+    executor = AgentExecutor(agent=agent, tools=tools, verbose=True)  # type: ignore
+    cl.user_session.set("agent", executor)
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    agent: AgentExecutor = cl.user_session.get("agent")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    langwatch.get_current_trace().update(
+        metadata={
+            "user_id": getattr(cl.user_session.get("user"), "identifier", "unknown"),
+            "thread_id": cl.context.session.thread_id,
+        }
+    )
+
+    async for chunk in agent.astream(
+        {
+            "question": message.content,
+            "messages": [HumanMessage(content="Hoi, dit is een test")],
+        },
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        if "output" in chunk:
+            await msg.stream_token(chunk["output"])
+        elif "actions" in chunk:
+            await msg.stream_token(chunk["actions"][0].log)
+        elif "steps" in chunk:
+            await msg.stream_token(chunk["steps"][0].observation + "\n\n")
+        else:
+            await msg.stream_token("<unammaped chunk>")
+
+    await msg.send()
+
+    await save_thread_history()
+
+
+@cl.password_auth_callback
+async def auth_callback(username: str, password: str) -> Optional[cl.User]:
+    if (username, password) == ("admin", "admin"):
+        return cl.User(identifier="admin")
+    else:
+        return None
+
+
+@cl.on_chat_resume
+async def on_chat_resume(thread: ThreadDict):
+    await cl.Message(f"Welcome back to {thread['name']}").send()
+    if "metadata" in thread and thread["metadata"]:
+        await cl.Message(thread["metadata"], author="metadata", language="json").send()
+    if "tags" in thread and thread["tags"]:
+        await cl.Message(
+            ",".join(thread["tags"]), author="tags", language="json"
+        ).send()
+
+
+================================================
+File: python-sdk/examples/langgraph_rag_bot_with_threads.py
+================================================
+import os
+
+os.environ["CHAINLIT_AUTH_SECRET"] = (
+    "sSgdH4IfqM/%5swBnuwNdZ8rS/VBDW-WiBF?>DW_YPPKm9p9CiO6PPm6Z4Ih7IL"
+)
+
+import datetime
+import os.path
+import pickle
+from typing import Dict, List, Literal, Optional
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import HumanMessage
+from langchain.schema.runnable.config import RunnableConfig
+
+import langwatch
+
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores.faiss import FAISS
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.tools import BaseTool, StructuredTool, tool
+import chainlit as cl
+import chainlit.data as cl_data
+from chainlit.data.utils import queue_until_user_message
+from chainlit.element import Element, ElementDict
+from chainlit.socket import persist_user_session
+from chainlit.step import StepDict
+from chainlit.types import (
+    Feedback,
+    PageInfo,
+    PaginatedResponse,
+    Pagination,
+    ThreadDict,
+    ThreadFilter,
+)
+from langgraph.graph import StateGraph, START, END, MessagesState
+from langgraph.prebuilt import ToolNode
+from langgraph.graph.state import CompiledStateGraph
+
+loader = WebBaseLoader("https://docs.langwatch.ai")
+docs = loader.load()
+documents = RecursiveCharacterTextSplitter(
+    chunk_size=1000, chunk_overlap=200
+).split_documents(docs)
+vector = FAISS.from_documents(documents, OpenAIEmbeddings())
+retriever = vector.as_retriever()
+
+
+now = datetime.datetime.now()
+
+thread_history = [
+    {
+        "id": "test1",
+        "name": "thread 1",
+        "createdAt": now,
+        "userId": "test",
+        "userIdentifier": "admin",
+        "steps": [
+            {
+                "id": "test1",
+                "name": "test",
+                "createdAt": now,
+                "type": "user_message",
+                "output": "Message 1",
+            },
+            {
+                "id": "test2",
+                "name": "test",
+                "createdAt": now,
+                "type": "assistant_message",
+                "output": "Message 2",
+            },
+        ],
+    },
+    {
+        "id": "test2",
+        "createdAt": now,
+        "userId": "test",
+        "userIdentifier": "admin",
+        "name": "thread 2",
+        "steps": [
+            {
+                "id": "test3",
+                "createdAt": now,
+                "name": "test",
+                "type": "user_message",
+                "output": "Message 3",
+            },
+            {
+                "id": "test4",
+                "createdAt": now,
+                "name": "test",
+                "type": "assistant_message",
+                "output": "Message 4",
+            },
+        ],
+    },
+]
+deleted_thread_ids = []
+
+THREAD_HISTORY_PICKLE_PATH = os.getenv("THREAD_HISTORY_PICKLE_PATH")
+if THREAD_HISTORY_PICKLE_PATH and os.path.exists(THREAD_HISTORY_PICKLE_PATH):
+    with open(THREAD_HISTORY_PICKLE_PATH, "rb") as f:
+        thread_history = pickle.load(f)
+
+
+async def save_thread_history():
+    if THREAD_HISTORY_PICKLE_PATH:
+        # Force saving of thread history for reload when server restarts
+        await persist_user_session(
+            cl.context.session.thread_id, cl.context.session.to_persistable()
+        )
+
+        with open(THREAD_HISTORY_PICKLE_PATH, "wb") as out_file:
+            pickle.dump(thread_history, out_file)
+
+
+class TestDataLayer(cl_data.base.BaseDataLayer):
+    async def get_user(self, identifier: str):
+        return cl.PersistedUser(
+            id="test", createdAt=now.isoformat(), identifier=identifier
+        )
+
+    async def create_user(self, user: cl.User):
+        return cl.PersistedUser(
+            id="test", createdAt=now.isoformat(), identifier=user.identifier
+        )
+
+    async def update_thread(
+        self,
+        thread_id: str,
+        name: Optional[str] = None,
+        user_id: Optional[str] = None,
+        metadata: Optional[Dict] = None,
+        tags: Optional[List[str]] = None,
+    ):
+        thread = next((t for t in thread_history if t["id"] == thread_id), None)
+        if thread:
+            if name:
+                thread["name"] = name
+            if metadata:
+                thread["metadata"] = metadata
+            if tags:
+                thread["tags"] = tags
+        else:
+            thread_history.append(
+                {
+                    "id": thread_id,
+                    "name": name,
+                    "metadata": metadata,
+                    "tags": tags,
+                    "createdAt": now.isoformat(),
+                    "userId": user_id,
+                    "userIdentifier": "admin",
+                    "steps": [],
+                }
+            )
+
+    @cl_data.queue_until_user_message()
+    async def create_step(self, step_dict: StepDict):
+        thread = next(
+            (t for t in thread_history if t["id"] == step_dict.get("threadId")), None
+        )
+        if thread:
+            thread["steps"].append(step_dict)
+
+    async def get_thread_author(self, thread_id: str):
+        return "admin"
+
+    async def list_threads(
+        self, pagination: Pagination, filters: ThreadFilter
+    ) -> PaginatedResponse[ThreadDict]:
+        return PaginatedResponse(
+            data=[t for t in thread_history if t["id"] not in deleted_thread_ids],
+            pageInfo=PageInfo(hasNextPage=False, startCursor=None, endCursor=None),
+        )  # type: ignore
+
+    async def get_thread(self, thread_id: str):
+        thread = next((t for t in thread_history if t["id"] == thread_id), None)
+        if not thread:
+            return None
+        thread["steps"] = sorted(thread["steps"], key=lambda x: x["createdAt"])
+        return thread
+
+    async def delete_thread(self, thread_id: str):
+        deleted_thread_ids.append(thread_id)
+
+    async def delete_feedback(
+        self,
+        feedback_id: str,
+    ) -> bool:
+        return True
+
+    async def upsert_feedback(
+        self,
+        feedback: Feedback,
+    ) -> str:
+        return ""
+
+    @queue_until_user_message()
+    async def create_element(self, element: "Element"):
+        pass
+
+    async def get_element(
+        self, thread_id: str, element_id: str
+    ) -> Optional["ElementDict"]:
+        pass
+
+    @queue_until_user_message()
+    async def delete_element(self, element_id: str, thread_id: Optional[str] = None):
+        pass
+
+    @queue_until_user_message()
+    async def update_step(self, step_dict: "StepDict"):
+        pass
+
+    @queue_until_user_message()
+    async def delete_step(self, step_id: str):
+        pass
+
+    async def build_debug_url(self) -> str:
+        return ""
+
+
+cl_data._data_layer = TestDataLayer()
+
+
+retriever_tool = create_retriever_tool(
+    langwatch.langchain.capture_rag_from_retriever(
+        retriever,
+        lambda document: RAGChunk(
+            document_id=document.metadata["source"], content=document.page_content
+        ),
+    ),
+    "langwatch_search",
+    "Search for information about LangWatch. For any questions about LangWatch, use this tool if you didn't already",
+)
+
+tools = [retriever_tool]
+tool_node = ToolNode(tools)
+model = ChatOpenAI(streaming=True).bind_tools(tools)
+
+
+def should_continue(state: MessagesState):
+    messages = state["messages"]
+    last_message = messages[-1]
+    # If the LLM makes a tool call, then we route to the "tools" node
+    if last_message.tool_calls:  # type: ignore
+        return "tools"
+    return END
+
+
+def call_model(state):
+    messages = state["messages"]
+    response = model.invoke(messages)
+    # We return a list, because this will get added to the existing list
+    return {"messages": [response]}
+
+
+# Define the graph
+workflow = StateGraph(MessagesState)
+
+workflow.add_node("agent", call_model)
+workflow.add_node("tools", tool_node)
+
+workflow.add_edge(START, "agent")
+workflow.add_conditional_edges("agent", should_continue)
+workflow.add_edge("tools", "agent")
+
+# Compile the graph
+app = workflow.compile()
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    msg = cl.Message(content="")
+
+    langwatch.get_current_trace().update(
+        metadata={
+            "user_id": getattr(cl.user_session.get("user"), "identifier", "unknown"),
+            "thread_id": cl.context.session.thread_id,
+        }
+    )
+
+    async for event in app.astream(
+        {"messages": [HumanMessage(content=message.content)]},
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        if "agent" in event:
+            if "messages" in event["agent"]:
+                for message in event["agent"]["messages"]:
+                    await msg.stream_token(message.content)
+
+    await msg.send()
+
+    await save_thread_history()
+
+
+@cl.password_auth_callback
+async def auth_callback(username: str, password: str) -> Optional[cl.User]:
+    if (username, password) == ("admin", "admin"):
+        return cl.User(identifier="admin")
+    else:
+        return None
+
+
+@cl.on_chat_resume
+async def on_chat_resume(thread: ThreadDict):
+    await cl.Message(f"Welcome back to {thread['name']}").send()
+    if "metadata" in thread and thread["metadata"]:
+        await cl.Message(thread["metadata"], author="metadata", language="json").send()
+    if "tags" in thread and thread["tags"]:
+        await cl.Message(
+            ",".join(thread["tags"]), author="tags", language="json"
+        ).send()
+
+
+================================================
+File: python-sdk/examples/litellm_bot.py
+================================================
+from typing import cast
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+import litellm
+from litellm import CustomStreamWrapper
+from litellm.types.utils import StreamingChoices
+
+import langwatch
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_litellm_calls(litellm)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    response = litellm.completion(
+        model="groq/llama3-70b-8192",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+    for part in cast(CustomStreamWrapper, response):
+        if token := cast(StreamingChoices, part.choices[0]).delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/openai_bot.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+import langwatch
+
+client = OpenAI()
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+    for part in completion:
+        if len(part.choices) == 0:
+            continue
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/openai_bot_disable_trace.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+import langwatch
+
+client = OpenAI()
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    langwatch.get_current_trace().disable_sending = True
+
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+    for part in completion:
+        if len(part.choices) == 0:
+            continue
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/openai_bot_function_call.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+
+client = OpenAI()
+
+import langwatch
+
+import json
+
+
+@langwatch.span(type="tool")
+def get_weather(city: str):
+    return "27°C and sunny"
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that calls tools that gives weather predictions.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        tools=[
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_weather",
+                    "description": "Get the weather for a city.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "city": {
+                                "type": "string",
+                                "description": "The city to get the weather for.",
+                            },
+                        },
+                        "required": ["city"],
+                    },
+                },
+            }
+        ],
+        tool_choice={
+            "type": "function",
+            "function": {
+                "name": "get_weather",
+            },
+        },
+    )
+
+    tool_message = completion.choices[0].message.tool_calls[0]  # type: ignore
+    weather_call = json.loads(tool_message.function.arguments)  # type: ignore
+
+    weather = get_weather(weather_call["city"])
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that gives weather predictions based on the tool results.",
+            },
+            {"role": "user", "content": message.content},
+            completion.choices[0].message,
+            {"tool_call_id": tool_message.id, "role": "tool", "name": tool_message.function.name, "content": weather},  # type: ignore
+        ],
+        stream=True,
+    )
+
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/openai_bot_rag.py
+================================================
+from dotenv import load_dotenv
+
+from langwatch.types import RAGChunk
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+
+client = OpenAI()
+
+import langwatch.openai
+
+
+@langwatch.span(type="rag")
+def rag_retrieval(query: str):
+    # the documents you retrieved from your vector database
+    search_results = [
+        {
+            "id": "doc-1",
+            "content": "France is a country in Europe.",
+        },
+        {
+            "id": "doc-2",
+            "content": "Paris is the capital of France.",
+        },
+    ]
+
+    # capture then on the span contexts with RAGChunk before returning
+    langwatch.get_current_span().update(
+        contexts=[
+            RAGChunk(
+                document_id=document["id"],
+                content=document["content"],
+            )
+            for document in search_results
+        ]
+    )
+
+    return search_results
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    msg = cl.Message(
+        content="",
+    )
+
+    contexts = rag_retrieval(message.content)
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis. {contexts}",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/openai_bot_sampling_rate.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+from openai import OpenAI
+import langwatch
+
+client = OpenAI()
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    langwatch.sampling_rate = 0.3
+
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+        stream_options={"include_usage": True},
+    )
+
+    for part in completion:
+        if len(part.choices) == 0:
+            continue
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/span_evaluation.py
+================================================
+from datetime import datetime
+from typing import Optional
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+import openai
+from openai import OpenAI
+import langwatch
+from pydantic import BaseModel
+
+
+client = OpenAI()
+
+user_bios = [
+    "Hello, my name is Richard and I am a software engineer, I'm 30 years old from New York.",
+    "My name is Rogerio, I was born in 1992 in Brazil and I love to play soccer.",
+    "Hi I'm Manouk, I'm Dutch, 25 years old and I love to travel.",
+]
+
+
+class GetBioInfo(BaseModel):
+    name: Optional[str] = None
+    profession: Optional[str] = None
+    year_of_birth: Optional[int] = None
+    country: Optional[str] = None
+
+
+class GetBioInfoList(BaseModel):
+    bio_infos: list[GetBioInfo]
+
+
+async def extract_structured_user_bios(user_bios: list[str]) -> GetBioInfoList:
+    completion = client.beta.chat.completions.parse(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a helpful assistant that helps extracts information from a list of user bio in a json list structure. Year of birth should be calculated based on the current year and the age, and fields not identified should be set to null. Current year is {datetime.now().year}.",
+            },
+            {"role": "user", "content": "\n".join(user_bios)},
+        ],
+        tools=[openai.pydantic_function_tool(GetBioInfoList)],
+        tool_choice="required",
+    )
+
+    get_bio_info_list: GetBioInfoList = completion.choices[0].message.tool_calls[0].function.parsed_arguments  # type: ignore
+
+    await langwatch.get_current_span().async_evaluate(
+        "ragas/faithfulness",
+        name="Faithfulness",
+        output=str(get_bio_info_list),
+        contexts=user_bios,
+        settings={
+            "model": "openai/gpt-3.5-turbo-16k",
+            "embeddings_model": "openai/text-embedding-ada-002",
+            "max_tokens": 2048,
+        },
+    )
+
+    return get_bio_info_list
+
+
+class GeneratePythonCode(BaseModel):
+    code: str
+
+
+@langwatch.span(type="tool")
+async def generate_and_execute_code(
+    msg: cl.Message, question: str, bio_info_list: GetBioInfoList
+) -> tuple[str, str]:
+    completion = client.beta.chat.completions.parse(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": f"""
+                You generate code to answer user question based on the bio info list provided.
+
+                Generate a piece of python code that will be evaluated to help answer user questions. If no code is needed, just emit `return ""`
+
+                You just need to generate the inner body of the function, the code starts with:
+
+                ```python
+                {bio_info_list}
+
+                def answer_result_helper():
+                """,
+            },
+            {"role": "user", "content": question},
+        ],
+        tools=[openai.pydantic_function_tool(GeneratePythonCode)],
+        tool_choice="required",
+    )
+
+    code = completion.choices[0].message.tool_calls[0].function.parsed_arguments.code  # type: ignore
+    indented_code = code.replace("\n", "\n    ")
+
+    code_to_execute = f"""
+def answer_result_helper():
+    {indented_code}
+"""
+
+    await msg.stream_token(f"```python\n{code_to_execute}\n```\n\n")
+
+    code_error = False
+    try:
+        result = execute_code(code_to_execute, bio_info_list)
+    except Exception as e:
+        code_error = True
+        result = str(e)
+
+    langwatch.get_current_span().add_evaluation(
+        name="Valid Python Code",  # required
+        passed=not code_error,
+        details=result if code_error else None,
+        cost={"currency": "USD", "amount": 1.5},
+    )
+
+    return code_to_execute, result
+
+
+@langwatch.span()
+def execute_code(code: str, bio_info_list: GetBioInfoList) -> str:
+    safe_builtins = dict(__builtins__)
+
+    # Remove potentially unsafe functions
+    unsafe_functions = [
+        "eval",
+        "exec",
+        "compile",
+        "__import__",
+        "open",
+        "input",
+        "breakpoint",
+    ]
+    for func in unsafe_functions:
+        safe_builtins.pop(func, None)
+
+    locals = {}
+    safe_globals_ = {
+        "__builtins__": safe_builtins,
+        "bio_infos": bio_info_list.bio_infos,
+    }
+
+    exec(code, safe_globals_, locals)
+
+    return locals["answer_result_helper"]()  # type: ignore
+
+
+@langwatch.span()
+async def answer_user(
+    question: str,
+    code: str,
+    result: str,
+):
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+            The user asked this question: {question}
+            We executed this code to answer the question:
+            ```python
+            {code}
+            ```
+            The result of the code is:
+            ```python
+            {result}
+            ```
+            Now, you need to answer the user question based on the result of the code.
+            """,
+            },
+        ],
+    )
+
+    return completion.choices[0].message.content or ""
+
+
+@cl.on_message
+@langwatch.trace()
+async def main(message: cl.Message):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+
+    # Example: "who is the oldest person?"
+    question = message.content
+
+    msg = cl.Message(
+        content="",
+    )
+
+    bio_info_list = await extract_structured_user_bios(user_bios)
+
+    await msg.stream_token(f"```python\n{bio_info_list}\n```\n\n")
+
+    code, result = await generate_and_execute_code(msg, question, bio_info_list)
+
+    await msg.stream_token(f"Result:\n```python\n{result}\n```\n\n")
+
+    answer = await answer_user(question, code, result)
+
+    await langwatch.get_current_trace().async_evaluate(
+        "ragas/answer_correctness",
+        name="Answer Correctness",
+        input=question,
+        output=answer,
+        expected_output="Rogerio",
+        settings={
+            "model": "openai/gpt-3.5-turbo-16k",
+            "embeddings_model": "openai/text-embedding-ada-002",
+            "max_tokens": 2048,
+        },
+    )
+
+    await msg.stream_token(answer)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/streamlit_openai_assistants_api_bot.py
+================================================
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from typing import Optional
+import streamlit as st
+from openai import OpenAI
+import langwatch
+from langwatch.tracer import ContextSpan
+
+client = OpenAI()
+
+assistant = client.beta.assistants.create(
+    name="Math Tutor",
+    instructions="You are a personal math tutor. Write and run code to answer math questions.",
+    tools=[{"type": "code_interpreter"}],
+    model="gpt-4o-mini",
+)
+
+thread = client.beta.threads.create()
+
+
+@langwatch.span(capture_output=False)
+def pipeline(message: str):
+    langwatch.get_current_trace().autotrack_openai_calls(client)
+    langwatch.get_current_trace().update(metadata={"thread_id": thread.id})
+
+    client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=message,
+    )
+
+    llm_span: Optional[ContextSpan] = None
+    step_span: Optional[ContextSpan] = None
+
+    with client.beta.threads.runs.stream(
+        thread_id=thread.id,
+        assistant_id=assistant.id,
+        instructions="Please address the user as Jane Doe. The user has a premium account.",
+    ) as stream:
+        for event in stream:
+            if event.event == "thread.run.created":
+                llm_span = langwatch.get_current_span().span(
+                    type="llm", input=event.data.instructions, model=event.data.model
+                )
+
+            elif event.event == "thread.run.completed":
+                if llm_span:
+                    usage = event.data.usage
+                    completion_tokens = usage.completion_tokens if usage else None
+                    prompt_tokens = usage.prompt_tokens if usage else None
+                    llm_span.end(
+                        metrics={
+                            "completion_tokens": completion_tokens,
+                            "prompt_tokens": prompt_tokens,
+                        }
+                    )
+                    llm_span = None
+
+            elif event.event == "thread.run.step.created":
+                if llm_span:
+                    step_span = llm_span.span(
+                        type="tool" if event.data.type == "tool_calls" else "span",
+                        name=event.data.step_details.type,
+                    )
+
+            elif event.event == "thread.run.step.delta":
+                if step_span:
+                    if (
+                        event.data.delta.step_details
+                        and event.data.delta.step_details.type == "tool_calls"
+                        and event.data.delta.step_details.tool_calls
+                        and len(event.data.delta.step_details.tool_calls) > 0
+                    ):
+                        tool_call = event.data.delta.step_details.tool_calls[0]
+                        if (
+                            tool_call.type == "code_interpreter"
+                            and tool_call.code_interpreter
+                        ):
+                            step_span.update(
+                                name=tool_call.type,
+                                input=(step_span.input or "") + (tool_call.code_interpreter.input or ""),  # type: ignore
+                                output=(step_span.output or []) + (tool_call.code_interpreter.outputs or []),  # type: ignore
+                            )
+                        # Add other tool calls here
+
+            elif event.event == "thread.run.step.completed":
+                if step_span:
+                    step_span.end()
+                    step_span = None
+
+            elif event.data.object == "thread.message.delta" and event.data.delta.content:  # type: ignore
+                text = event.data.delta.content[0].text.value or ""  # type: ignore
+
+                if llm_span:
+                    llm_span.update(output=(llm_span.output or "") + text)  # type: ignore
+
+                if step_span:
+                    step_span.update(output=(step_span.output or "") + text)  # type: ignore
+
+                yield text
+
+            else:
+                pass
+
+
+@langwatch.trace()
+def process_message():
+    message = st.session_state.prompt
+    with st.chat_message("user"):
+        st.markdown(message)
+
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+
+        message_placeholder.write_stream(pipeline(message))
+
+
+prompt = st.chat_input(
+    "Ask your question here: ", on_submit=process_message, key="prompt"
+)
+
+
+================================================
+File: python-sdk/examples/weaviate_dspy_visualization.ipynb
+================================================
+"""
+# DSPy with Weaviate + LangWatch DSPy Visualizer
+
+This notebook shows an example of DSPy RAG program using Weaviate as the vector database and LangWatch for visualization of the DSPy optimization process.
+"""
+
+# Install weaviate and dspy along with langwatch for the visualization
+%pip install weaviate-client "dspy-ai[weaviate]" langwatch
+
+"""
+## 1. Load Data into Weaviate
+
+You need a running Weaviate cluster with data:
+
+1. Learn about the installation options here
+2. Import your data:
+
+    a. You can follow the [Weaviate-Import.ipynb](https://github.com/weaviate/recipes/blob/main/integrations/llm-frameworks/dspy/Weaviate-Import.ipynb) notebook to load in the Weaviate blogs
+  
+    b. Or follow this [Quickstart Guide](https://weaviate.io/developers/weaviate/quickstart)
+
+"""
+
+"""
+## 2. Prepare the LLM and Retriever
+"""
+
+import os
+from getpass import getpass
+
+os.environ["OPENAI_API_KEY"] = getpass("Enter your OPENAI_API_KEY: ")
+
+import dspy
+from dspy.retrieve.weaviate_rm import WeaviateRM
+import weaviate
+
+llm = dspy.OpenAI(
+    model="gpt-4o-mini",
+    max_tokens=4096,
+    temperature=0,
+    api_key=os.environ["OPENAI_API_KEY"]
+)
+
+print("LLM test response:", llm("hello there"))
+
+weaviate_client = weaviate.connect_to_local()
+retriever_model = WeaviateRM("WeaviateBlogChunk", weaviate_client=weaviate_client)
+
+print("Retriever test response:", retriever_model("LLMs")[0])
+
+dspy.settings.configure(lm=llm, rm=retriever_model)
+
+"""
+## 3. Prepare the Dataset
+"""
+
+import httpx
+
+dataset = httpx.get("https://raw.githubusercontent.com/weaviate/recipes/main/integrations/llm-frameworks/dspy/WeaviateBlogRAG-0-0-0.json").json()
+
+gold_answers = []
+queries = []
+
+for row in dataset:
+    gold_answers.append(row["gold_answer"])
+    queries.append(row["query"])
+
+data = []
+
+for i in range(len(gold_answers)):
+    data.append(dspy.Example(gold_answer=gold_answers[i], question=queries[i]).with_inputs("question"))
+
+trainset, devset = data[:30], data[30:50]
+
+len(trainset), len(devset)
+
+"""
+## 4. Define the RAG model
+"""
+
+class GenerateAnswer(dspy.Signature):
+    """Assess the the context and answer the question."""
+
+    context = dspy.InputField(desc="Helpful information for answering the question.")
+    question = dspy.InputField()
+    answer = dspy.OutputField(desc="A detailed answer that is supported by the context.")
+
+
+class RAG(dspy.Module):
+    def __init__(self, k=3):
+        super().__init__()
+
+        self.retrieve = dspy.Retrieve(k=k)
+        self.generate_answer = dspy.Predict(GenerateAnswer)
+
+    def forward(self, question):
+        context = self.retrieve(question).passages
+        pred = self.generate_answer(context=context, question=question).answer
+        return dspy.Prediction(context=context, answer=pred, question=question)
+
+
+dev_example = devset[0]
+print(f"[Devset] Question: {dev_example.question}")
+print(f"[Devset] Answer: {dev_example.gold_answer}")
+
+generate_answer = RAG()
+
+pred = generate_answer(question=dev_example.question)
+
+# Print the input and the prediction.
+print(f"[Prediction] Question: {dev_example.question}")
+print(f"[Prediction] Predicted Answer: {pred.answer}")
+
+"""
+## 5. Define your Metric
+"""
+
+class TypedEvaluator(dspy.Signature):
+    """Evaluate the quality of a system's answer to a question according to a given criterion.
+    Please be a bit harsh, only give a 5 to a truly above and beyond answer.
+    """
+
+    criterion: str = dspy.InputField(desc="The evaluation criterion.")
+    question: str = dspy.InputField(desc="The question asked to the system.")
+    ground_truth_answer: str = dspy.InputField(desc="An expert written Ground Truth Answer to the question.")
+    predicted_answer: str = dspy.InputField(desc="The system's answer to the question.")
+    rating: float = dspy.OutputField(desc="A float rating between 1 and 5")
+
+
+def MetricWrapper(gold, pred, trace=None):
+    alignment_criterion = "How aligned is the predicted_answer with the ground_truth?"
+    return dspy.TypedPredictor(TypedEvaluator)(criterion=alignment_criterion,
+                                          question=gold.question,
+                                          ground_truth_answer=gold.gold_answer,
+                                          predicted_answer=pred.answer).rating
+
+from dspy.evaluate.evaluate import Evaluate
+
+evaluate = Evaluate(devset=devset, num_threads=4, display_progerss=False)
+
+uncomplied_score = evaluate(RAG(), metric=MetricWrapper)
+uncomplied_score
+
+"""
+## 6. Connect to LangWatch
+"""
+
+import langwatch
+
+langwatch.login()
+
+"""
+## 7. Start Training Session!
+
+This will cost around $0.40
+"""
+
+from dspy.teleprompt import MIPROv2
+import dspy.evaluate
+
+# use gpt-4o as the prompt model to teach gpt4-mini
+teacher = dspy.OpenAI(
+    model="gpt-4o", max_tokens=4096, temperature=0, api_key=os.environ["OPENAI_API_KEY"]
+)
+
+# Set up a MIPROv2 optimizer, which will compile our RAG program.
+optimizer = MIPROv2(
+    metric=MetricWrapper,
+    prompt_model=teacher,
+    task_model=llm,
+    num_candidates=3,
+    init_temperature=0.7,
+)
+
+# Initialize langwatch for this run, to track the optimizer compilation
+langwatch.dspy.init(experiment="weaviate-blog-rag-experiment", optimizer=optimizer)
+
+# Compile
+compiled_rag = optimizer.compile(
+    RAG(),
+    trainset=trainset,
+    num_batches=10,
+    max_bootstrapped_demos=5,
+    max_labeled_demos=5,
+    eval_kwargs=dict(num_threads=16, display_progress=True, display_table=0),
+)
+
+"""
+Screenshot:
+
+![optimization screenshot](./weaviate_setup/optimization_screenshot.png)
+"""
+
+complied_score = evaluate(compiled_rag, metric=MetricWrapper)
+print(complied_score)
+
+print(f"Congratulations! We optimized the RAG program and bumped the score from {uncomplied_score} to {complied_score}!")
+
+"""
+## 8. Save the optimized RAG
+
+You can now use your optimized RAG program for inference
+"""
+
+compiled_rag.save("optimized_rag.json")
+
+"""
+## 9. Final Step: Instrument your DSPy program for Production
+
+Now that you have your optimized RAG, you are ready to deploy, but usage in production can also be unpredictable.
+
+To keep track of which documents are being retrieved and used by your RAG in production, you can use the `langwatch.trace()` decorator to instrument your DSPy program ([docs for more details](https://docs.langwatch.ai/integration/python/guide#capturing-llm-spans))
+"""
+
+import langwatch
+
+compiled_rag = RAG()
+compiled_rag.load("optimized_rag.json")
+
+@langwatch.trace()
+def generate_response(question: str):
+  langwatch.get_current_trace().autotrack_dspy()
+  public_url = langwatch.get_current_trace().share()
+  print(f"Trace Public URL: {public_url}")
+
+  return compiled_rag(question=question)
+
+
+generate_response(dev_example.question)
+
+"""
+Screenshot:
+
+![Tracing Screenshot](./weaviate_setup/tracing_screenshot.png)
+"""
+
+================================================
+File: python-sdk/examples/data/rag_dspy_bot.json
+================================================
+{
+  "retrieve": {
+    "k": 3
+  },
+  "generate_answer": {
+    "lm": null,
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "question": "At My Window was released by which American singer-songwriter?",
+        "answer": "John Townes Van Zandt"
+      }
+    ],
+    "signature_instructions": "Answer questions with short factoid answers.",
+    "signature_prefix": "Answer:",
+    "extended_signature_instructions": "Provide concise and accurate answers to a variety of trivia questions that cover a wide range of topics, including pop culture, historical events, notable individuals, and geographical references. Ensure that your responses include key facts, significant accomplishments, and contextual details where relevant, to enhance the understanding of the topic being queried.",
+    "extended_signature_prefix": "Answer:"
+  }
+}
+
+
+================================================
+File: python-sdk/examples/legacy/legacy_langchain_pydantic_bot.py
+================================================
+import asyncio
+import sys
+
+sys.path.insert(0, "../../")
+
+import pydantic
+import langchain
+import openai
+
+print("pydantic version:", pydantic.__version__)
+print("langchain version:", langchain.__version__)
+print("openai version:", openai.__version__)
+
+if pydantic.__version__ != "1.10.15":
+    raise ValueError("pydantic version must be 1.10.15")
+if langchain.__version__ != "0.0.323":
+    raise ValueError("langchain version must be 0.0.323")
+if openai.__version__ != "0.28.1":
+    raise ValueError("openai version must be 0.28.1")
+
+from dotenv import load_dotenv
+from langchain.chat_models.openai import ChatOpenAI
+
+load_dotenv()
+
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import StrOutputParser
+from langchain.schema.runnable import Runnable
+from langchain.schema.runnable.config import RunnableConfig
+
+import langwatch
+
+
+model = ChatOpenAI(streaming=True)
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+        ),
+        ("human", "{question}"),
+    ]
+)
+runnable = prompt | model | StrOutputParser()
+
+
+@langwatch.trace()
+async def main(input: str):
+    langwatch.get_current_trace().update(
+        metadata={"customer_id": "customer_example", "labels": ["v1.0.0"]}
+    )
+
+    async for chunk in runnable.astream(
+        {"question": input},
+        config=RunnableConfig(
+            callbacks=[
+                langwatch.get_current_trace().get_langchain_callback(),
+            ]
+        ),
+    ):
+        print(chunk, end="", flush=True)
+
+    print("\n")
+    print("legacy_langchain_pydantic_bot.py:", langwatch.get_current_trace().share())
+
+
+asyncio.run(main("hello"))
+
+
+================================================
+File: python-sdk/examples/legacy/poetry.toml
+================================================
+[virtualenvs]
+in-project = true
+
+
+================================================
+File: python-sdk/examples/legacy/pyproject.toml
+================================================
+[tool.poetry]
+name = "legacy"
+version = "0.1.0"
+description = ""
+authors = ["Rogério Chaves <rogeriochaves@users.noreply.github.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.9"
+langsmith = "0.0.92"
+langchain = "0.0.323"
+langwatch = "0.1.16"
+pydantic = "1.10.15"
+openai = "0.28.1"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openinference_dspy_bot.py
+================================================
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import dspy
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from openinference.instrumentation.dspy import DSPyInstrumentor
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+DSPyInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+llm = dspy.OpenAI(
+    model="gpt-4o-mini",
+    max_tokens=2048,
+    temperature=0,
+    api_key=os.environ["OPENAI_API_KEY"],
+)
+
+colbertv2_wiki17_abstracts = dspy.ColBERTv2(
+    url="http://20.102.90.50:2017/wiki17_abstracts"
+)
+
+dspy.settings.configure(lm=llm, rm=colbertv2_wiki17_abstracts)
+
+
+class GenerateAnswer(dspy.Signature):
+    """Answer questions with short factoid answers."""
+
+    context = dspy.InputField(desc="may contain relevant facts")
+    question = dspy.InputField()
+    answer = dspy.OutputField(desc="often between 1 and 5 words")
+
+
+class RAG(dspy.Module):
+    def __init__(self, num_passages=3):
+        super().__init__()
+
+        self.retrieve = dspy.Retrieve(k=num_passages)
+        self.generate_answer = dspy.ChainOfThought(GenerateAnswer)
+
+    def forward(self, question):
+        context = self.retrieve(question).passages  # type: ignore
+        prediction = self.generate_answer(question=question, context=context)
+        return dspy.Prediction(answer=prediction.answer)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    program = RAG()
+    program.load(
+        f"{os.path.dirname(os.path.abspath(__file__))}/../data/rag_dspy_bot.json",
+        use_legacy_loading=True,
+    )
+    program = program.reset_copy()
+    prediction = program(question=message.content)
+
+    await msg.stream_token(prediction.answer)
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openinference_haystack.py
+================================================
+# This example uses the OpenTelemetry instrumentation for OpenAI from OpenInference: https://pypi.org/project/openinference-instrumentation-openai/
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+from haystack import Pipeline, Document
+from haystack.utils import Secret
+from haystack.document_stores.in_memory import InMemoryDocumentStore
+from haystack.components.retrievers.in_memory import InMemoryBM25Retriever
+from haystack.components.generators import OpenAIGenerator
+from haystack.components.builders.answer_builder import AnswerBuilder
+from haystack.components.builders.prompt_builder import PromptBuilder
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from openinference.instrumentation.haystack import HaystackInstrumentor
+from openinference.instrumentation import using_attributes
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+HaystackInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+# Haystack pipeline
+
+# Write documents to InMemoryDocumentStore
+document_store = InMemoryDocumentStore()
+document_store.write_documents(
+    [
+        Document(content="My name is Jean and I live in Paris."),
+        Document(content="My name is Mark and I live in Berlin."),
+        Document(content="My name is Giorgio and I live in Rome."),
+    ]
+)
+
+# Build a RAG pipeline
+prompt_template = """
+Given these documents, answer the question.
+Documents:
+{% for doc in documents %}
+    {{ doc.content }}
+{% endfor %}
+Question: {{question}}
+Answer:
+"""
+
+retriever = InMemoryBM25Retriever(document_store=document_store)
+prompt_builder = PromptBuilder(template=prompt_template)
+llm = OpenAIGenerator(
+    api_key=Secret.from_token(os.environ["OPENAI_API_KEY"]), model="gpt-4o-mini"
+)
+
+rag_pipeline = Pipeline()
+rag_pipeline.add_component("retriever", retriever)
+rag_pipeline.add_component("prompt_builder", prompt_builder)
+rag_pipeline.add_component("llm", llm)
+rag_pipeline.connect("retriever", "prompt_builder.documents")
+rag_pipeline.connect("prompt_builder", "llm")
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    with using_attributes(
+        session_id=message.thread_id,
+        user_id="my-test-user",
+        tags=["User relevant question", "Second tag example"],
+        metadata={"foo": "bar"},
+    ):
+        results = rag_pipeline.run(
+            {
+                "retriever": {"query": message.content},
+                "prompt_builder": {"question": message.content},
+            }
+        )
+
+    msg.content = results["llm"]["replies"][0]
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openinference_langchain_bot.py
+================================================
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import StrOutputParser
+from langchain.schema.runnable import Runnable
+from langchain.schema.runnable.config import RunnableConfig
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from openinference.instrumentation.langchain import LangChainInstrumentor
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    model = ChatOpenAI(streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    runnable = prompt | model | StrOutputParser()
+    cl.user_session.set("runnable", runnable)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    runnable: Runnable = cl.user_session.get("runnable")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    async for chunk in runnable.astream(
+        {"question": message.content},
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+            ]
+        ),
+    ):
+        await msg.stream_token(chunk)
+
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openinference_openai_assistants_api_bot.py
+================================================
+# This example uses the OpenTelemetry instrumentation for OpenAI from OpenLLMetry: https://pypi.org/project/opentelemetry-instrumentation-openai/
+
+from datetime import datetime
+from typing import Optional, cast
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from openinference.instrumentation.openai import OpenAIInstrumentor
+from openai import AsyncOpenAI, AsyncAssistantEventHandler
+
+
+client = AsyncOpenAI()
+
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    assistant = await client.beta.assistants.create(
+        name="Math Tutor",
+        instructions="You are a personal math tutor. Write and run code to answer math questions.",
+        tools=[{"type": "code_interpreter"}],
+        model="gpt-4o-mini",
+    )
+
+    thread = await client.beta.threads.create()
+
+    cl.user_session.set("thread_id", thread.id)
+    cl.user_session.set("assistant_id", assistant.id)
+    cl.user_session.set("assistant_name", assistant.name)
+
+class EventHandler(AsyncAssistantEventHandler):
+    def __init__(self, assistant_name: str) -> None:
+        super().__init__()
+        self.current_message: Optional[cl.Message] = None
+        self.current_step: Optional[cl.Step] = None
+        self.current_tool_call = None
+        self.assistant_name = assistant_name
+
+    async def on_text_created(self, text) -> None:
+        self.current_message = cl.Message(author=self.assistant_name, content="")
+        await self.current_message.send()
+
+    async def on_text_delta(self, delta, snapshot):
+        if self.current_message:
+            await self.current_message.stream_token(delta.value or "")
+
+    async def on_text_done(self, text):
+        if self.current_message:
+            await self.current_message.update()
+
+    async def on_tool_call_created(self, tool_call):
+        self.current_tool_call = tool_call.id
+        self.current_step = cl.Step(name=tool_call.type, type="tool")
+        self.current_step.language = "python"
+        self.current_step.created_at = datetime.now()
+        await self.current_step.send()
+
+    async def on_tool_call_delta(self, delta, snapshot):
+        if snapshot.id != self.current_tool_call:
+            self.current_tool_call = snapshot.id
+            self.current_step = cl.Step(name=delta.type, type="tool")
+            self.current_step.language = "python"
+            self.current_step.start = datetime.now()
+            await self.current_step.send()
+
+        if delta.type == "code_interpreter":
+            if self.current_step and delta.code_interpreter and delta.code_interpreter.outputs:
+                for output in delta.code_interpreter.outputs:
+                    if output.type == "logs":
+                        error_step = cl.Step(
+                            name=delta.type,
+                            type="tool"
+                        )
+                        error_step.is_error = True
+                        error_step.output = output.logs
+                        error_step.language = "markdown"
+                        error_step.start = self.current_step.start
+                        error_step.end = datetime.now()
+                        await error_step.send()
+            else:
+                if self.current_step and delta.code_interpreter and delta.code_interpreter.input:
+                    await self.current_step.stream_token(delta.code_interpreter.input)
+
+
+    async def on_tool_call_done(self, tool_call):
+        if self.current_step:
+            self.current_step.end = datetime.now()
+            await self.current_step.update()
+
+@cl.on_message
+async def main(message: cl.Message):
+    thread_id = cast(str, cl.user_session.get("thread_id"))
+    assistant_id = cast(str, cl.user_session.get("assistant_id"))
+    assistant_name = cast(str, cl.user_session.get("assistant_name"))
+
+    await client.beta.threads.messages.create(
+        thread_id=thread_id, role="user", content=message.content
+    )
+
+    async with client.beta.threads.runs.stream(
+        thread_id=thread_id,
+        assistant_id=assistant_id,
+        instructions="Please address the user as Jane Doe. The user has a premium account.",
+        event_handler=EventHandler(assistant_name=assistant_name),
+    ) as stream:
+        await stream.until_done()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openinference_openai_bot.py
+================================================
+# This example uses the OpenTelemetry instrumentation for OpenAI from OpenInference: https://pypi.org/project/openinference-instrumentation-openai/
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from openinference.instrumentation.openai import OpenAIInstrumentor
+from openinference.instrumentation import using_attributes
+from openai import OpenAI
+
+client = OpenAI()
+
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    with using_attributes(
+        session_id="my-test-session",
+        user_id="my-test-user",
+        tags=["tag-1", "tag-2"],
+        metadata={"foo": "bar"},
+    ):
+        completion = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+                },
+                {"role": "user", "content": message.content},
+            ],
+            stream=True,
+        )
+
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openllmetry_anthropic_bot.py
+================================================
+# This example uses the OpenTelemetry instrumentation for OpenAI from OpenLLMetry: https://pypi.org/project/opentelemetry-instrumentation-openai/
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from opentelemetry.instrumentation.anthropic import AnthropicInstrumentor
+import anthropic
+
+client = anthropic.Anthropic()
+
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+AnthropicInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.messages.create(
+        model="claude-3-5-sonnet-20240620",
+        max_tokens=1000,
+        temperature=0,
+        stream=True,
+        system="You are a world-class poet. Respond only with short poems.",
+        messages=[
+            {
+                "role": "user",
+                "content": [{"type": "text", "text": "Why is the ocean salty?"}],
+            }
+        ],
+    )
+
+    for part in completion:
+        if part.type == "content_block_delta":
+            await msg.stream_token(part.delta.text or "")
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openllmetry_langchain_bot.py
+================================================
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+import chainlit as cl
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema import StrOutputParser
+from langchain.schema.runnable import Runnable
+from langchain.schema.runnable.config import RunnableConfig
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from opentelemetry.instrumentation.langchain import LangchainInstrumentor
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+LangchainInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    model = ChatOpenAI(streaming=True)
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            ),
+            ("human", "{question}"),
+        ]
+    )
+    runnable = prompt | model | StrOutputParser()
+    cl.user_session.set("runnable", runnable)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    runnable: Runnable = cl.user_session.get("runnable")  # type: ignore
+
+    msg = cl.Message(content="")
+
+    async for chunk in runnable.astream(
+        {"question": message.content},
+        config=RunnableConfig(
+            callbacks=[
+                cl.LangchainCallbackHandler(),
+            ],
+            metadata={"user_id": "123", "thread_id": "789", "customer_id": "456"},
+        ),
+    ):
+        await msg.stream_token(chunk)
+
+    await msg.send()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/openllmetry_openai_bot.py
+================================================
+# This example uses the OpenTelemetry instrumentation for OpenAI from OpenLLMetry: https://pypi.org/project/opentelemetry-instrumentation-openai/
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+import chainlit as cl
+
+import os
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+
+from opentelemetry.instrumentation.openai import OpenAIInstrumentor
+from openai import OpenAI
+
+
+client = OpenAI()
+
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider()
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+
+
+@cl.on_message
+async def main(message: cl.Message):
+    msg = cl.Message(
+        content="",
+    )
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+            },
+            {"role": "user", "content": message.content},
+        ],
+        stream=True,
+    )
+
+    for part in completion:
+        if token := part.choices[0].delta.content or "":
+            await msg.stream_token(token)
+
+    await msg.update()
+
+
+================================================
+File: python-sdk/examples/opentelemetry/traditional_instrumentation_fastapi_app.py
+================================================
+from dotenv import load_dotenv
+from fastapi.testclient import TestClient
+
+load_dotenv()
+
+import os
+from fastapi import FastAPI
+from openai import OpenAI
+from pydantic import BaseModel
+from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
+client = OpenAI()
+
+
+# Set up OpenTelemetry trace provider with LangWatch as the endpoint
+tracer_provider = trace_sdk.TracerProvider(
+    resource=Resource(attributes={"service.name": "fastapi_sample_endpoint"})
+)
+tracer_provider.add_span_processor(
+    SimpleSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=f"{os.environ.get('LANGWATCH_ENDPOINT', 'https://app.langwatch.ai')}/api/otel/v1/traces",
+            headers={"Authorization": "Bearer " + os.environ["LANGWATCH_API_KEY"]},
+        )
+    )
+)
+# Optionally, you can also print the spans to the console.
+tracer_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+
+
+app = FastAPI()
+# Instrument FastAPI with OpenTelemetry
+FastAPIInstrumentor.instrument_app(app)
+trace.set_tracer_provider(tracer_provider)
+tracer = trace.get_tracer(__name__)
+
+
+class EndpointParams(BaseModel):
+    input: str
+
+
+@app.post("/")
+def fastapi_sample_endpoint(params: EndpointParams):
+    with tracer.start_as_current_span("fastapi_sample_endpoint"):
+        completion = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that only reply in short tweet-like responses, using lots of emojis.",
+                },
+                {"role": "user", "content": params.input},
+            ],
+        )
+
+        return completion.choices[0].message.content
+
+
+def call_fastapi_sample_endpoint(input: str) -> str:
+    test_client = TestClient(app)
+    response = test_client.post("/", json={"input": input})
+
+    return response.json()
+
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+
+    # Test one llm call before starting the server
+    print(call_fastapi_sample_endpoint("Hello, world!"))
+
+    port = int(os.environ.get("PORT", 9000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
+
+================================================
+File: python-sdk/examples/weaviate_setup/Weaviate-Import.ipynb
+================================================
+"""
+# Weaviate Import
+
+This notebook is used to populate the `WeaviateBlogChunk` class.
+
+You can connect to Weaviate through local host, or create a free 14-day sandbox on [WCS](https://console.weaviate.cloud/)!
+
+1. (Option 1) Create a cluster on WCS and grab your cluster URL and auth key (if enabled)
+
+1. (Option 2) Run `docker-compose up -d` with the docker script in the file to start Weaviate locally on localhost:8080
+
+
+2. Make sure the `/blog` folder is in this directory (these are parsed from github.com/weaviate/weaviate-io -- feel free to drag and drop that folder in here to update the content).
+
+
+3. Run this notebook and the 1182 blog chunks will be loaded into Weaviate.
+"""
+
+"""
+## Connect to Client
+"""
+
+# Import Weaviate and Connect to Client
+import weaviate
+
+client = weaviate.connect_to_local()  # Connect to local host
+# client = weaviate.connect_to_wcs(
+#     cluster_url="WCS-url",  # Replace with your WCS URL
+#     auth_credentials=weaviate.auth.AuthApiKey("auth-key"),  # Replace with your WCS key
+#     headers={
+#         'X-Cohere-Api-Key': ("API-Key") # Replace with your Cohere API key
+#     }
+# )
+
+"""
+## Create Schema
+"""
+
+# CAUTION: Running this will delete the collection along with the objects
+
+# client.collections.delete_all()
+
+import weaviate.classes.config as wvcc
+
+collection = client.collections.create(
+    name="WeaviateBlogChunk",
+    vectorizer_config=wvcc.Configure.Vectorizer.text2vec_cohere
+    (
+        model="embed-multilingual-v3.0"
+    ),
+    properties=[
+            wvcc.Property(name="content", data_type=wvcc.DataType.TEXT),
+            wvcc.Property(name="author", data_type=wvcc.DataType.TEXT),
+      ]
+)
+
+"""
+## Chunk Blogs
+"""
+
+import os
+import re
+
+def chunk_list(lst, chunk_size):
+    """Break a list into chunks of the specified size."""
+    return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+
+def split_into_sentences(text):
+    """Split text into sentences using regular expressions."""
+    sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
+    return [sentence.strip() for sentence in sentences if sentence.strip()]
+
+def read_and_chunk_index_files(main_folder_path):
+    """Read index.md files from subfolders, split into sentences, and chunk every 5 sentences."""
+    blog_chunks = []
+    for folder_name in os.listdir(main_folder_path):
+        subfolder_path = os.path.join(main_folder_path, folder_name)
+        if os.path.isdir(subfolder_path):
+            index_file_path = os.path.join(subfolder_path, 'index.mdx')
+            if os.path.isfile(index_file_path):
+                with open(index_file_path, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                    sentences = split_into_sentences(content)
+                    sentence_chunks = chunk_list(sentences, 5)
+                    sentence_chunks = [' '.join(chunk) for chunk in sentence_chunks]
+                    blog_chunks.extend(sentence_chunks)
+    return blog_chunks
+
+# Example usage
+main_folder_path = './examples/weaviate_setup/blog'
+blog_chunks = read_and_chunk_index_files(main_folder_path)
+
+
+len(blog_chunks)
+
+blog_chunks[0]
+
+"""
+## Import Objects
+"""
+
+from weaviate.util import get_valid_uuid
+from uuid import uuid4
+
+blogs = client.collections.get("WeaviateBlogChunk")
+
+for idx, blog_chunk in enumerate(blog_chunks):
+    upload = blogs.data.insert(
+        properties={
+            "content": blog_chunk
+        }
+    )
+
+================================================
+File: python-sdk/examples/weaviate_setup/docker-compose.yml
+================================================
+# Run it with:
+#
+# COHERE_API_KEY=your_api_key docker compose up
+#
+
+---
+version: "3.4"
+services:
+  weaviate:
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --scheme
+      - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.26.1
+    ports:
+      - 8080:8080
+      - 50051:50051
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: on-failure:0
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      ENABLE_MODULES: "text2vec-cohere,text2vec-huggingface,text2vec-palm,text2vec-openai,generative-openai,generative-cohere,generative-palm,ref2vec-centroid,reranker-cohere,qna-openai"
+      DEFAULT_VECTORIZER_MODULE: text2vec-cohere
+      COHERE_APIKEY: ${COHERE_API_KEY}
+      CLUSTER_HOSTNAME: "node1"
+volumes:
+  weaviate_data:
+
+
+================================================
+File: python-sdk/examples/weaviate_setup/.gitignore
+================================================
+blog/
+
+

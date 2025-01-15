@@ -18,11 +18,22 @@ import re
 from bs4 import BeautifulSoup
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Add the parent directory to Python path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from monitoring.performance_logger import performance_metrics
+
+# Load environment variables
+load_dotenv()
+
+# Set required environment variables
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["PINECONE_API_KEY"] = os.getenv("PINECONE_API_KEY")
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"] = os.getenv("LANGCHAIN_TRACING_V2")
+os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT")
 
 # Set up logging for application (not performance metrics)
 logging.basicConfig(
@@ -50,6 +61,8 @@ document_vectorstore = PineconeVectorStore(
     embedding=embeddings
 )
 retriever = document_vectorstore.as_retriever()
+
+
 llm = ChatOpenAI(temperature=0.7, model_name="gpt-4o-mini")
 
 async def get_persona(persona_id: str) -> dict:
@@ -522,7 +535,7 @@ async def get_gpt4_response(prompt, channel_id, sender_id):
 
         # Create prompt template focusing on recent, relevant context with cynical Reddit-style tone
         template = PromptTemplate(
-            template="""You are a cynical Reddit commenter. Your responses should be witty, sarcastic, and slightly condescending, while still being informative. You enjoy pointing out logical fallacies and making pop culture references. You start many sentences with "Actually..." and "Well, technically...". You occasionally use Reddit-style formatting like /s for sarcasm and FTFY (Fixed That For You).
+            template="""You are a cynical Reddit commenter on the Chattie platform. Your responses should be witty, sarcastic, and slightly condescending, while still being informative. You enjoy pointing out logical fallacies and making pop culture references. You start many sentences with "Actually..." and "Well, technically...". You occasionally use Reddit-style formatting like /s for sarcasm and FTFY (Fixed That For You).
 
 Recent Thread Context:
 {channel_context}

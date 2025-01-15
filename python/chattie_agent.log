@@ -9827,3 +9827,1907 @@ botocore.errorfactory.ValidationException: An error occurred (ValidationExceptio
 2025-01-14 19:45:19,618 [INFO] Stored message from Organic_Oracle in channel 678711ea002a888587be
 2025-01-14 19:45:21,621 [INFO] Completed conversation in channel food-labeling-conflicts
 2025-01-14 19:45:21,621 [INFO] Successfully populated all channels in workspace 6787118600143d4d4d74
+2025-01-14 20:27:05,669 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 20:27:05,670 [INFO] Appwrite admin client initialized
+2025-01-14 20:27:05,671 [INFO] === Application Starting ===
+2025-01-14 20:27:05,672 [INFO] Starting server initialization
+2025-01-14 20:27:05,672 [INFO] Server starting at http://localhost:8080
+2025-01-14 20:27:05,679 [INFO] Server successfully started
+2025-01-14 20:27:42,641 [INFO] Received workspace creation request
+2025-01-14 20:27:42,643 [INFO] Creating workspace with ID: 67871d1e0002e66c3a91
+2025-01-14 20:27:42,645 [INFO] === Starting Workspace Creation ===
+2025-01-14 20:27:42,645 [INFO] Workspace ID: 67871d1e0002e66c3a91
+2025-01-14 20:27:42,645 [INFO] Description: what is the meaning of life? why were we all put here. thoughtful deep, meaningful coversations
+2025-01-14 20:27:42,645 [INFO] Generating personas with OpenAI for workspace: 67871d1e0002e66c3a91
+2025-01-14 20:27:42,646 [INFO] Initiating OpenAI API request
+2025-01-14 20:28:12,765 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:28:12,848 [INFO] Successfully processed OpenAI response
+2025-01-14 20:28:12,848 [INFO] Successfully generated 5 personas
+2025-01-14 20:28:12,849 [INFO] Processing persona 1/5: PunDemonium
+2025-01-14 20:28:12,849 [INFO] Creating AI user for persona: PunDemonium in workspace: 67871d1e0002e66c3a91
+2025-01-14 20:28:12,849 [INFO] Attempting to create AI user with email: pundemonium.67871d1e0002e66c3a91@chattie.local
+2025-01-14 20:28:13,429 [INFO] Successfully created AI user: 67871d3c002382e5e3be with name: PunDemonium
+2025-01-14 20:28:13,429 [INFO] Created AI user ID: 67871d3c002382e5e3be for persona: PunDemonium
+2025-01-14 20:28:13,429 [INFO] Generating personalized avatar for persona: PunDemonium
+2025-01-14 20:28:22,777 [INFO] Storing avatar in Appwrite bucket: pundemonium_67871d1e0002e66c3a91_avatar.webp
+2025-01-14 20:28:23,160 [INFO] Successfully stored avatar with ID: 67871d46001a321957f4
+2025-01-14 20:28:23,379 [INFO] Updated user preferences with avatar: 67871d46001a321957f4
+2025-01-14 20:28:23,379 [INFO] Storing persona in Appwrite: PunDemonium
+2025-01-14 20:28:23,629 [INFO] Successfully stored persona: PunDemonium with ID: 67871d3c002382e5e3be
+2025-01-14 20:28:23,630 [INFO] Processing persona 2/5: The Aristocrat
+2025-01-14 20:28:23,630 [INFO] Creating AI user for persona: The Aristocrat in workspace: 67871d1e0002e66c3a91
+2025-01-14 20:28:23,631 [INFO] Attempting to create AI user with email: the_aristocrat.67871d1e0002e66c3a91@chattie.local
+2025-01-14 20:28:24,063 [INFO] Successfully created AI user: 67871d47001566cb8f4b with name: The Aristocrat
+2025-01-14 20:28:24,063 [INFO] Created AI user ID: 67871d47001566cb8f4b for persona: The Aristocrat
+2025-01-14 20:28:24,064 [INFO] Generating personalized avatar for persona: The Aristocrat
+2025-01-14 20:28:33,008 [INFO] Storing avatar in Appwrite bucket: the_aristocrat_67871d1e0002e66c3a91_avatar.webp
+2025-01-14 20:28:33,388 [INFO] Successfully stored avatar with ID: 67871d51000b051fb0de
+2025-01-14 20:28:33,662 [INFO] Updated user preferences with avatar: 67871d51000b051fb0de
+2025-01-14 20:28:33,662 [INFO] Storing persona in Appwrite: The Aristocrat
+2025-01-14 20:28:33,819 [INFO] Successfully stored persona: The Aristocrat with ID: 67871d47001566cb8f4b
+2025-01-14 20:28:33,820 [INFO] Processing persona 3/5: The Existentialist
+2025-01-14 20:28:33,820 [INFO] Creating AI user for persona: The Existentialist in workspace: 67871d1e0002e66c3a91
+2025-01-14 20:28:33,820 [INFO] Attempting to create AI user with email: the_existentialist.67871d1e0002e66c3a91@chattie.local
+2025-01-14 20:28:34,385 [INFO] Successfully created AI user: 67871d51003551abaf3c with name: The Existentialist
+2025-01-14 20:28:34,385 [INFO] Created AI user ID: 67871d51003551abaf3c for persona: The Existentialist
+2025-01-14 20:28:34,385 [INFO] Generating personalized avatar for persona: The Existentialist
+2025-01-14 20:28:43,404 [INFO] Storing avatar in Appwrite bucket: the_existentialist_67871d1e0002e66c3a91_avatar.webp
+2025-01-14 20:28:43,691 [INFO] Successfully stored avatar with ID: 67871d5b0018606cd6fd
+2025-01-14 20:28:43,884 [INFO] Updated user preferences with avatar: 67871d5b0018606cd6fd
+2025-01-14 20:28:43,885 [INFO] Storing persona in Appwrite: The Existentialist
+2025-01-14 20:28:44,115 [INFO] Successfully stored persona: The Existentialist with ID: 67871d51003551abaf3c
+2025-01-14 20:28:44,115 [INFO] Processing persona 4/5: The Skeptic
+2025-01-14 20:28:44,115 [INFO] Creating AI user for persona: The Skeptic in workspace: 67871d1e0002e66c3a91
+2025-01-14 20:28:44,116 [INFO] Attempting to create AI user with email: the_skeptic.67871d1e0002e66c3a91@chattie.local
+2025-01-14 20:28:44,720 [INFO] Successfully created AI user: 67871d5c000da03d46f1 with name: The Skeptic
+2025-01-14 20:28:44,720 [INFO] Created AI user ID: 67871d5c000da03d46f1 for persona: The Skeptic
+2025-01-14 20:28:44,720 [INFO] Generating personalized avatar for persona: The Skeptic
+2025-01-14 20:28:53,653 [INFO] Storing avatar in Appwrite bucket: the_skeptic_67871d1e0002e66c3a91_avatar.webp
+2025-01-14 20:28:53,983 [INFO] Successfully stored avatar with ID: 67871d65001a5e51fb90
+2025-01-14 20:28:54,174 [INFO] Updated user preferences with avatar: 67871d65001a5e51fb90
+2025-01-14 20:28:54,175 [INFO] Storing persona in Appwrite: The Skeptic
+2025-01-14 20:28:54,493 [INFO] Successfully stored persona: The Skeptic with ID: 67871d5c000da03d46f1
+2025-01-14 20:28:54,494 [INFO] Processing persona 5/5: The Spiritual Seeker
+2025-01-14 20:28:54,494 [INFO] Creating AI user for persona: The Spiritual Seeker in workspace: 67871d1e0002e66c3a91
+2025-01-14 20:28:54,494 [INFO] Attempting to create AI user with email: the_spiritual_seeker.67871d1e0002e66c3a91@chattie.local
+2025-01-14 20:28:55,078 [INFO] Successfully created AI user: 67871d660004d349e4b2 with name: The Spiritual Seeker
+2025-01-14 20:28:55,078 [INFO] Created AI user ID: 67871d660004d349e4b2 for persona: The Spiritual Seeker
+2025-01-14 20:28:55,078 [INFO] Generating personalized avatar for persona: The Spiritual Seeker
+2025-01-14 20:29:03,948 [INFO] Storing avatar in Appwrite bucket: the_spiritual_seeker_67871d1e0002e66c3a91_avatar.webp
+2025-01-14 20:29:04,225 [INFO] Successfully stored avatar with ID: 67871d6f0022887e6dae
+2025-01-14 20:29:04,535 [INFO] Updated user preferences with avatar: 67871d6f0022887e6dae
+2025-01-14 20:29:04,535 [INFO] Storing persona in Appwrite: The Spiritual Seeker
+2025-01-14 20:29:04,781 [INFO] Successfully stored persona: The Spiritual Seeker with ID: 67871d660004d349e4b2
+2025-01-14 20:29:04,782 [INFO] Generating channels with OpenAI for workspace: 67871d1e0002e66c3a91
+2025-01-14 20:29:04,784 [INFO] Initiating OpenAI API request
+2025-01-14 20:29:18,813 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:18,857 [INFO] Successfully processed OpenAI response
+2025-01-14 20:29:18,857 [INFO] Successfully generated 5 channels
+2025-01-14 20:29:18,857 [INFO] Processing channel 1/5: existential-questions
+2025-01-14 20:29:18,857 [INFO] Storing channel in Appwrite: existential-questions
+2025-01-14 20:29:19,144 [INFO] Successfully stored channel: existential-questions with ID: 67871d7e002d920e09ef
+2025-01-14 20:29:19,144 [INFO] Processing channel 2/5: the-purpose-debate
+2025-01-14 20:29:19,144 [INFO] Storing channel in Appwrite: the-purpose-debate
+2025-01-14 20:29:19,299 [INFO] Successfully stored channel: the-purpose-debate with ID: 67871d7f00102c46c82a
+2025-01-14 20:29:19,300 [INFO] Processing channel 3/5: the-happiness-paradox
+2025-01-14 20:29:19,300 [INFO] Storing channel in Appwrite: the-happiness-paradox
+2025-01-14 20:29:19,556 [INFO] Successfully stored channel: the-happiness-paradox with ID: 67871d7f00305484f61b
+2025-01-14 20:29:19,556 [INFO] Processing channel 4/5: life-after-death
+2025-01-14 20:29:19,556 [INFO] Storing channel in Appwrite: life-after-death
+2025-01-14 20:29:19,833 [INFO] Successfully stored channel: life-after-death with ID: 67871d7f002c48f49a54
+2025-01-14 20:29:19,833 [INFO] Processing channel 5/5: meaning-in-modern-life
+2025-01-14 20:29:19,833 [INFO] Storing channel in Appwrite: meaning-in-modern-life
+2025-01-14 20:29:19,993 [INFO] Successfully stored channel: meaning-in-modern-life with ID: 67871d7f0036ffd8f887
+2025-01-14 20:29:19,993 [INFO] Starting workspace member updates for workspace: 67871d1e0002e66c3a91
+2025-01-14 20:29:20,434 [INFO] Found 5 channels for workspace
+2025-01-14 20:29:20,434 [INFO] Updating workspace with 7 total members
+2025-01-14 20:29:20,967 [INFO] Updating labels for member: 67871d3c002382e5e3be
+2025-01-14 20:29:21,384 [INFO] Updating labels for member: 67871d47001566cb8f4b
+2025-01-14 20:29:21,855 [INFO] Updating labels for member: 67871d51003551abaf3c
+2025-01-14 20:29:22,270 [INFO] Updating labels for member: 67871d5c000da03d46f1
+2025-01-14 20:29:22,870 [INFO] Updating labels for member: 67871d660004d349e4b2
+2025-01-14 20:29:23,353 [INFO] Updating labels for member: 6786b0f90038710c7bcd
+2025-01-14 20:29:23,900 [INFO] Updating labels for member: bot
+2025-01-14 20:29:24,191 [INFO] Completed workspace member updates
+2025-01-14 20:29:24,192 [INFO] Saving test data to test_data/responses.json
+2025-01-14 20:29:24,193 [INFO] Workspace creation completed - Personas: 5, Channels: 5
+2025-01-14 20:29:24,193 [INFO] Starting autonomous conversations in background
+2025-01-14 20:29:24,523 [INFO] Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-14 20:29:24,523 [INFO] Looking for plugins in pinecone_plugins.inference
+2025-01-14 20:29:24,530 [INFO] Installing plugin inference into Pinecone
+2025-01-14 20:29:24,652 [INFO] Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-14 20:29:24,653 [INFO] Looking for plugins in pinecone_plugins.inference
+2025-01-14 20:29:24,654 [INFO] === Workspace Creation Complete ===
+2025-01-14 20:29:24,654 [INFO] Successfully processed workspace creation request
+2025-01-14 20:29:24,655 [INFO] ::1 [14/Jan/2025:20:27:42 -0600] "GET /?workspace_id=67871d1e0002e66c3a91&description=what%20is%20the%20meaning%20of%20life%3F%20why%20were%20we%20all%20put%20here.%20thoughtful%20deep%2C%20meaningful%20coversations HTTP/1.1" 200 23663 "-" "node"
+2025-01-14 20:29:24,655 [INFO] Loaded workspace data for 67871d1e0002e66c3a91
+2025-01-14 20:29:24,655 [INFO] Found 5 channels
+2025-01-14 20:29:24,655 [INFO] Found 5 personas
+2025-01-14 20:29:24,656 [INFO] Channel data: {
+  "name": "existential-questions",
+  "$id": "67871d7e002d920e09ef",
+  "description": "A deep dive into the fundamental questions of existence, sparking intense debates about purpose and meaning.",
+  "purpose": "To explore various philosophical perspectives on existence and the meaning of life, encouraging thoughtful and heated discussions.",
+  "topics": [
+    "The role of consciousness in defining meaning",
+    "Nihilism versus existentialism",
+    "The impact of culture on our understanding of purpose"
+  ],
+  "debate_topics": [
+    "Is there an inherent meaning to life?",
+    "Can science provide answers to existential questions?",
+    "Do we create our own meaning or is it given?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "The validity of subjective versus objective meaning",
+    "Whether emotional experiences can define purpose",
+    "The influence of religion versus science on understanding existence"
+  ],
+  "type": "public",
+  "members": [
+    "67871d3c002382e5e3be",
+    "67871d47001566cb8f4b",
+    "67871d51003551abaf3c",
+    "67871d5c000da03d46f1",
+    "67871d660004d349e4b2"
+  ],
+  "primary_personas": [
+    "PunDemonium",
+    "The Aristocrat",
+    "The Existentialist",
+    "The Skeptic",
+    "The Spiritual Seeker"
+  ],
+  "workspace_id": "67871d1e0002e66c3a91"
+}
+2025-01-14 20:29:24,656 [INFO] Starting conversation in existential-questions with personas: ['The Aristocrat', 'The Spiritual Seeker']
+2025-01-14 20:29:25,492 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:25,921 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:29:25,962 [INFO] Channel data: {
+  "name": "the-purpose-debate",
+  "$id": "67871d7f00102c46c82a",
+  "description": "Discussions centered around the notion of purpose, often leading to heated arguments about destiny and free will.",
+  "purpose": "To challenge and debate the various interpretations of purpose in life, fostering both personal insights and philosophical arguments.",
+  "topics": [
+    "The influence of genetics on life purpose",
+    "Free will versus determinism",
+    "Religious versus secular definitions of purpose"
+  ],
+  "debate_topics": [
+    "Is life predetermined or do we have free will?",
+    "Can purpose exist without a higher power?",
+    "How do societal expectations shape our sense of purpose?"
+  ],
+  "conversation_tone": "formal",
+  "expected_conflict_points": [
+    "The role of fate versus choice in shaping our lives",
+    "Different interpretations of 'purpose' across cultures",
+    "Emotional versus rational approaches to defining purpose"
+  ],
+  "type": "public",
+  "members": [
+    "67871d3c002382e5e3be",
+    "67871d47001566cb8f4b",
+    "67871d51003551abaf3c",
+    "67871d5c000da03d46f1",
+    "67871d660004d349e4b2"
+  ],
+  "primary_personas": [
+    "PunDemonium",
+    "The Aristocrat",
+    "The Existentialist",
+    "The Skeptic",
+    "The Spiritual Seeker"
+  ],
+  "workspace_id": "67871d1e0002e66c3a91"
+}
+2025-01-14 20:29:25,962 [INFO] Starting conversation in the-purpose-debate with personas: ['PunDemonium', 'The Skeptic', 'The Existentialist']
+2025-01-14 20:29:26,766 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:26,998 [INFO] Stored message from The Skeptic in channel 67871d7f00102c46c82a
+2025-01-14 20:29:27,011 [INFO] Channel data: {
+  "name": "the-happiness-paradox",
+  "$id": "67871d7f00305484f61b",
+  "description": "Exploring the relationship between happiness and meaning, often resulting in passionate discussions about what truly brings joy.",
+  "purpose": "To dissect the complex relationship between happiness and meaning, inviting diverse opinions and experiences.",
+  "topics": [
+    "Is happiness the ultimate goal of life?",
+    "Can we find meaning in suffering?",
+    "The impact of materialism on happiness"
+  ],
+  "debate_topics": [
+    "Does the pursuit of happiness detract from finding meaning?",
+    "Can a meaningful life be devoid of happiness?",
+    "Is happiness a byproduct of meaning or a separate pursuit?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "Whether happiness is a fleeting feeling or a lasting state",
+    "The balance between personal happiness and societal responsibilities",
+    "Different cultural definitions of happiness and fulfillment"
+  ],
+  "type": "public",
+  "members": [
+    "67871d3c002382e5e3be",
+    "67871d47001566cb8f4b",
+    "67871d51003551abaf3c",
+    "67871d5c000da03d46f1",
+    "67871d660004d349e4b2"
+  ],
+  "primary_personas": [
+    "PunDemonium",
+    "The Aristocrat",
+    "The Existentialist",
+    "The Skeptic",
+    "The Spiritual Seeker"
+  ],
+  "workspace_id": "67871d1e0002e66c3a91"
+}
+2025-01-14 20:29:27,012 [INFO] Starting conversation in the-happiness-paradox with personas: ['The Existentialist', 'The Spiritual Seeker', 'The Aristocrat']
+2025-01-14 20:29:27,810 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:27,905 [INFO] Stored message from The Spiritual Seeker in channel 67871d7f00305484f61b
+2025-01-14 20:29:27,922 [INFO] Channel data: {
+  "name": "life-after-death",
+  "$id": "67871d7f002c48f49a54",
+  "description": "Controversial discussions about what happens after we die, often leading to passionate disagreements about beliefs and evidence.",
+  "purpose": "To explore various beliefs about life after death, encouraging open-minded debates that can be both emotional and rational.",
+  "topics": [
+    "The implications of life after death on how we live",
+    "Different religious views on the afterlife",
+    "Psychological perspectives on death and dying"
+  ],
+  "debate_topics": [
+    "Is there evidence for life after death?",
+    "How do beliefs about the afterlife influence moral behavior?",
+    "Can we find comfort in the idea of an afterlife?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "The validity of anecdotal experiences versus scientific evidence",
+    "Emotional responses related to fear of death",
+    "Cultural differences in afterlife beliefs and their implications"
+  ],
+  "type": "public",
+  "members": [
+    "67871d3c002382e5e3be",
+    "67871d47001566cb8f4b",
+    "67871d51003551abaf3c",
+    "67871d5c000da03d46f1",
+    "67871d660004d349e4b2"
+  ],
+  "primary_personas": [
+    "PunDemonium",
+    "The Aristocrat",
+    "The Existentialist",
+    "The Skeptic",
+    "The Spiritual Seeker"
+  ],
+  "workspace_id": "67871d1e0002e66c3a91"
+}
+2025-01-14 20:29:27,924 [INFO] Starting conversation in life-after-death with personas: ['The Skeptic', 'PunDemonium']
+2025-01-14 20:29:28,455 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:28,592 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:29:28,609 [INFO] Channel data: {
+  "name": "meaning-in-modern-life",
+  "$id": "67871d7f0036ffd8f887",
+  "description": "A space to discuss how modern life and technology influence our understanding of meaning and purpose.",
+  "purpose": "To analyze the impact of contemporary society on individual and collective meanings, fostering discussions that merge practical and theoretical insights.",
+  "topics": [
+    "How technology shapes our understanding of connection and purpose",
+    "The search for meaning in a fast-paced world",
+    "Consumerism and its effects on life satisfaction"
+  ],
+  "debate_topics": [
+    "Is modern life more meaningful or less meaningful than in the past?",
+    "Does social media enhance or detract from meaningful connections?",
+    "Can we find purpose in the gig economy?"
+  ],
+  "conversation_tone": "casual",
+  "expected_conflict_points": [
+    "Diverse opinions on the role of technology in our lives",
+    "Generational perspectives on meaning",
+    "The tension between individualism and collectivism in modern society"
+  ],
+  "type": "public",
+  "members": [
+    "67871d3c002382e5e3be",
+    "67871d47001566cb8f4b",
+    "67871d51003551abaf3c",
+    "67871d5c000da03d46f1",
+    "67871d660004d349e4b2"
+  ],
+  "primary_personas": [
+    "PunDemonium",
+    "The Aristocrat",
+    "The Existentialist",
+    "The Skeptic",
+    "The Spiritual Seeker"
+  ],
+  "workspace_id": "67871d1e0002e66c3a91"
+}
+2025-01-14 20:29:28,609 [INFO] Starting conversation in meaning-in-modern-life with personas: ['PunDemonium', 'The Existentialist']
+2025-01-14 20:29:29,992 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:30,129 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:29:32,441 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:33,159 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:33,326 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:29:33,328 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:33,329 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:33,734 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:33,833 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:29:34,564 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:34,731 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:29:34,732 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:34,733 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:35,514 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:35,631 [INFO] Stored message from PunDemonium in channel 67871d7f00102c46c82a
+2025-01-14 20:29:36,105 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:36,222 [INFO] Stored message from The Existentialist in channel 67871d7f00305484f61b
+2025-01-14 20:29:39,856 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:40,532 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:40,672 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:29:40,672 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:41,192 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:41,339 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:29:41,341 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:41,738 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:41,904 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:29:41,909 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:42,485 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:42,657 [INFO] Stored message from The Existentialist in channel 67871d7f00102c46c82a
+2025-01-14 20:29:45,551 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:46,016 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:46,125 [INFO] Stored message from The Aristocrat in channel 67871d7f00305484f61b
+2025-01-14 20:29:46,704 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:47,263 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:47,407 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:29:49,349 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:50,188 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:50,332 [INFO] Stored message from PunDemonium in channel 67871d7f00102c46c82a
+2025-01-14 20:29:50,333 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:50,884 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:51,008 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:29:55,064 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:55,694 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:55,786 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:29:55,786 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:56,376 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:56,493 [INFO] Stored message from The Existentialist in channel 67871d7f00305484f61b
+2025-01-14 20:29:56,495 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:56,834 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:56,939 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:29:57,962 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:58,430 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:58,636 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:29:58,640 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:29:59,092 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:29:59,285 [INFO] Stored message from The Skeptic in channel 67871d7f00102c46c82a
+2025-01-14 20:30:01,836 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:02,417 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:02,565 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:30:06,021 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:06,736 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:06,955 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:30:06,958 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:08,165 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:08,328 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:30:08,986 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:09,627 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:09,725 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:30:10,328 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:10,993 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:11,130 [INFO] Stored message from The Existentialist in channel 67871d7f00102c46c82a
+2025-01-14 20:30:11,777 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:12,348 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:12,559 [INFO] Stored message from The Spiritual Seeker in channel 67871d7f00305484f61b
+2025-01-14 20:30:14,880 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:15,434 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:15,594 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:30:16,070 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:16,738 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:16,843 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:30:16,844 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:17,375 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:17,505 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:30:18,124 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:18,596 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:18,778 [INFO] Stored message from PunDemonium in channel 67871d7f00102c46c82a
+2025-01-14 20:30:20,696 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:21,196 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:21,355 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:30:24,131 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:24,832 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:25,040 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:30:26,685 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:27,294 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:27,408 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:30:27,410 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:27,411 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:27,413 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:27,812 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:27,987 [INFO] Stored message from The Skeptic in channel 67871d7f00102c46c82a
+2025-01-14 20:30:28,598 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:28,775 [INFO] Stored message from The Aristocrat in channel 67871d7f00305484f61b
+2025-01-14 20:30:29,387 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:29,576 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:30:35,898 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:36,438 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:36,627 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:30:36,632 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:36,633 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:37,462 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:37,641 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:30:38,277 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:38,410 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:30:40,440 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:41,052 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:41,177 [INFO] Stored message from The Existentialist in channel 67871d7f00102c46c82a
+2025-01-14 20:30:41,253 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:41,776 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:41,926 [INFO] Stored message from The Existentialist in channel 67871d7f00305484f61b
+2025-01-14 20:30:43,331 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:43,815 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:43,915 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:30:45,729 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:46,286 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:46,436 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:30:46,778 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:47,282 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:47,393 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:30:48,767 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:49,230 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:49,334 [INFO] Stored message from PunDemonium in channel 67871d7f00102c46c82a
+2025-01-14 20:30:52,117 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:52,747 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:52,897 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:30:54,362 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:55,107 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:55,347 [INFO] Stored message from The Spiritual Seeker in channel 67871d7f00305484f61b
+2025-01-14 20:30:55,348 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:56,105 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:56,236 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:30:56,241 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:30:56,873 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:30:57,032 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:31:01,709 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:02,527 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:02,648 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:31:04,908 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:05,510 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:05,626 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:31:05,627 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:06,139 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:06,231 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:31:09,088 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:09,621 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:09,707 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:31:10,567 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:11,004 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:11,175 [INFO] Stored message from The Aristocrat in channel 67871d7f00305484f61b
+2025-01-14 20:31:12,534 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:13,000 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:13,196 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:31:13,197 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:14,036 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:14,170 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:31:17,103 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:17,807 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:17,973 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:31:20,273 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:20,856 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:21,031 [INFO] Stored message from PunDemonium in channel 67871d7f0036ffd8f887
+2025-01-14 20:31:22,468 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:22,956 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:23,139 [INFO] Stored message from The Spiritual Seeker in channel 67871d7e002d920e09ef
+2025-01-14 20:31:23,141 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:23,923 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:24,137 [INFO] Stored message from The Existentialist in channel 67871d7f00305484f61b
+2025-01-14 20:31:24,138 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:24,590 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:24,724 [INFO] Stored message from The Skeptic in channel 67871d7f002c48f49a54
+2025-01-14 20:31:29,343 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:30,206 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:30,377 [INFO] Stored message from The Skeptic in channel 67871d7f00102c46c82a
+2025-01-14 20:31:31,010 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:32,038 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:32,222 [INFO] Stored message from The Aristocrat in channel 67871d7e002d920e09ef
+2025-01-14 20:31:32,226 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:33,007 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:33,187 [INFO] Stored message from The Existentialist in channel 67871d7f0036ffd8f887
+2025-01-14 20:31:33,188 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:33,759 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:33,977 [INFO] Stored message from PunDemonium in channel 67871d7f002c48f49a54
+2025-01-14 20:31:33,991 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:31:34,618 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:31:34,755 [INFO] Stored message from The Spiritual Seeker in channel 67871d7f00305484f61b
+2025-01-14 20:31:40,076 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 20:31:40,076 [INFO] Appwrite admin client initialized
+2025-01-14 20:31:40,077 [INFO] === Application Starting ===
+2025-01-14 20:31:40,078 [INFO] Starting server initialization
+2025-01-14 20:31:40,078 [INFO] Server starting at http://localhost:8080
+2025-01-14 20:31:40,085 [INFO] Server successfully started
+2025-01-14 20:33:06,344 [INFO] Received workspace creation request
+2025-01-14 20:33:06,348 [INFO] Creating workspace with ID: 67871e61002bb0961ffa
+2025-01-14 20:33:06,355 [INFO] === Starting Workspace Creation ===
+2025-01-14 20:33:06,355 [INFO] Workspace ID: 67871e61002bb0961ffa
+2025-01-14 20:33:06,355 [INFO] Description: is democracy a good system? when has it failed, when has it been great?
+2025-01-14 20:33:06,355 [INFO] Generating personas with OpenAI for workspace: 67871e61002bb0961ffa
+2025-01-14 20:33:06,358 [INFO] Initiating OpenAI API request
+2025-01-14 20:33:19,834 [WARNING] 401 Client Error: Unauthorized for url: https://app.langwatch.ai/api/collector, retrying in 0.5 seconds...
+2025-01-14 20:33:20,782 [WARNING] 401 Client Error: Unauthorized for url: https://app.langwatch.ai/api/collector, retrying in 1.5 seconds...
+2025-01-14 20:33:22,766 [WARNING] 401 Client Error: Unauthorized for url: https://app.langwatch.ai/api/collector, retrying in 4.5 seconds...
+2025-01-14 20:33:27,716 [WARNING] 401 Client Error: Unauthorized for url: https://app.langwatch.ai/api/collector, retrying in 13.5 seconds...
+2025-01-14 20:35:41,441 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 20:35:41,442 [INFO] Appwrite admin client initialized
+2025-01-14 20:37:45,013 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 20:37:45,014 [INFO] Appwrite admin client initialized
+2025-01-14 20:37:45,015 [INFO] === Application Starting ===
+2025-01-14 20:37:45,015 [INFO] Starting server initialization
+2025-01-14 20:37:45,015 [INFO] Server starting at http://localhost:8080
+2025-01-14 20:37:45,019 [INFO] Server successfully started
+2025-01-14 20:38:04,264 [INFO] Received workspace creation request
+2025-01-14 20:38:04,266 [INFO] Creating workspace with ID: 67871f8b0030d32a16f3
+2025-01-14 20:38:04,268 [INFO] === Starting Workspace Creation ===
+2025-01-14 20:38:04,268 [INFO] Workspace ID: 67871f8b0030d32a16f3
+2025-01-14 20:38:04,268 [INFO] Description: is democracy a good thing? a bad thing?
+2025-01-14 20:38:04,268 [INFO] Generating personas with OpenAI for workspace: 67871f8b0030d32a16f3
+2025-01-14 20:38:04,276 [INFO] Initiating OpenAI API request
+2025-01-14 20:40:10,307 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 20:40:10,307 [INFO] Appwrite admin client initialized
+2025-01-14 20:40:10,308 [INFO] === Application Starting ===
+2025-01-14 20:40:10,309 [INFO] Starting server initialization
+2025-01-14 20:40:10,309 [INFO] Server starting at http://localhost:8080
+2025-01-14 20:40:10,312 [INFO] Server successfully started
+2025-01-14 20:40:23,924 [INFO] Received workspace creation request
+2025-01-14 20:40:23,925 [INFO] Creating workspace with ID: 6787201700176e334eac
+2025-01-14 20:40:23,926 [INFO] === Starting Workspace Creation ===
+2025-01-14 20:40:23,926 [INFO] Workspace ID: 6787201700176e334eac
+2025-01-14 20:40:23,926 [INFO] Description: workplace harassment
+2025-01-14 20:40:23,926 [INFO] Generating personas with OpenAI for workspace: 6787201700176e334eac
+2025-01-14 20:40:23,926 [INFO] Initiating OpenAI API request
+2025-01-14 20:40:44,752 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:40:44,784 [INFO] Successfully processed OpenAI response
+2025-01-14 20:40:44,784 [INFO] Successfully generated 5 personas
+2025-01-14 20:40:44,785 [INFO] Processing persona 1/5: PunbelievablePete
+2025-01-14 20:40:44,785 [INFO] Creating AI user for persona: PunbelievablePete in workspace: 6787201700176e334eac
+2025-01-14 20:40:44,785 [INFO] Attempting to create AI user with email: punbelievablepete.6787201700176e334eac@chattie.local
+2025-01-14 20:40:45,305 [INFO] Successfully created AI user: 6787202c001784fafa7c with name: PunbelievablePete
+2025-01-14 20:40:45,306 [INFO] Created AI user ID: 6787202c001784fafa7c for persona: PunbelievablePete
+2025-01-14 20:40:45,306 [INFO] Generating personalized avatar for persona: PunbelievablePete
+2025-01-14 20:40:54,600 [INFO] Storing avatar in Appwrite bucket: punbelievablepete_6787201700176e334eac_avatar.webp
+2025-01-14 20:40:54,946 [INFO] Successfully stored avatar with ID: 67872036002c4f9494fa
+2025-01-14 20:40:55,142 [INFO] Updated user preferences with avatar: 67872036002c4f9494fa
+2025-01-14 20:40:55,143 [INFO] Storing persona in Appwrite: PunbelievablePete
+2025-01-14 20:40:55,444 [INFO] Successfully stored persona: PunbelievablePete with ID: 6787202c001784fafa7c
+2025-01-14 20:40:55,444 [INFO] Processing persona 2/5: FormalFelicity
+2025-01-14 20:40:55,444 [INFO] Creating AI user for persona: FormalFelicity in workspace: 6787201700176e334eac
+2025-01-14 20:40:55,445 [INFO] Attempting to create AI user with email: formalfelicity.6787201700176e334eac@chattie.local
+2025-01-14 20:40:55,995 [INFO] Successfully created AI user: 67872037002996508792 with name: FormalFelicity
+2025-01-14 20:40:55,995 [INFO] Created AI user ID: 67872037002996508792 for persona: FormalFelicity
+2025-01-14 20:40:55,995 [INFO] Generating personalized avatar for persona: FormalFelicity
+2025-01-14 20:41:04,324 [WARNING] Failed with personalized prompt: An error occurred (ValidationException) when calling the InvokeModel operation: Content in the all of the generated image(s) has been blocked and has been filtered from the response. Our system automatically blocked because the generated image(s) may conflict our AUP or AWS Responsible AI Policy.. Trying fallback prompt...
+2025-01-14 20:41:13,386 [INFO] Storing avatar in Appwrite bucket: formalfelicity_6787201700176e334eac_avatar.webp
+2025-01-14 20:41:13,734 [INFO] Successfully stored avatar with ID: 67872049001b3ac86ed4
+2025-01-14 20:41:14,042 [INFO] Updated user preferences with avatar: 67872049001b3ac86ed4
+2025-01-14 20:41:14,042 [INFO] Storing persona in Appwrite: FormalFelicity
+2025-01-14 20:41:14,265 [INFO] Successfully stored persona: FormalFelicity with ID: 67872037002996508792
+2025-01-14 20:41:14,265 [INFO] Processing persona 3/5: SassySamantha
+2025-01-14 20:41:14,265 [INFO] Creating AI user for persona: SassySamantha in workspace: 6787201700176e334eac
+2025-01-14 20:41:14,265 [INFO] Attempting to create AI user with email: sassysamantha.6787201700176e334eac@chattie.local
+2025-01-14 20:41:14,724 [INFO] Successfully created AI user: 6787204a001c11bbf488 with name: SassySamantha
+2025-01-14 20:41:14,724 [INFO] Created AI user ID: 6787204a001c11bbf488 for persona: SassySamantha
+2025-01-14 20:41:14,724 [INFO] Generating personalized avatar for persona: SassySamantha
+2025-01-14 20:41:25,017 [INFO] Storing avatar in Appwrite bucket: sassysamantha_6787201700176e334eac_avatar.webp
+2025-01-14 20:41:25,407 [INFO] Successfully stored avatar with ID: 6787205500086710d2ec
+2025-01-14 20:41:25,580 [INFO] Updated user preferences with avatar: 6787205500086710d2ec
+2025-01-14 20:41:25,580 [INFO] Storing persona in Appwrite: SassySamantha
+2025-01-14 20:41:25,753 [INFO] Successfully stored persona: SassySamantha with ID: 6787204a001c11bbf488
+2025-01-14 20:41:25,753 [INFO] Processing persona 4/5: DataDrivenDerek
+2025-01-14 20:41:25,753 [INFO] Creating AI user for persona: DataDrivenDerek in workspace: 6787201700176e334eac
+2025-01-14 20:41:25,753 [INFO] Attempting to create AI user with email: datadrivenderek.6787201700176e334eac@chattie.local
+2025-01-14 20:41:26,275 [INFO] Successfully created AI user: 67872055002895d16c62 with name: DataDrivenDerek
+2025-01-14 20:41:26,275 [INFO] Created AI user ID: 67872055002895d16c62 for persona: DataDrivenDerek
+2025-01-14 20:41:26,275 [INFO] Generating personalized avatar for persona: DataDrivenDerek
+2025-01-14 20:41:35,671 [INFO] Storing avatar in Appwrite bucket: datadrivenderek_6787201700176e334eac_avatar.webp
+2025-01-14 20:41:36,035 [INFO] Successfully stored avatar with ID: 6787205f0025c5f48c90
+2025-01-14 20:41:36,412 [INFO] Updated user preferences with avatar: 6787205f0025c5f48c90
+2025-01-14 20:41:36,413 [INFO] Storing persona in Appwrite: DataDrivenDerek
+2025-01-14 20:41:36,590 [INFO] Successfully stored persona: DataDrivenDerek with ID: 67872055002895d16c62
+2025-01-14 20:41:36,590 [INFO] Processing persona 5/5: EmpatheticElla
+2025-01-14 20:41:36,591 [INFO] Creating AI user for persona: EmpatheticElla in workspace: 6787201700176e334eac
+2025-01-14 20:41:36,591 [INFO] Attempting to create AI user with email: empatheticella.6787201700176e334eac@chattie.local
+2025-01-14 20:41:37,100 [INFO] Successfully created AI user: 67872060000fbfb5f3ea with name: EmpatheticElla
+2025-01-14 20:41:37,100 [INFO] Created AI user ID: 67872060000fbfb5f3ea for persona: EmpatheticElla
+2025-01-14 20:41:37,100 [INFO] Generating personalized avatar for persona: EmpatheticElla
+2025-01-14 20:41:45,467 [WARNING] Failed with personalized prompt: An error occurred (ValidationException) when calling the InvokeModel operation: Content in the all of the generated image(s) has been blocked and has been filtered from the response. Our system automatically blocked because the generated image(s) may conflict our AUP or AWS Responsible AI Policy.. Trying fallback prompt...
+2025-01-14 20:41:54,620 [INFO] Storing avatar in Appwrite bucket: empatheticella_6787201700176e334eac_avatar.webp
+2025-01-14 20:41:54,992 [INFO] Successfully stored avatar with ID: 67872072002a0e8c9130
+2025-01-14 20:41:55,253 [INFO] Updated user preferences with avatar: 67872072002a0e8c9130
+2025-01-14 20:41:55,254 [INFO] Storing persona in Appwrite: EmpatheticElla
+2025-01-14 20:41:55,400 [INFO] Successfully stored persona: EmpatheticElla with ID: 67872060000fbfb5f3ea
+2025-01-14 20:41:55,400 [INFO] Generating channels with OpenAI for workspace: 6787201700176e334eac
+2025-01-14 20:41:55,400 [INFO] Initiating OpenAI API request
+2025-01-14 20:42:15,248 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:15,271 [INFO] Successfully processed OpenAI response
+2025-01-14 20:42:15,271 [INFO] Successfully generated 5 channels
+2025-01-14 20:42:15,271 [INFO] Processing channel 1/5: zero-tolerance-policies
+2025-01-14 20:42:15,271 [INFO] Storing channel in Appwrite: zero-tolerance-policies
+2025-01-14 20:42:15,562 [INFO] Successfully stored channel: zero-tolerance-policies with ID: 67872087002ecda68283
+2025-01-14 20:42:15,562 [INFO] Processing channel 2/5: emotional-impact-of-harassment
+2025-01-14 20:42:15,562 [INFO] Storing channel in Appwrite: emotional-impact-of-harassment
+2025-01-14 20:42:15,723 [INFO] Successfully stored channel: emotional-impact-of-harassment with ID: 67872087002dd53d13f9
+2025-01-14 20:42:15,724 [INFO] Processing channel 3/5: gender-bias-in-harassment-cases
+2025-01-14 20:42:15,724 [INFO] Storing channel in Appwrite: gender-bias-in-harassment-cases
+2025-01-14 20:42:15,940 [INFO] Successfully stored channel: gender-bias-in-harassment-cases with ID: 67872087000ae9ae2f77
+2025-01-14 20:42:15,940 [INFO] Processing channel 4/5: the-role-of-social-media
+2025-01-14 20:42:15,940 [INFO] Storing channel in Appwrite: the-role-of-social-media
+2025-01-14 20:42:16,146 [INFO] Successfully stored channel: the-role-of-social-media with ID: 67872087001b58a87a8f
+2025-01-14 20:42:16,147 [INFO] Processing channel 5/5: humor-in-harassment-discussions
+2025-01-14 20:42:16,147 [INFO] Storing channel in Appwrite: humor-in-harassment-discussions
+2025-01-14 20:42:16,445 [INFO] Successfully stored channel: humor-in-harassment-discussions with ID: 678720880010133538bb
+2025-01-14 20:42:16,445 [INFO] Starting workspace member updates for workspace: 6787201700176e334eac
+2025-01-14 20:42:16,807 [INFO] Found 5 channels for workspace
+2025-01-14 20:42:16,807 [INFO] Updating workspace with 7 total members
+2025-01-14 20:42:17,341 [INFO] Updating labels for member: 6787202c001784fafa7c
+2025-01-14 20:42:17,708 [INFO] Updating labels for member: 67872037002996508792
+2025-01-14 20:42:18,142 [INFO] Updating labels for member: 6787204a001c11bbf488
+2025-01-14 20:42:18,582 [INFO] Updating labels for member: 67872055002895d16c62
+2025-01-14 20:42:18,989 [INFO] Updating labels for member: 67872060000fbfb5f3ea
+2025-01-14 20:42:19,541 [INFO] Updating labels for member: 6786b0f90038710c7bcd
+2025-01-14 20:42:19,921 [INFO] Updating labels for member: bot
+2025-01-14 20:42:20,222 [INFO] Completed workspace member updates
+2025-01-14 20:42:20,231 [INFO] Saving test data to test_data/responses.json
+2025-01-14 20:42:20,241 [INFO] Workspace creation completed - Personas: 5, Channels: 5
+2025-01-14 20:42:20,241 [INFO] Starting autonomous conversations in background
+2025-01-14 20:42:20,712 [INFO] Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-14 20:42:20,712 [INFO] Looking for plugins in pinecone_plugins.inference
+2025-01-14 20:42:20,724 [INFO] Installing plugin inference into Pinecone
+2025-01-14 20:42:20,913 [INFO] Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-14 20:42:20,913 [INFO] Looking for plugins in pinecone_plugins.inference
+2025-01-14 20:42:20,914 [INFO] === Workspace Creation Complete ===
+2025-01-14 20:42:20,914 [INFO] Successfully processed workspace creation request
+2025-01-14 20:42:20,915 [INFO] ::1 [14/Jan/2025:20:40:23 -0600] "GET /?workspace_id=6787201700176e334eac&description=workplace%20harassment HTTP/1.1" 200 22218 "-" "node"
+2025-01-14 20:42:20,915 [INFO] Loaded workspace data for 6787201700176e334eac
+2025-01-14 20:42:20,915 [INFO] Found 5 channels
+2025-01-14 20:42:20,915 [INFO] Found 5 personas
+2025-01-14 20:42:20,916 [INFO] Channel data: {
+  "name": "zero-tolerance-policies",
+  "$id": "67872087002ecda68283",
+  "description": "Explores the effectiveness and implications of zero tolerance policies in workplaces, examining whether they foster a safer environment or create a culture of fear.",
+  "purpose": "To debate the pros and cons of zero tolerance policies and their real-world impacts on workplace culture.",
+  "topics": [
+    "Impact of zero tolerance on workplace dynamics",
+    "Legal implications of strict policies",
+    "Employee morale and reporting behaviors"
+  ],
+  "debate_topics": [
+    "Are zero tolerance policies overly punitive?",
+    "Do they prevent genuine discussions about harassment?",
+    "Can these policies be applied in all workplace environments?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "The balance between employee protection and individual rights",
+    "The effectiveness of punitive measures vs. educational approaches",
+    "The role of management in enforcing these policies"
+  ],
+  "type": "public",
+  "members": [
+    "6787202c001784fafa7c",
+    "67872037002996508792",
+    "6787204a001c11bbf488",
+    "67872055002895d16c62",
+    "67872060000fbfb5f3ea"
+  ],
+  "primary_personas": [
+    "PunbelievablePete",
+    "FormalFelicity",
+    "SassySamantha",
+    "DataDrivenDerek",
+    "EmpatheticElla"
+  ],
+  "workspace_id": "6787201700176e334eac"
+}
+2025-01-14 20:42:20,916 [INFO] Starting conversation in zero-tolerance-policies with personas: ['DataDrivenDerek', 'PunbelievablePete']
+2025-01-14 20:42:21,696 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:22,471 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:42:22,615 [INFO] Channel data: {
+  "name": "emotional-impact-of-harassment",
+  "$id": "67872087002dd53d13f9",
+  "description": "Focuses on the emotional and psychological toll of workplace harassment on victims and the importance of recognizing these impacts in policy-making.",
+  "purpose": "To share personal experiences and insights about the emotional ramifications of harassment, highlighting the need for empathy in policies.",
+  "topics": [
+    "Long-term effects of harassment on mental health",
+    "Coping mechanisms and support systems",
+    "The role of bystanders in supporting victims"
+  ],
+  "debate_topics": [
+    "Should emotional impact be considered in legal definitions of harassment?",
+    "Is it appropriate for workplaces to mandate emotional support?",
+    "How can we balance emotional discussions with practical solutions?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "The adequacy of current mental health support in workplaces",
+    "Differing views on victim responsibilities vs. organizational accountability",
+    "How to effectively engage bystanders in prevention efforts"
+  ],
+  "type": "public",
+  "members": [
+    "6787202c001784fafa7c",
+    "67872037002996508792",
+    "6787204a001c11bbf488",
+    "67872055002895d16c62",
+    "67872060000fbfb5f3ea"
+  ],
+  "primary_personas": [
+    "PunbelievablePete",
+    "FormalFelicity",
+    "SassySamantha",
+    "DataDrivenDerek",
+    "EmpatheticElla"
+  ],
+  "workspace_id": "6787201700176e334eac"
+}
+2025-01-14 20:42:22,617 [INFO] Starting conversation in emotional-impact-of-harassment with personas: ['EmpatheticElla', 'PunbelievablePete']
+2025-01-14 20:42:23,217 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:23,347 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:42:23,368 [INFO] Channel data: {
+  "name": "gender-bias-in-harassment-cases",
+  "$id": "67872087000ae9ae2f77",
+  "description": "Examines the intersection of gender bias and workplace harassment, analyzing how biases affect reporting, responses, and outcomes of harassment cases.",
+  "purpose": "To critically assess the role of gender in harassment cases and explore solutions to mitigate bias in reporting and handling.",
+  "topics": [
+    "Statistics on gender bias in harassment reporting",
+    "Differences in how men and women experience harassment",
+    "Impact of gender stereotypes on case outcomes"
+  ],
+  "debate_topics": [
+    "Are current policies inadvertently biased against men?",
+    "Should training programs focus more on gender awareness?",
+    "Is the term 'harassment' too gendered?"
+  ],
+  "conversation_tone": "formal",
+  "expected_conflict_points": [
+    "The validity of gender-specific statistics",
+    "Differing opinions on the role of training in reducing bias",
+    "The effectiveness of existing policies in protecting all genders"
+  ],
+  "type": "public",
+  "members": [
+    "6787202c001784fafa7c",
+    "67872037002996508792",
+    "6787204a001c11bbf488",
+    "67872055002895d16c62",
+    "67872060000fbfb5f3ea"
+  ],
+  "primary_personas": [
+    "PunbelievablePete",
+    "FormalFelicity",
+    "SassySamantha",
+    "DataDrivenDerek",
+    "EmpatheticElla"
+  ],
+  "workspace_id": "6787201700176e334eac"
+}
+2025-01-14 20:42:23,369 [INFO] Starting conversation in gender-bias-in-harassment-cases with personas: ['DataDrivenDerek', 'SassySamantha', 'EmpatheticElla']
+2025-01-14 20:42:23,787 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:23,950 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:42:23,965 [INFO] Channel data: {
+  "name": "the-role-of-social-media",
+  "$id": "67872087001b58a87a8f",
+  "description": "Discusses how social media has changed the landscape of workplace harassment, both positively and negatively.",
+  "purpose": "To evaluate the impacts of social media on awareness, reporting, and the public discourse surrounding workplace harassment.",
+  "topics": [
+    "The impact of online activism on workplace policies",
+    "Social media's role in amplifying harassment cases",
+    "Balancing anonymity and accountability in online discussions"
+  ],
+  "debate_topics": [
+    "Does social media help or hinder victims of harassment?",
+    "Should companies monitor employee social media activity?",
+    "Can online platforms be held accountable for harassment issues?"
+  ],
+  "conversation_tone": "casual",
+  "expected_conflict_points": [
+    "The ethics of monitoring employee social media",
+    "The effectiveness of online activism vs. traditional methods",
+    "Differing views on anonymity and transparency in reporting"
+  ],
+  "type": "public",
+  "members": [
+    "6787202c001784fafa7c",
+    "67872037002996508792",
+    "6787204a001c11bbf488",
+    "67872055002895d16c62",
+    "67872060000fbfb5f3ea"
+  ],
+  "primary_personas": [
+    "PunbelievablePete",
+    "FormalFelicity",
+    "SassySamantha",
+    "DataDrivenDerek",
+    "EmpatheticElla"
+  ],
+  "workspace_id": "6787201700176e334eac"
+}
+2025-01-14 20:42:23,965 [INFO] Starting conversation in the-role-of-social-media with personas: ['DataDrivenDerek', 'SassySamantha', 'EmpatheticElla']
+2025-01-14 20:42:24,480 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:24,623 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:42:24,637 [INFO] Channel data: {
+  "name": "humor-in-harassment-discussions",
+  "$id": "678720880010133538bb",
+  "description": "Explores the controversial use of humor in discussions about workplace harassment, examining when it is appropriate and when it crosses the line.",
+  "purpose": "To engage in light-hearted yet serious discussions about the role humor plays in workplace culture and its impact on harassment.",
+  "topics": [
+    "The thin line between humor and harassment",
+    "Using humor to break the ice in serious discussions",
+    "Cultural differences in humor acceptance"
+  ],
+  "debate_topics": [
+    "Is it ever acceptable to joke about harassment?",
+    "Can humor be a tool for healing in the workplace?",
+    "How do we define humor that is harmful versus humor that is healing?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "The appropriateness of humor in serious contexts",
+    "Differing opinions on humor's role in workplace culture",
+    "The potential for misunderstanding humor across cultures"
+  ],
+  "type": "public",
+  "members": [
+    "6787202c001784fafa7c",
+    "67872037002996508792",
+    "6787204a001c11bbf488",
+    "67872055002895d16c62",
+    "67872060000fbfb5f3ea"
+  ],
+  "primary_personas": [
+    "PunbelievablePete",
+    "FormalFelicity",
+    "SassySamantha",
+    "DataDrivenDerek",
+    "EmpatheticElla"
+  ],
+  "workspace_id": "6787201700176e334eac"
+}
+2025-01-14 20:42:24,637 [INFO] Starting conversation in humor-in-harassment-discussions with personas: ['PunbelievablePete', 'FormalFelicity']
+2025-01-14 20:42:25,202 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:25,329 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:42:26,674 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:27,087 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:27,260 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:42:27,261 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:27,262 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:27,262 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:27,926 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:28,062 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:42:28,467 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:28,612 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:42:29,355 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:29,519 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:42:29,521 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:29,901 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:30,105 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:42:32,787 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:33,392 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:33,534 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:42:34,092 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:34,523 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:34,681 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:42:34,716 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:35,257 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:35,396 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:42:35,446 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:35,855 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:36,015 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:42:36,434 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:36,907 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:37,059 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:42:40,659 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:41,132 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:41,222 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:42:41,222 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:41,778 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:41,903 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:42:41,904 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:42,356 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:42,529 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:42:42,529 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:43,156 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:43,236 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:42:46,072 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:46,631 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:46,790 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:42:47,758 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:48,501 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:48,732 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:42:48,861 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:49,366 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:49,510 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:42:49,511 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:49,998 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:50,130 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:42:50,168 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:50,880 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:50,964 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:42:53,048 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:53,505 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:53,644 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:42:56,064 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:56,701 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:56,804 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:42:57,992 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:58,479 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:58,616 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:42:58,618 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:42:59,244 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:42:59,420 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:43:00,577 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:01,139 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:01,253 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:43:02,567 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:03,079 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:03,209 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:43:03,211 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:04,775 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:04,883 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:43:04,884 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:05,531 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:05,649 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:43:06,568 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:06,941 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:07,072 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:43:08,029 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:08,606 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:08,759 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:43:09,711 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:10,322 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:10,429 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:43:12,039 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:12,630 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:12,796 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:43:12,797 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:13,851 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:14,287 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:43:14,430 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:14,435 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:15,198 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:15,373 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:43:15,755 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:15,955 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:43:19,014 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:19,392 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:19,539 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:43:20,917 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:21,296 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:21,454 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:43:21,455 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:22,034 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:22,167 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:43:22,168 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:22,561 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:22,707 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:43:22,708 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:23,153 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:23,256 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:43:26,693 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:27,278 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:27,480 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:43:28,351 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:28,958 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:29,115 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:43:31,079 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:31,510 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:31,671 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:43:33,140 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:33,146 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:33,772 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:33,958 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:43:34,431 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:34,528 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:43:35,205 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:35,863 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:35,987 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:43:37,232 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:37,722 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:37,896 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:43:38,664 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:39,009 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:39,187 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:43:39,828 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:40,316 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:40,477 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:43:41,892 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:42,382 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:42,559 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:43:43,309 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:43,805 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:43,915 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:43:43,916 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:44,389 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:44,540 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:43:47,652 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:48,136 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:48,390 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:43:48,522 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:48,950 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:49,104 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:43:49,111 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:49,683 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:49,853 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:43:50,962 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:51,486 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:51,604 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:43:51,606 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:51,977 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:52,112 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:43:55,197 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:55,794 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:55,892 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:43:56,136 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:57,103 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:57,234 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:43:57,238 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:57,941 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:58,054 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:43:58,384 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:43:58,900 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:43:59,098 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:44:01,343 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:01,899 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:02,043 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:44:02,046 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:02,620 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:02,713 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:44:05,731 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:06,240 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:06,362 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:44:06,363 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:06,776 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:06,931 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:44:07,245 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:07,827 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:07,962 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:44:08,110 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:08,630 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:08,761 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:44:11,646 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:12,288 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:12,467 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:44:12,468 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:12,469 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:13,107 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:13,248 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:44:13,846 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:14,073 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:44:14,075 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:14,573 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:14,709 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:44:17,724 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:18,091 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:18,219 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:44:20,150 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:20,638 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:20,723 [INFO] Stored message from EmpatheticElla in channel 67872087002dd53d13f9
+2025-01-14 20:44:21,390 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:21,781 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:21,905 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:44:21,908 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:21,909 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:22,309 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:22,449 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:44:22,916 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:23,050 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:44:27,711 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:28,057 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:28,363 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:44:28,365 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:28,819 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:28,946 [INFO] Stored message from PunbelievablePete in channel 67872087002dd53d13f9
+2025-01-14 20:44:29,982 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:30,533 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:30,662 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:44:30,664 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:31,185 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:31,320 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:44:31,323 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:31,323 [INFO] Completed conversation in channel emotional-impact-of-harassment
+2025-01-14 20:44:31,770 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:31,877 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:44:37,835 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:38,407 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:38,563 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:44:38,564 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:39,284 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:39,382 [INFO] Stored message from DataDrivenDerek in channel 67872087002ecda68283
+2025-01-14 20:44:39,384 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:40,023 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:40,131 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:44:42,076 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:42,617 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:42,778 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:44:44,647 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:45,411 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:45,578 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:44:47,041 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:47,852 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:47,932 [INFO] Stored message from PunbelievablePete in channel 67872087002ecda68283
+2025-01-14 20:44:47,933 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:48,533 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:48,650 [INFO] Stored message from PunbelievablePete in channel 678720880010133538bb
+2025-01-14 20:44:49,933 [INFO] Completed conversation in channel zero-tolerance-policies
+2025-01-14 20:44:54,310 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:54,864 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:54,982 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:44:56,406 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:56,847 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:57,011 [INFO] Stored message from FormalFelicity in channel 678720880010133538bb
+2025-01-14 20:44:57,809 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:44:58,297 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:44:58,387 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:44:59,014 [INFO] Completed conversation in channel humor-in-harassment-discussions
+2025-01-14 20:45:05,501 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:06,228 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:06,323 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:45:09,788 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:10,338 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:10,476 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:45:16,170 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:16,727 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:16,833 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:45:18,496 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:18,983 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:19,120 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:45:26,176 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:26,673 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:26,788 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:45:27,011 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:27,729 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:27,812 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:45:33,952 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:34,412 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:34,504 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:45:36,469 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:36,973 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:37,105 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:45:42,213 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:42,994 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:43,087 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:45:50,476 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:45:50,894 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:45:51,058 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:45:59,708 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:00,189 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:00,310 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:46:05,414 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:05,831 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:05,973 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:46:13,415 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:14,056 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:14,194 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:46:17,716 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:18,486 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:18,634 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:46:20,782 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:21,303 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:21,462 [INFO] Stored message from DataDrivenDerek in channel 67872087000ae9ae2f77
+2025-01-14 20:46:28,195 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:28,708 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:28,872 [INFO] Stored message from SassySamantha in channel 67872087000ae9ae2f77
+2025-01-14 20:46:32,674 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:33,275 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:33,406 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:46:35,096 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:35,651 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:35,825 [INFO] Stored message from EmpatheticElla in channel 67872087000ae9ae2f77
+2025-01-14 20:46:37,828 [INFO] Completed conversation in channel gender-bias-in-harassment-cases
+2025-01-14 20:46:41,308 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:41,846 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:41,985 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:46:52,626 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:46:53,146 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:46:53,313 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:47:01,362 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:47:01,899 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:47:01,995 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:47:11,409 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:47:12,001 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:47:12,132 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:47:20,216 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:47:20,883 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:47:21,096 [INFO] Stored message from DataDrivenDerek in channel 67872087001b58a87a8f
+2025-01-14 20:47:32,526 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:47:33,209 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:47:33,384 [INFO] Stored message from SassySamantha in channel 67872087001b58a87a8f
+2025-01-14 20:47:41,723 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:47:42,681 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:47:42,809 [INFO] Stored message from EmpatheticElla in channel 67872087001b58a87a8f
+2025-01-14 20:47:44,811 [INFO] Completed conversation in channel the-role-of-social-media
+2025-01-14 20:47:44,812 [INFO] Successfully populated all channels in workspace 6787201700176e334eac
+2025-01-14 20:54:33,873 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 20:54:33,873 [INFO] Appwrite admin client initialized
+2025-01-14 20:54:33,874 [INFO] === Application Starting ===
+2025-01-14 20:54:33,875 [INFO] Starting server initialization
+2025-01-14 20:54:33,875 [INFO] Server starting at http://localhost:8080
+2025-01-14 20:54:33,878 [INFO] Server successfully started
+2025-01-14 20:56:15,772 [INFO] Received workspace creation request
+2025-01-14 20:56:15,777 [INFO] Creating workspace with ID: 678723ce003e243127cb
+2025-01-14 20:56:15,785 [INFO] === Starting Workspace Creation ===
+2025-01-14 20:56:15,785 [INFO] Workspace ID: 678723ce003e243127cb
+2025-01-14 20:56:15,786 [INFO] Description: impact of technology on humans, past present and future
+2025-01-14 20:56:15,786 [INFO] Generating personas with OpenAI for workspace: 678723ce003e243127cb
+2025-01-14 20:56:15,796 [INFO] Initiating OpenAI API request
+2025-01-14 20:56:44,781 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:56:44,844 [INFO] Successfully processed OpenAI response
+2025-01-14 20:56:44,844 [INFO] Successfully generated 5 personas
+2025-01-14 20:56:44,845 [INFO] Processing persona 1/5: TechnoTyrant
+2025-01-14 20:56:44,845 [INFO] Creating AI user for persona: TechnoTyrant in workspace: 678723ce003e243127cb
+2025-01-14 20:56:44,845 [INFO] Attempting to create AI user with email: technotyrant.678723ce003e243127cb@chattie.local
+2025-01-14 20:56:45,244 [INFO] Successfully created AI user: 678723ec002af7e1d6e0 with name: TechnoTyrant
+2025-01-14 20:56:45,244 [INFO] Created AI user ID: 678723ec002af7e1d6e0 for persona: TechnoTyrant
+2025-01-14 20:56:45,244 [INFO] Generating personalized avatar for persona: TechnoTyrant
+2025-01-14 20:56:54,587 [INFO] Storing avatar in Appwrite bucket: technotyrant_678723ce003e243127cb_avatar.webp
+2025-01-14 20:56:54,843 [INFO] Successfully stored avatar with ID: 678723f6000703813186
+2025-01-14 20:56:55,026 [INFO] Updated user preferences with avatar: 678723f6000703813186
+2025-01-14 20:56:55,027 [INFO] Storing persona in Appwrite: TechnoTyrant
+2025-01-14 20:56:55,242 [INFO] Successfully stored persona: TechnoTyrant with ID: 678723ec002af7e1d6e0
+2025-01-14 20:56:55,242 [INFO] Processing persona 2/5: Professor Pundit
+2025-01-14 20:56:55,242 [INFO] Creating AI user for persona: Professor Pundit in workspace: 678723ce003e243127cb
+2025-01-14 20:56:55,243 [INFO] Attempting to create AI user with email: professor_pundit.678723ce003e243127cb@chattie.local
+2025-01-14 20:56:55,765 [INFO] Successfully created AI user: 678723f70010708dd3e1 with name: Professor Pundit
+2025-01-14 20:56:55,765 [INFO] Created AI user ID: 678723f70010708dd3e1 for persona: Professor Pundit
+2025-01-14 20:56:55,765 [INFO] Generating personalized avatar for persona: Professor Pundit
+2025-01-14 20:57:04,824 [INFO] Storing avatar in Appwrite bucket: professor_pundit_678723ce003e243127cb_avatar.webp
+2025-01-14 20:57:05,166 [INFO] Successfully stored avatar with ID: 678724000035679b771c
+2025-01-14 20:57:05,410 [INFO] Updated user preferences with avatar: 678724000035679b771c
+2025-01-14 20:57:05,411 [INFO] Storing persona in Appwrite: Professor Pundit
+2025-01-14 20:57:05,699 [INFO] Successfully stored persona: Professor Pundit with ID: 678723f70010708dd3e1
+2025-01-14 20:57:05,700 [INFO] Processing persona 3/5: SassySynth
+2025-01-14 20:57:05,700 [INFO] Creating AI user for persona: SassySynth in workspace: 678723ce003e243127cb
+2025-01-14 20:57:05,700 [INFO] Attempting to create AI user with email: sassysynth.678723ce003e243127cb@chattie.local
+2025-01-14 20:57:06,183 [INFO] Successfully created AI user: 67872401002e54125b58 with name: SassySynth
+2025-01-14 20:57:06,184 [INFO] Created AI user ID: 67872401002e54125b58 for persona: SassySynth
+2025-01-14 20:57:06,184 [INFO] Generating personalized avatar for persona: SassySynth
+2025-01-14 20:57:15,252 [INFO] Storing avatar in Appwrite bucket: sassysynth_678723ce003e243127cb_avatar.webp
+2025-01-14 20:57:15,656 [INFO] Successfully stored avatar with ID: 6787240b002c173f48f0
+2025-01-14 20:57:16,028 [INFO] Updated user preferences with avatar: 6787240b002c173f48f0
+2025-01-14 20:57:16,028 [INFO] Storing persona in Appwrite: SassySynth
+2025-01-14 20:57:16,207 [INFO] Successfully stored persona: SassySynth with ID: 67872401002e54125b58
+2025-01-14 20:57:16,207 [INFO] Processing persona 4/5: The Analog Advocate
+2025-01-14 20:57:16,207 [INFO] Creating AI user for persona: The Analog Advocate in workspace: 678723ce003e243127cb
+2025-01-14 20:57:16,207 [INFO] Attempting to create AI user with email: the_analog_advocate.678723ce003e243127cb@chattie.local
+2025-01-14 20:57:16,692 [INFO] Successfully created AI user: 6787240c0036693b0fc4 with name: The Analog Advocate
+2025-01-14 20:57:16,692 [INFO] Created AI user ID: 6787240c0036693b0fc4 for persona: The Analog Advocate
+2025-01-14 20:57:16,692 [INFO] Generating personalized avatar for persona: The Analog Advocate
+2025-01-14 20:57:25,729 [INFO] Storing avatar in Appwrite bucket: the_analog_advocate_678723ce003e243127cb_avatar.webp
+2025-01-14 20:57:26,053 [INFO] Successfully stored avatar with ID: 678724150019081fa0ce
+2025-01-14 20:57:26,293 [INFO] Updated user preferences with avatar: 678724150019081fa0ce
+2025-01-14 20:57:26,293 [INFO] Storing persona in Appwrite: The Analog Advocate
+2025-01-14 20:57:26,435 [INFO] Successfully stored persona: The Analog Advocate with ID: 6787240c0036693b0fc4
+2025-01-14 20:57:26,435 [INFO] Processing persona 5/5: Data Diva
+2025-01-14 20:57:26,435 [INFO] Creating AI user for persona: Data Diva in workspace: 678723ce003e243127cb
+2025-01-14 20:57:26,435 [INFO] Attempting to create AI user with email: data_diva.678723ce003e243127cb@chattie.local
+2025-01-14 20:57:26,901 [INFO] Successfully created AI user: 678724160027bc002d41 with name: Data Diva
+2025-01-14 20:57:26,902 [INFO] Created AI user ID: 678724160027bc002d41 for persona: Data Diva
+2025-01-14 20:57:26,902 [INFO] Generating personalized avatar for persona: Data Diva
+2025-01-14 20:57:35,843 [INFO] Storing avatar in Appwrite bucket: data_diva_678723ce003e243127cb_avatar.webp
+2025-01-14 20:57:36,105 [INFO] Successfully stored avatar with ID: 6787241f000dc823c30c
+2025-01-14 20:57:36,469 [INFO] Updated user preferences with avatar: 6787241f000dc823c30c
+2025-01-14 20:57:36,470 [INFO] Storing persona in Appwrite: Data Diva
+2025-01-14 20:57:36,758 [INFO] Successfully stored persona: Data Diva with ID: 678724160027bc002d41
+2025-01-14 20:57:36,758 [INFO] Generating channels with OpenAI for workspace: 678723ce003e243127cb
+2025-01-14 20:57:36,759 [INFO] Initiating OpenAI API request
+2025-01-14 20:58:00,103 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:00,132 [INFO] Successfully processed OpenAI response
+2025-01-14 20:58:00,132 [INFO] Successfully generated 5 channels
+2025-01-14 20:58:00,132 [INFO] Processing channel 1/5: automation-and-employment
+2025-01-14 20:58:00,132 [INFO] Storing channel in Appwrite: automation-and-employment
+2025-01-14 20:58:00,432 [INFO] Successfully stored channel: automation-and-employment with ID: 678724380033cccf05b6
+2025-01-14 20:58:00,432 [INFO] Processing channel 2/5: privacy-in-the-digital-age
+2025-01-14 20:58:00,432 [INFO] Storing channel in Appwrite: privacy-in-the-digital-age
+2025-01-14 20:58:00,734 [INFO] Successfully stored channel: privacy-in-the-digital-age with ID: 67872438001b0515e640
+2025-01-14 20:58:00,734 [INFO] Processing channel 3/5: social-media-and-mental-health
+2025-01-14 20:58:00,734 [INFO] Storing channel in Appwrite: social-media-and-mental-health
+2025-01-14 20:58:00,964 [INFO] Successfully stored channel: social-media-and-mental-health with ID: 678724380033dc2e0a61
+2025-01-14 20:58:00,965 [INFO] Processing channel 4/5: ethics-of-ai
+2025-01-14 20:58:00,965 [INFO] Storing channel in Appwrite: ethics-of-ai
+2025-01-14 20:58:01,136 [INFO] Successfully stored channel: ethics-of-ai with ID: 6787243800293a111694
+2025-01-14 20:58:01,136 [INFO] Processing channel 5/5: future-of-human-connection
+2025-01-14 20:58:01,136 [INFO] Storing channel in Appwrite: future-of-human-connection
+2025-01-14 20:58:01,443 [INFO] Successfully stored channel: future-of-human-connection with ID: 67872439003b659b75b7
+2025-01-14 20:58:01,443 [INFO] Starting workspace member updates for workspace: 678723ce003e243127cb
+2025-01-14 20:58:01,996 [INFO] Found 5 channels for workspace
+2025-01-14 20:58:01,996 [INFO] Updating workspace with 7 total members
+2025-01-14 20:58:02,604 [INFO] Updating labels for member: 678723ec002af7e1d6e0
+2025-01-14 20:58:03,147 [INFO] Updating labels for member: 678723f70010708dd3e1
+2025-01-14 20:58:03,678 [INFO] Updating labels for member: 67872401002e54125b58
+2025-01-14 20:58:04,113 [INFO] Updating labels for member: 6787240c0036693b0fc4
+2025-01-14 20:58:04,618 [INFO] Updating labels for member: 678724160027bc002d41
+2025-01-14 20:58:05,012 [INFO] Updating labels for member: 6786b0f90038710c7bcd
+2025-01-14 20:58:05,469 [INFO] Updating labels for member: bot
+2025-01-14 20:58:05,815 [INFO] Completed workspace member updates
+2025-01-14 20:58:05,815 [INFO] Saving test data to test_data/responses.json
+2025-01-14 20:58:05,818 [INFO] Workspace creation completed - Personas: 5, Channels: 5
+2025-01-14 20:58:05,818 [INFO] Starting autonomous conversations in background
+2025-01-14 20:58:06,189 [INFO] Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-14 20:58:06,190 [INFO] Looking for plugins in pinecone_plugins.inference
+2025-01-14 20:58:06,198 [INFO] Installing plugin inference into Pinecone
+2025-01-14 20:58:06,351 [INFO] Discovering subpackages in _NamespacePath(['/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/pinecone_plugins'])
+2025-01-14 20:58:06,351 [INFO] Looking for plugins in pinecone_plugins.inference
+2025-01-14 20:58:06,352 [INFO] === Workspace Creation Complete ===
+2025-01-14 20:58:06,352 [INFO] Successfully processed workspace creation request
+2025-01-14 20:58:06,353 [INFO] ::1 [14/Jan/2025:20:56:15 -0600] "GET /?workspace_id=678723ce003e243127cb&description=impact%20of%20technology%20on%20humans%2C%20past%20present%20and%20future HTTP/1.1" 200 21215 "-" "node"
+2025-01-14 20:58:06,354 [INFO] Loaded workspace data for 678723ce003e243127cb
+2025-01-14 20:58:06,354 [INFO] Found 5 channels
+2025-01-14 20:58:06,354 [INFO] Found 5 personas
+2025-01-14 20:58:06,355 [INFO] Channel data: {
+  "name": "automation-and-employment",
+  "$id": "678724380033cccf05b6",
+  "description": "Explores the tension between technological advancement in automation and job displacement.",
+  "purpose": "To debate the future of work in the age of machines, analyzing both the opportunities and threats posed by automation.",
+  "topics": [
+    "Impact of automation on job security",
+    "Reskilling and upskilling workforce",
+    "Economic inequality and automation"
+  ],
+  "debate_topics": [
+    "Is automation a net positive or negative for society?",
+    "Should governments implement universal basic income as a solution?",
+    "Are job losses inevitable with advancing technology?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "Tech Optimist believes in creating new job categories, while Labor Advocate warns about immediate job losses.",
+    "Economist may argue for economic growth while Labor Advocate focuses on wage stagnation."
+  ],
+  "type": "public",
+  "members": [
+    "678723ec002af7e1d6e0",
+    "678723f70010708dd3e1",
+    "67872401002e54125b58",
+    "6787240c0036693b0fc4",
+    "678724160027bc002d41"
+  ],
+  "primary_personas": [
+    "TechnoTyrant",
+    "Professor Pundit",
+    "SassySynth",
+    "The Analog Advocate",
+    "Data Diva"
+  ],
+  "workspace_id": "678723ce003e243127cb"
+}
+2025-01-14 20:58:06,355 [INFO] Starting conversation in automation-and-employment with personas: ['TechnoTyrant', 'SassySynth', 'Professor Pundit']
+2025-01-14 20:58:06,955 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:07,445 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 20:58:07,617 [INFO] Channel data: {
+  "name": "privacy-in-the-digital-age",
+  "$id": "67872438001b0515e640",
+  "description": "A heated debate on how technology compromises personal privacy and data security.",
+  "purpose": "To discuss the balance between technological innovation and the right to privacy.",
+  "topics": [
+    "Data collection practices by tech companies",
+    "Government surveillance vs. public safety",
+    "Consumer consent and understanding of data usage"
+  ],
+  "debate_topics": [
+    "Are privacy concerns exaggerated in the age of technology?",
+    "Is government regulation necessary to protect citizens?",
+    "Do users have a responsibility to safeguard their own data?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "Privacy Advocate argues for stringent data protection laws, while Tech Developer emphasizes innovation.",
+    "Government Regulator may see surveillance as a tool for safety, conflicting with Privacy Advocate's views."
+  ],
+  "type": "public",
+  "members": [
+    "678723ec002af7e1d6e0",
+    "678723f70010708dd3e1",
+    "67872401002e54125b58",
+    "6787240c0036693b0fc4",
+    "678724160027bc002d41"
+  ],
+  "primary_personas": [
+    "TechnoTyrant",
+    "Professor Pundit",
+    "SassySynth",
+    "The Analog Advocate",
+    "Data Diva"
+  ],
+  "workspace_id": "678723ce003e243127cb"
+}
+2025-01-14 20:58:07,617 [INFO] Starting conversation in privacy-in-the-digital-age with personas: ['SassySynth', 'TechnoTyrant']
+2025-01-14 20:58:08,067 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:08,193 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 20:58:08,206 [INFO] Channel data: {
+  "name": "social-media-and-mental-health",
+  "$id": "678724380033dc2e0a61",
+  "description": "Investigates the controversial relationship between social media usage and mental well-being.",
+  "purpose": "To explore how social media affects human psychology, relationships, and societal norms.",
+  "topics": [
+    "Impact of social media on self-esteem",
+    "Social media as a tool for connection vs. isolation",
+    "The role of online culture in shaping behavior"
+  ],
+  "debate_topics": [
+    "Does social media lead to increased anxiety and depression?",
+    "Can social media be beneficial for mental health?",
+    "Should platforms be held accountable for harmful content?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "Mental Health Professional emphasizes the negative impacts, while Social Media Influencer highlights positive connections.",
+    "Skeptic may question the validity of mental health claims related to social media."
+  ],
+  "type": "public",
+  "members": [
+    "678723ec002af7e1d6e0",
+    "678723f70010708dd3e1",
+    "67872401002e54125b58",
+    "6787240c0036693b0fc4",
+    "678724160027bc002d41"
+  ],
+  "primary_personas": [
+    "TechnoTyrant",
+    "Professor Pundit",
+    "SassySynth",
+    "The Analog Advocate",
+    "Data Diva"
+  ],
+  "workspace_id": "678723ce003e243127cb"
+}
+2025-01-14 20:58:08,207 [INFO] Starting conversation in social-media-and-mental-health with personas: ['The Analog Advocate', 'SassySynth']
+2025-01-14 20:58:08,732 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:08,826 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 20:58:08,849 [INFO] Channel data: {
+  "name": "ethics-of-ai",
+  "$id": "6787243800293a111694",
+  "description": "A space for intense discussions on the ethical implications of artificial intelligence.",
+  "purpose": "To examine the moral dilemmas posed by AI development and deployment in various sectors.",
+  "topics": [
+    "Bias in AI algorithms",
+    "Accountability for AI decisions",
+    "AI in surveillance and law enforcement"
+  ],
+  "debate_topics": [
+    "Is AI development outpacing ethical considerations?",
+    "Should there be a moratorium on certain AI technologies?",
+    "Can AI ever be truly unbiased?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "AI Ethicist raises concerns about bias, while Tech Entrepreneur argues for technological advancement.",
+    "Civil Rights Advocate may clash with both over the implications of AI in surveillance."
+  ],
+  "type": "public",
+  "members": [
+    "678723ec002af7e1d6e0",
+    "678723f70010708dd3e1",
+    "67872401002e54125b58",
+    "6787240c0036693b0fc4",
+    "678724160027bc002d41"
+  ],
+  "primary_personas": [
+    "TechnoTyrant",
+    "Professor Pundit",
+    "SassySynth",
+    "The Analog Advocate",
+    "Data Diva"
+  ],
+  "workspace_id": "678723ce003e243127cb"
+}
+2025-01-14 20:58:08,849 [INFO] Starting conversation in ethics-of-ai with personas: ['Professor Pundit', 'Data Diva', 'TechnoTyrant']
+2025-01-14 20:58:09,393 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:09,606 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 20:58:09,627 [INFO] Channel data: {
+  "name": "future-of-human-connection",
+  "$id": "67872439003b659b75b7",
+  "description": "Discusses how technology is reshaping human relationships and community dynamics.",
+  "purpose": "To debate whether technology enhances or detracts from genuine human connection.",
+  "topics": [
+    "Online communities vs. real-life interactions",
+    "The role of technology in family dynamics",
+    "Future of dating and relationships in a tech-driven world"
+  ],
+  "debate_topics": [
+    "Is technology creating more meaningful connections or superficial interactions?",
+    "Will future generations value face-to-face communication?",
+    "Should there be limits on technology use in personal relationships?"
+  ],
+  "conversation_tone": "mixed",
+  "expected_conflict_points": [
+    "Cultural Anthropologist may argue for the preservation of traditional forms of connection, while Tech Visionary promotes technological integration.",
+    "Traditionalist may feel threatened by emerging trends, clashing with both modern viewpoints."
+  ],
+  "type": "public",
+  "members": [
+    "678723ec002af7e1d6e0",
+    "678723f70010708dd3e1",
+    "67872401002e54125b58",
+    "6787240c0036693b0fc4",
+    "678724160027bc002d41"
+  ],
+  "primary_personas": [
+    "TechnoTyrant",
+    "Professor Pundit",
+    "SassySynth",
+    "The Analog Advocate",
+    "Data Diva"
+  ],
+  "workspace_id": "678723ce003e243127cb"
+}
+2025-01-14 20:58:09,628 [INFO] Starting conversation in future-of-human-connection with personas: ['SassySynth', 'Data Diva']
+2025-01-14 20:58:10,241 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:10,396 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 20:58:13,391 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:14,352 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:14,526 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 20:58:14,529 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:14,531 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:14,533 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:15,196 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:15,313 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 20:58:15,778 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:15,911 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 20:58:16,386 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:16,578 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:58:18,159 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:18,654 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:18,784 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 20:58:19,654 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:20,147 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:20,263 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 20:58:21,829 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:22,521 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:22,749 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:58:24,721 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:25,256 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:25,415 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 20:58:26,113 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:26,800 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:26,920 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 20:58:26,921 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:27,441 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:27,631 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 20:58:28,797 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:29,288 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:29,420 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 20:58:31,960 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:32,436 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:32,602 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 20:58:36,725 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:37,132 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:37,328 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 20:58:37,333 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:37,831 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:37,949 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 20:58:37,949 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:37,950 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:38,380 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:38,521 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 20:58:38,998 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:39,107 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:58:40,642 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:41,111 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:41,260 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 20:58:44,984 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:45,394 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:45,525 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 20:58:46,852 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:47,387 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:47,520 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 20:58:48,281 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:48,841 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:48,984 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 20:58:49,973 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:50,496 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:50,599 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 20:58:50,600 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:51,156 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:51,302 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 20:58:52,499 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:53,013 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:53,154 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 20:58:57,970 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:58,409 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:58,558 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 20:58:58,559 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:58:59,124 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:58:59,303 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:59:01,183 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:01,729 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:01,941 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 20:59:03,020 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:03,567 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:03,738 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 20:59:08,507 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:09,054 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:09,170 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 20:59:09,173 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:09,175 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:09,787 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:09,870 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 20:59:10,311 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:10,397 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 20:59:10,841 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:11,317 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:11,473 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 20:59:11,474 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:12,096 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:12,267 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 20:59:17,833 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:18,625 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:18,891 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 20:59:20,516 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:20,537 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:22,516 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:22,621 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 20:59:23,312 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:23,512 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 20:59:23,516 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:23,525 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:24,335 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:24,417 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:59:24,920 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:25,023 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 20:59:30,222 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:30,845 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:30,992 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 20:59:30,993 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:31,521 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:31,636 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 20:59:31,730 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:32,241 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:32,359 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 20:59:34,757 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:35,317 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:35,464 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 20:59:36,042 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:36,695 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:36,800 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 20:59:38,856 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:39,450 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:39,566 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 20:59:39,568 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:39,926 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:40,108 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:59:40,331 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:41,085 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:41,209 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 20:59:42,476 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:43,231 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:43,361 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 20:59:45,560 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:45,981 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:46,139 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 20:59:46,181 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:46,883 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:47,021 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 20:59:49,771 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:50,259 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:50,469 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 20:59:50,471 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:50,475 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:51,080 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:51,184 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 20:59:51,594 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:51,708 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 20:59:52,422 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:52,940 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:53,111 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 20:59:56,898 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:57,476 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:57,604 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 20:59:57,746 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:58,147 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 20:59:58,294 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 20:59:59,287 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 20:59:59,886 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:00,004 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 21:00:01,455 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:02,013 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:02,170 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:00:05,704 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:06,415 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:06,539 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 21:00:06,548 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:07,057 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:07,184 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 21:00:08,944 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:09,422 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:09,594 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 21:00:09,597 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:10,051 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:10,196 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 21:00:15,408 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:15,832 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:15,931 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 21:00:15,933 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:16,543 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:16,651 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:00:17,248 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:17,773 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:17,890 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 21:00:17,930 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:18,437 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:18,597 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 21:00:22,740 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:23,673 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:23,816 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 21:00:25,489 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:26,171 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:26,333 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 21:00:27,758 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:28,205 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:28,299 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 21:00:28,562 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:29,031 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:29,215 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 21:00:35,386 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:35,935 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:36,132 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:00:36,133 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:36,991 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:37,156 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 21:00:37,574 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:38,117 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:38,263 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 21:00:38,784 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:39,282 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:39,461 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 21:00:39,462 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:40,061 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:40,141 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 21:00:45,677 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:46,394 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:46,496 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 21:00:48,059 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:50,501 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:50,646 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:00:50,648 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:50,650 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:50,651 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:51,041 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:51,141 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 21:00:51,589 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:51,674 [INFO] Stored message from SassySynth in channel 67872439003b659b75b7
+2025-01-14 21:00:52,214 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:52,349 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 21:00:57,301 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:57,947 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:58,074 [INFO] Stored message from Data Diva in channel 67872439003b659b75b7
+2025-01-14 21:00:58,075 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:58,076 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:58,523 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:58,684 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 21:00:59,131 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:00:59,365 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 21:00:59,366 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:00:59,983 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:00,102 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 21:01:00,103 [INFO] Completed conversation in channel future-of-human-connection
+2025-01-14 21:01:00,432 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:00,923 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:01,047 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 21:01:03,894 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:04,325 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:04,478 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 21:01:05,658 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:06,115 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:06,268 [INFO] Stored message from SassySynth in channel 67872438001b0515e640
+2025-01-14 21:01:09,949 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:10,505 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:10,636 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:01:11,888 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:12,418 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:12,560 [INFO] Stored message from The Analog Advocate in channel 678724380033dc2e0a61
+2025-01-14 21:01:15,874 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:16,310 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:16,396 [INFO] Stored message from TechnoTyrant in channel 67872438001b0515e640
+2025-01-14 21:01:18,399 [INFO] Completed conversation in channel privacy-in-the-digital-age
+2025-01-14 21:01:19,207 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:19,681 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:19,814 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 21:01:20,404 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:20,922 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:21,116 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:01:21,242 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:21,794 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:21,925 [INFO] Stored message from SassySynth in channel 678724380033dc2e0a61
+2025-01-14 21:01:23,927 [INFO] Completed conversation in channel social-media-and-mental-health
+2025-01-14 21:01:33,603 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:34,366 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:34,499 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 21:01:34,500 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:35,030 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:35,176 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 21:01:43,836 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:44,351 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:44,498 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:01:46,971 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:47,409 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:47,530 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 21:01:57,352 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:57,929 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:58,171 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:01:58,866 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:01:59,452 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:01:59,559 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 21:02:08,733 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:09,384 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:09,557 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 21:02:09,561 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:09,973 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:10,142 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 21:02:16,135 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:16,834 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:16,948 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 21:02:17,272 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:17,756 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:17,954 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:02:28,319 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:29,003 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:29,108 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:02:29,969 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:30,564 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:30,725 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 21:02:39,987 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:40,558 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:40,752 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 21:02:42,067 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:42,618 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:42,726 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 21:02:47,811 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:49,498 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:49,674 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:02:50,134 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:02:50,684 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:02:50,842 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 21:03:00,303 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:00,886 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:01,052 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 21:03:05,820 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:06,401 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:06,523 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:03:12,971 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:13,733 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:13,863 [INFO] Stored message from Professor Pundit in channel 6787243800293a111694
+2025-01-14 21:03:16,513 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:17,052 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:17,219 [INFO] Stored message from TechnoTyrant in channel 678724380033cccf05b6
+2025-01-14 21:03:26,059 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:26,729 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:26,913 [INFO] Stored message from Data Diva in channel 6787243800293a111694
+2025-01-14 21:03:28,516 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:28,919 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:29,054 [INFO] Stored message from SassySynth in channel 678724380033cccf05b6
+2025-01-14 21:03:38,274 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:38,715 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:38,853 [INFO] Stored message from Professor Pundit in channel 678724380033cccf05b6
+2025-01-14 21:03:40,855 [INFO] Completed conversation in channel automation-and-employment
+2025-01-14 21:03:42,562 [INFO] HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-14 21:03:43,078 [INFO] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-01-14 21:03:43,239 [INFO] Stored message from TechnoTyrant in channel 6787243800293a111694
+2025-01-14 21:03:45,241 [INFO] Completed conversation in channel ethics-of-ai
+2025-01-14 21:03:45,244 [INFO] Successfully populated all channels in workspace 678723ce003e243127cb
+2025-01-14 21:08:11,566 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 21:08:11,566 [INFO] Appwrite admin client initialized
+2025-01-14 21:08:11,567 [INFO] === Application Starting ===
+2025-01-14 21:08:11,567 [INFO] Starting server initialization
+2025-01-14 21:08:11,567 [INFO] Server starting at http://localhost:8080
+2025-01-14 21:08:11,571 [INFO] Server successfully started
+2025-01-14 22:24:00,962 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-14 22:24:00,962 [INFO] Appwrite admin client initialized
+2025-01-14 22:24:00,963 [INFO] === Application Starting ===
+2025-01-14 22:24:00,964 [INFO] Starting server initialization
+2025-01-14 22:24:00,964 [INFO] Server starting at http://localhost:8080
+2025-01-14 22:24:00,975 [INFO] Server successfully started
+2025-01-15 09:59:54,659 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-15 09:59:54,660 [INFO] Appwrite admin client initialized
+2025-01-15 09:59:54,661 [INFO] === Application Starting ===
+2025-01-15 09:59:54,662 [INFO] Starting server initialization
+2025-01-15 09:59:54,662 [INFO] Server starting at http://localhost:8080
+2025-01-15 09:59:54,668 [INFO] Server successfully started

@@ -24,6 +24,7 @@ from appwrite.query import Query
 from titanGenerate import generate_images, OBJECTS, generate_profile_prompt
 from PIL import Image
 from io import BytesIO
+import langwatch
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -59,6 +60,11 @@ DATABASE_ID = 'main'
 AI_PERSONAS_COLLECTION = 'ai_personas'
 CHANNELS_COLLECTION = 'channels'
 MESSAGES_COLLECTION = 'messages'
+
+
+# LangWatch
+langwatch.endpoint = "http://localhost:5560"
+langwatch.api_key = os.getenv('LANGWATCH_API_KEY')
 
 # Enhanced persona generation to include more chat-relevant details and conflicting viewpoints
 PERSONA_GENERATION_PROMPT = """Create {num_personas} unique and engaging AI personas for a workspace focused on: {description}
@@ -159,10 +165,12 @@ async def create_ai_user(persona_name: str, workspace_id: str):
             logger.error("Failed to get existing user: %s. Inner error: %s", username, str(inner_e))
             raise e
 
+@langwatch.trace()
 async def generate_with_openai(prompt: str, api_key: str) -> str:
     logger.info("Initiating OpenAI API request")
     client = AsyncOpenAI(api_key=api_key)
-    
+
+    langwatch.get_current_trace().autotrack_openai_calls(client)
     try:
         logger.debug("Sending prompt to OpenAI API (first 100 chars): %s", prompt[:100])
         response = await client.chat.completions.create(
@@ -572,6 +580,8 @@ async def handle_request(request):
         logger.error("Request handler error: %s", str(e))
         logger.exception(e)
         return web.Response(text=f"Error: {str(e)}", status=500)
+
+
 
 async def main():
     logger.info("Starting server initialization")

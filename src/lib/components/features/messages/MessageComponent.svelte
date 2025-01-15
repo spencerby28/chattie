@@ -4,7 +4,6 @@
 	import * as ContextMenu from "$lib/components/ui/context-menu";
 	import MessageActions from '../MessageActions.svelte';
 	import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
-	import { marked } from 'marked';
 
 	import { createEventDispatcher } from 'svelte';
 	import { page } from '$app/stores';
@@ -15,6 +14,8 @@
 	import { createBrowserClient } from '$lib/appwrite/appwrite-browser';
 	import { Client, Storage } from 'appwrite';
 	import { PUBLIC_APPWRITE_ENDPOINT, PUBLIC_APPWRITE_PROJECT } from '$env/static/public';
+
+	import markdownit from 'markdown-it';
 
 	export let message: Message;
 	export let user: SimpleMember;
@@ -136,28 +137,36 @@
 		}
 	}
 
-	// Configure marked options for security and features
-	marked.setOptions({
-		gfm: true, // GitHub Flavored Markdown
-		breaks: true, // Convert line breaks to <br>
-		sanitize: true // Sanitize HTML input
-	});
+	const md = markdownit({
+		html: true,
+		linkify: true,
+		typographer: false,
+		breaks: true
+	}).enable(['list'])
+
+	function processContent(content: string) {
+		// Ensure proper list formatting by adding newlines before lists if needed
+		return content.replace(/^(\d+\.)/gm, '\n$1')
+					 .replace(/\*\*/g, '_'); // Convert ** to _ for emphasis
+	}
 
 	// Function to determine if content is HTML
 	function isHTML(str: string) {
-		return str.startsWith('<') && str.endsWith('>');
+		const doc = new DOMParser().parseFromString(str, 'text/html');
+		return Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
 	}
 
 	// Function to render content based on type
 	function renderContent(content: string) {
+		if (!content) return '';
+		
 		if (isHTML(content)) {
 			return content;
 		} else {
-			return marked(content);
+			return md.render(processContent(content));
 		}
 	}
 </script>
-
 <!-- Markup -->
  <!--svelte-ignore a11y-no-static-element-interactions-->
  
@@ -204,7 +213,9 @@
 		{:else if isHTML(message.content)}
 			<div class="mt-1 prose prose-sm max-w-none [&_.mention]:text-blue-500 [&_.mention]:bg-blue-500/10 [&_.mention]:rounded [&_.mention]:px-1">{@html message.content}</div>
 		{:else}
-			<div class="mt-1 prose prose-sm max-w-none">{@html renderContent(message.content)}</div>
+			<div class="mt-1  rendered-content">
+				{@html renderContent(message.content)}
+			</div>
 		{/if}
 
 		<!-- Reactions -->
@@ -385,4 +396,20 @@
 	:global(.prose ol) {
 		@apply list-decimal list-inside;
 	}
+
+
+
+    /* Add proper list styling */
+    :global(.rendered-content ol) {
+        list-style-type: decimal !important;
+        padding-left: 2rem !important;
+        margin: 0.5rem 0 !important;
+    }
+    :global(.rendered-content li) {
+        margin: 0.25rem 0 !important;
+    }
+    :global(.rendered-content p) {
+        margin: 0.5rem 0 !important;
+    }
+
 </style> 
