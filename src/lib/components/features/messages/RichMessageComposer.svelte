@@ -437,7 +437,7 @@
 
 		{#if suggestionPopoverOpen}
 			<div 
-				class="absolute left-0 bottom-full z-50 border border-border bg-popover text-popover-foreground shadow-md rounded-md mx-3 p-2 mb-1 min-w-[200px] w-fit"
+				class="absolute left-0 bottom-full z-50 border border-border bg-background text-foreground shadow-md rounded-md mx-3 p-2 mb-1 min-w-[200px] w-fit"
 			>
 				<div class="text-xs font-semibold text-muted-foreground mb-2 px-2">MENTION:</div>
 				{#if filteredMembers.length === 0}
@@ -456,13 +456,13 @@
 							>
 								{#if member.bot}
 									<div class="flex items-center bg-gradient-to-r from-blue-400/60 to-purple-600/60 text-white rounded px-2 py-0.5">
-										<span class="text-[10px] font-medium mr-1.5">AI</span>
+										<span class="text-[10px] font-medium mr-1.5 text-foreground">AI</span>
 										<span class="text-sm">{member.name}</span>
 									</div>
 								{:else if member.id === 'bot'}
-									<div class="flex items-center bg-chattie-bg text-white rounded px-2 py-0.5 ring-1 ring-white/10">
-										<span class="text-[10px] font-medium mr-1.5">AI</span>
-										<span class="text-sm">{member.name}</span>
+									<div class="flex items-center bg-chattie-bg text-foreground rounded px-2 py-0.5 ring-1 ring-border">
+										<span class="text-[10px] font-medium mr-1.5 text-foreground">AI</span>
+										<span class="text-sm text-foreground">{member.name}</span>
 									</div>
 								{:else}
 									<span class="flex-1">{member.name}</span>
@@ -476,7 +476,7 @@
 
 		{#if slashCommandPopoverOpen}
 			<div 
-				class="absolute left-0 bottom-full z-50 border border-border bg-popover text-popover-foreground shadow-md rounded-md mx-3 p-2 mb-1 min-w-[200px] w-fit"
+				class="absolute left-0 bottom-full z-50 border border-border bg-background text-foreground shadow-md rounded-md mx-3 p-2 mb-1 min-w-[200px] w-fit"
 			>
 				<div class="text-xs font-semibold text-muted-foreground mb-2 px-2">COMMANDS:</div>
 				<div class="max-h-[180px] overflow-y-auto">

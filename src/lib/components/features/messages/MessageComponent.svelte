@@ -4,6 +4,7 @@
 	import * as ContextMenu from "$lib/components/ui/context-menu";
 	import MessageActions from '../MessageActions.svelte';
 	import Avatar from '$lib/components/ui/avatar/Avatar.svelte';
+	import { marked } from 'marked';
 
 	import { createEventDispatcher } from 'svelte';
 	import { page } from '$app/stores';
@@ -134,9 +135,32 @@
 			});
 		}
 	}
+
+	// Configure marked options for security and features
+	marked.setOptions({
+		gfm: true, // GitHub Flavored Markdown
+		breaks: true, // Convert line breaks to <br>
+		sanitize: true // Sanitize HTML input
+	});
+
+	// Function to determine if content is HTML
+	function isHTML(str: string) {
+		return str.startsWith('<') && str.endsWith('>');
+	}
+
+	// Function to render content based on type
+	function renderContent(content: string) {
+		if (isHTML(content)) {
+			return content;
+		} else {
+			return marked(content);
+		}
+	}
 </script>
 
 <!-- Markup -->
+ <!--svelte-ignore a11y-no-static-element-interactions-->
+ 
 <div
 	class="flex gap-3 group relative p-2 rounded-lg transition-colors duration-200 overflow-visible {isHighlighted ? 'highlight-message' : ''}"
 	on:mouseenter={() => (hoveredMessageId = message.$id)}
@@ -177,10 +201,10 @@
 					</button>
 				</div>
 			</div>
-		{:else if message.content.startsWith('<')}
+		{:else if isHTML(message.content)}
 			<div class="mt-1 prose prose-sm max-w-none [&_.mention]:text-blue-500 [&_.mention]:bg-blue-500/10 [&_.mention]:rounded [&_.mention]:px-1">{@html message.content}</div>
 		{:else}
-			<p class="mt-1 whitespace-pre-line">{message.content}</p>
+			<div class="mt-1 prose prose-sm max-w-none">{@html renderContent(message.content)}</div>
 		{/if}
 
 		<!-- Reactions -->
@@ -337,5 +361,28 @@
 		background: rgba(59, 130, 246, 0.1);
 		border-radius: 4px;
 		padding: 0 4px;
+	}
+
+	/* Add styles for markdown content */
+	:global(.prose) {
+		@apply text-foreground;
+	}
+	:global(.prose a) {
+		@apply text-blue-500 hover:text-blue-600 no-underline;
+	}
+	:global(.prose code) {
+		@apply bg-accent/50 px-1 py-0.5 rounded text-sm;
+	}
+	:global(.prose pre) {
+		@apply bg-accent/50 p-3 rounded-lg;
+	}
+	:global(.prose blockquote) {
+		@apply border-l-4 border-accent pl-4 italic;
+	}
+	:global(.prose ul) {
+		@apply list-disc list-inside;
+	}
+	:global(.prose ol) {
+		@apply list-decimal list-inside;
 	}
 </style> 
