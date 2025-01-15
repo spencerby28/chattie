@@ -59,6 +59,6 @@
     </div>
 </header>
 
-<main class="pt-16">
+<main class="h-screen">
     <slot />
 </main>
