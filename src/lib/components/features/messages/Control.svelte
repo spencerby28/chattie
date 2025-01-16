@@ -108,7 +108,7 @@
 				size: "sm"
 			}),
 			"hover:bg-gradient-to-r hover:from-blue-400/60 hover:to-purple-600/60",
-			isRecording && "relative ring-2 ring-white after:absolute after:inset-[-2px] after:animate-pulse after:ring-2 after:ring-white after:rounded-md"
+			isRecording && "relative ring-2 ring-foreground after:absolute after:inset-[-2px] after:animate-pulse after:ring-2 after:ring-foreground after:rounded-md"
 		)}
 		title={isRecording ? "Stop Recording" : "Start Recording"}
 		type="button"
