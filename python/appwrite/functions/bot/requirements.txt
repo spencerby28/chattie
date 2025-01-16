@@ -1,0 +1,7 @@
+appwrite
+langchain-community
+langchain-core
+langchain-openai
+langchain-pinecone
+bs4
+python-dotenv

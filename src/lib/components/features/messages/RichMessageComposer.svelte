@@ -19,6 +19,9 @@
 	import { memberStore } from '$lib/stores/members';
 	import * as Command from "$lib/components/ui/command";
 	import * as Popover from "$lib/components/ui/popover";
+	import { WhisperService } from '$lib/services/whisper';
+	import { Loader2 } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	//import '@friendofsvelte/tipex/styles/Tipex.css';
 	//import '@friendofsvelte/tipex/styles/ProseMirror.css';
@@ -32,6 +35,10 @@
 	let channelId = $derived($page.params.channelId);
 	let suggestionPopoverOpen = $state(false);
 	let slashCommandPopoverOpen = $state(false);
+	let isRecording = $state(false);
+	let isProcessing = $state(false);
+	let whisperService: WhisperService;
+	let error = $state('');
 
 	// Check if we're in a thread from URL params
 	let isThread = $derived(new URLSearchParams($page.url.search).get('thread') === 'true');
@@ -378,6 +385,51 @@
 		}
 	}
 
+	onMount(() => {
+		whisperService = new WhisperService({
+			minVolume: 0.04,        // 4% minimum volume
+			silenceLength: 1.5,     // 1.5s silence
+			translate: false        // Don't translate to English
+		});
+
+		whisperService.onTranscription((text) => {
+			if (editor && text.trim()) {
+				const currentContent = editor.getText();
+				if (currentContent) {
+					editor.commands.insertContent(' ' + text);
+				} else {
+					editor.commands.setContent(text);
+				}
+			}
+			isProcessing = false;
+		});
+
+		whisperService.onError((err) => {
+			error = err;
+			isRecording = false;
+			isProcessing = false;
+		});
+
+		return () => {
+			if (isRecording) {
+				whisperService.stopRecording();
+				isProcessing = false;
+			}
+		};
+	});
+
+	function handleRecordingToggle() {
+		if (isRecording) {
+			whisperService.stopRecording();
+			isRecording = false;
+			// Don't set processing here - it will be set when the actual API request is made
+		} else {
+			error = '';
+			isRecording = true;
+			whisperService.startRecording();
+		}
+	}
+
 </script>
 <div class="w-full flex flex-col">
 	<div class="relative w-full">
@@ -417,12 +469,27 @@
 						class="flex items-center justify-between px-2 py-2 bg-gradient-to-r from-blue-400/60 to-purple-600/60"
 						onmousedown={(e) => e.preventDefault()}
 					>
-						<Control 
-							{tipex} 
-							{members} 
-							{dropdownOpen} 
-							onFileUpload={() => fileUploadOpen = true}
-						/>
+						<div class="flex items-center gap-4">
+							<Control 
+								{tipex} 
+								{members} 
+								{dropdownOpen}
+								{isRecording}
+								onRecordingToggle={handleRecordingToggle}
+								onFileUpload={() => fileUploadOpen = true}
+							/>
+							{#if isProcessing}
+								<div class="flex items-center gap-2 text-sm text-muted-foreground">
+									<Loader2 class="h-4 w-4 animate-spin" />
+									Processing...
+								</div>
+							{/if}
+							{#if error}
+								<div class="text-sm text-destructive">
+									{error}
+								</div>
+							{/if}
+						</div>
 						<Button
 							on:click={() => handleSend()}
 							class="bg-black text-white hover:bg-black/90 mr-4"

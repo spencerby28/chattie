@@ -1,17 +1,18 @@
 <script lang="ts">
 	import type { TipexEditor } from '@friendofsvelte/tipex';
-	import { Loader2, Heading1, Heading2, Type, Bold, Italic, Code, AtSign, Paperclip } from 'lucide-svelte';
+	import { Loader2, Heading1, Heading2, Type, Bold, Italic, Code, AtSign, Paperclip, Mic, MicOff } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
     import Button from '$lib/components/ui/button/button.svelte';
 	import { buttonVariants } from '../../ui/button';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import type { SimpleMember } from '$lib/types';
 
-	let { tipex, members = [], dropdownOpen, onFileUpload } = $props<{
+	let { tipex, members = [], dropdownOpen, onFileUpload, isRecording = false, onRecordingToggle } = $props<{
 		tipex: TipexEditor;
 		members: SimpleMember[];
 		dropdownOpen: boolean;
 		onFileUpload: () => void;
+		isRecording?: boolean;
+		onRecordingToggle?: () => void;
 	}>();
 
 	$effect(() => {
@@ -19,31 +20,6 @@
 	});
 
 	const buttons = [
-		/*
-		{
-			icon: Heading1,
-			label: 'H1',
-			isActive: () => tipex?.isActive('heading', { level: 1 }),
-            // @ts-ignore
-			action: () => tipex?.chain().focus().toggleHeading({ level: 1 }).run()
-		},
-		
-		{
-			icon: Heading2, 
-			label: 'H2',
-			isActive: () => tipex?.isActive('heading', { level: 2 }),
-            // @ts-ignore
-			action: () => tipex?.chain().focus().toggleHeading({ level: 2 }).run()
-		},
-		
-		{
-			icon: Type,
-			label: 'P',
-			isActive: () => tipex?.isActive('paragraph'),
-            // @ts-ignore
-			action: () => tipex?.chain().focus().setParagraph().run()
-		},
-		*/
 		{
 			icon: Bold,
 			label: 'Bold',
@@ -57,16 +33,7 @@
 			isActive: () => tipex?.isActive('italic'),
             // @ts-ignore
 			action: () => tipex?.chain().focus().toggleItalic().run()
-		},
-		/*
-		{
-			icon: Code,
-			label: 'Code',
-			isActive: () => tipex?.isActive('code'),
-            // @ts-ignore
-			action: () => tipex?.chain().focus().toggleCode().run()
 		}
-			*/
 	];
 
 	function insertMention(member: SimpleMember) {
@@ -131,6 +98,22 @@
 		type="button"
 	>
 		<Paperclip class="h-4 w-4 invert" />
+	</Button>
+
+	<Button
+		on:click={onRecordingToggle}
+		class={cn(
+			buttonVariants({ 
+				variant: "outline",
+				size: "sm"
+			}),
+			"hover:bg-gradient-to-r hover:from-blue-400/60 hover:to-purple-600/60",
+			isRecording && "relative ring-2 ring-white after:absolute after:inset-[-2px] after:animate-pulse after:ring-2 after:ring-white after:rounded-md"
+		)}
+		title={isRecording ? "Stop Recording" : "Start Recording"}
+		type="button"
+	>
+		<svelte:component this={isRecording ? Mic : MicOff} class="h-4 w-4 invert relative z-10" />
 	</Button>
 
 	<Button

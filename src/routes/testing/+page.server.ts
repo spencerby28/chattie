@@ -7,23 +7,19 @@ export const load: PageServerLoad = async ({ locals }) => {
         throw error(401, 'Unauthorized');
     }
 
-    const messageId = '6787e1cf002688bd761c';
-    const { databases } = createAdminClient();
-    
+    const adminClient = createAdminClient();
+
     try {
-        const message = await databases.getDocument(
+        const persona = await adminClient.databases.getDocument(
             'main',
-            'messages',
-            messageId
+            'ai_personas',
+            '678816c30019011bc460'
         );
-        
         return {
-            message
+            persona
         };
-    } catch (e) {
-        console.error('Failed to load message:', e);
-        throw error(500, {
-            message: 'Failed to load message. Please try again.'
-        });
+    } catch (err) {
+        console.error('Error fetching AI persona:', err);
+        throw error(500, 'Failed to load AI persona');
     }
 };

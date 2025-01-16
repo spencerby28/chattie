@@ -1,0 +1,13 @@
+2025-01-16 12:33:56,387 [INFO] Starting performance test - creating 100 messages
+2025-01-16 12:33:56,833 [INFO] Message 1/100 created in 0.443 seconds
+2025-01-16 12:33:57,041 [INFO] Message 2/100 created in 0.204 seconds
+2025-01-16 12:33:57,169 [INFO] Message 3/100 created in 0.128 seconds
+2025-01-16 12:33:57,304 [INFO] Message 4/100 created in 0.134 seconds
+2025-01-16 12:33:57,438 [INFO] Message 5/100 created in 0.134 seconds
+2025-01-16 12:33:57,563 [INFO] Message 6/100 created in 0.125 seconds
+2025-01-16 12:33:57,694 [INFO] Message 7/100 created in 0.130 seconds
+2025-01-16 12:33:57,826 [INFO] Message 8/100 created in 0.131 seconds
+2025-01-16 12:33:57,954 [INFO] Message 9/100 created in 0.128 seconds
+2025-01-16 12:33:58,083 [INFO] Message 10/100 created in 0.129 seconds
+2025-01-16 12:33:58,213 [INFO] Message 11/100 created in 0.130 seconds
+2025-01-16 12:33:58,348 [INFO] Message 12/100 created in 0.134 seconds

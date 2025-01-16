@@ -109,6 +109,7 @@ async def get_persona_context(mention_id: str, channel_id: str) -> dict:
         # Get persona from database using the new function
         persona = await get_persona(mention_id)
         if not persona:
+            logger.warning(f"Could not find persona with ID {mention_id}")
             return None
         
         # Get recent messages from this persona in the channel
@@ -117,16 +118,26 @@ async def get_persona_context(mention_id: str, channel_id: str) -> dict:
             k=5,
             filter={
                 "channel_id": channel_id,
-                "sender_id": mention_id
+                "sender_id": mention_id,
+                "sender_name": persona["name"] # Ensure messages match persona name
             }
         )
         
+        # Validate that retrieved messages match the persona
+        validated_messages = []
+        for msg in relevant_messages:
+            if (msg.metadata.get("sender_id") == mention_id and 
+                msg.metadata.get("sender_name") == persona["name"]):
+                validated_messages.append(msg)
+            else:
+                logger.warning(f"Found message with mismatched sender details for persona {mention_id}")
+        
         return {
             'persona': persona,
-            'recent_messages': relevant_messages
+            'recent_messages': validated_messages
         }
     except Exception as e:
-        logger.error(f"Error getting persona context: {str(e)}")
+        logger.error(f"Error getting persona context for {mention_id}: {str(e)}")
         return None
 
 async def handle_summarize_command(channel_id: str, user_id: str, workspace_id: str) -> str:
@@ -201,7 +212,7 @@ Analysis:""",
         logger.error(f"Error in analyze command: {str(e)}")
         return "<strong><i>Sorry, I encountered an error while trying to analyze the conversation.</i></strong>"
 
-async def get_persona_response(prompt: str, persona_context: dict, channel_id: str) -> str:
+async def get_persona_response(prompt: str, persona_context: dict, channel_id: str, sender_name: str, sender_id: str) -> str:
     """Generate a response from a specific persona"""
     try:
         # Get relevant channel context - combine persona history and relevant messages in one search
@@ -243,10 +254,12 @@ Recent conversation context:
 Your own recent messages:
 {own_messages}
 
-Please respond to the following message in your unique voice and style briefly, maintaining your personality and viewpoints:
+You are responding to {sender_name} ({sender_id}).
+Please respond to their following message in your unique voice and style briefly, maintaining your personality and viewpoints:
 {prompt}""",
             input_variables=["name", "role", "personality", "conversation_style", "knowledge_base", 
-                           "opinions", "disagreements", "channel_context", "own_messages", "prompt"]
+                           "opinions", "disagreements", "channel_context", "own_messages", 
+                           "sender_name", "sender_id", "prompt"]
         )
 
         # Format the prompt with persona information
@@ -262,6 +275,8 @@ Please respond to the following message in your unique voice and style briefly, 
                                      for doc in other_messages[-3:]]),  # Only use last 3 messages for context
             own_messages="\n".join([f"You: {doc.page_content}" 
                                   for doc in own_messages[-2:]]),  # Only use last 2 own messages
+            sender_name=sender_name,
+            sender_id=sender_id,
             prompt=prompt
         )
 
@@ -370,7 +385,8 @@ async def handle_message(request):
                 # Get GPT-4 response with enhanced context
                 response_content = await get_gpt4_response(
                     clean_content,
-                    data['channel_id'],
+                    data['workspace_id'],
+                    data['sender_name'],
                     data['sender_id']
                 )
             else:
@@ -384,7 +400,9 @@ async def handle_message(request):
                     response_content = await get_persona_response(
                         clean_content,
                         persona_context,
-                        data['channel_id']
+                        data['channel_id'],
+                        data['sender_name'],
+                        data['sender_id']
                     )
             
             performance_metrics.add_operation_time('llm_processing', time.time() - llm_start)
@@ -515,19 +533,23 @@ async def send_private_message(user_id: str, content: str, workspace_id: str, ch
         logger.error(f"Error sending private message to {user_id}: {str(e)}")
         raise
 
-
-async def get_gpt4_response(prompt, channel_id, sender_id):
+async def get_gpt4_response(prompt, workspace_id, sender_name, sender_id):
     try:
         start_time = time.time()
 
+        # Create a more focused query combining user context and prompt
+        enhanced_query = f"Context from {sender_name} ({sender_id}): {prompt}"
+        
         # Get relevant context only from current channel and last 24 hours
         context_start = time.time()
         channel_context = retriever.get_relevant_documents(
-            prompt,
-            k=5,
+            enhanced_query,
+            k=5,  # Increased number of relevant docs
             filter={
-                "channel_id": channel_id
-          #      "timestamp": {"$gt": (datetime.now() - timedelta(hours=24)).isoformat()}
+                "workspace_id": workspace_id,
+                "$or": [
+                    {"sender_id": sender_id},  # Get messages from this user
+                ]
             }
         )
 
@@ -535,26 +557,31 @@ async def get_gpt4_response(prompt, channel_id, sender_id):
 
         # Create prompt template focusing on helpful responses with context
         template = PromptTemplate(
-            template="""You are Chattie Bot, a helpful AI assistant. Your role is to provide clear, informative responses that directly reference the conversation context.
+            template="""You are Chattie Bot, a helpful AI assistant. You are responding to {sender_name} (ID: {sender_id}).
 
 Recent Thread Context:
 {channel_context}
 
-Please respond to this query, incorporating specific examples from the context above: {query}
+{sender_name}'s Current Query: {query}
 
-Remember to:
-- Reference specific points from the conversation context
+When responding:
+- Directly address {sender_name}
+- Reference relevant points from their conversation history
 - Provide clear, helpful information
-- Stay focused on the topic at hand
+- Stay focused on their specific question
 - Be friendly and professional
-- Clarify any ambiguities by citing the context""",
-            input_variables=["query", "channel_context"]
+- If the context shows previous interactions with {sender_name}, maintain continuity""",
+            input_variables=["query", "channel_context", "sender_name", "sender_id"]
         )
 
         prompt_with_context = template.format(
             query=prompt,
-            channel_context="\n".join([f"{doc.metadata.get('sender_name', 'Unknown User')}: {doc.page_content}" 
-                                     for doc in channel_context[-5:]])  # Only use last 5 messages
+            channel_context="\n".join([
+                f"[{doc.metadata.get('timestamp', 'Unknown Time')}] {doc.metadata.get('sender_name', 'Unknown User')}: {doc.page_content}" 
+                for doc in sorted(channel_context, key=lambda x: x.metadata.get('timestamp', ''))
+            ]),
+            sender_name=sender_name,
+            sender_id=sender_id
         )
 
         # Get response with higher temperature for more creative/snarky responses

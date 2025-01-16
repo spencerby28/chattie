@@ -1,0 +1,1462 @@
+{
+    "projectId": "chattie",
+    "projectName": "chattie",
+    "settings": {
+        "services": {
+            "account": true,
+            "avatars": true,
+            "databases": true,
+            "locale": true,
+            "health": true,
+            "storage": true,
+            "teams": true,
+            "users": true,
+            "functions": true,
+            "graphql": true,
+            "messaging": true
+        },
+        "auth": {
+            "methods": {
+                "jwt": false,
+                "phone": false,
+                "invites": false,
+                "anonymous": false,
+                "email-otp": false,
+                "magic-url": false,
+                "email-password": true
+            },
+            "security": {
+                "duration": 31536000,
+                "limit": 0,
+                "sessionsLimit": 10,
+                "passwordHistory": 0,
+                "passwordDictionary": false,
+                "personalDataCheck": false,
+                "sessionAlerts": false,
+                "mockNumbers": []
+            }
+        }
+    },
+    "functions": [
+        {
+            "$id": "sync2",
+            "execute": [
+                "any"
+            ],
+            "name": "Sync with Meilisearch",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-16.0",
+            "scopes": [
+                "databases.read",
+                "collections.read",
+                "documents.read"
+            ],
+            "events": [
+                "messages.*",
+                "databases.*.collections.messages.documents.*"
+            ],
+            "schedule": "",
+            "timeout": 15,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/Sync with Meilisearch"
+        },
+        {
+            "$id": "vector-sync",
+            "execute": [
+                "any"
+            ],
+            "name": "Sync with Pinecone",
+            "enabled": true,
+            "logging": true,
+            "runtime": "node-16.0",
+            "scopes": [
+                "databases.read",
+                "collections.read",
+                "documents.read"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 30,
+            "entrypoint": "src/main.js",
+            "commands": "npm install",
+            "path": "functions/Sync with Pinecone"
+        },
+        {
+            "$id": "bot",
+            "name": "bot",
+            "runtime": "python-3.9",
+            "execute": [
+                "any"
+            ],
+            "events": [
+                "databases.*.collections.messages.documents.*"
+            ],
+            "scopes": [
+                "sessions.write",
+                "users.read",
+                "users.write",
+                "teams.read",
+                "teams.write",
+                "databases.read",
+                "databases.write",
+                "collections.read",
+                "collections.write",
+                "attributes.read",
+                "attributes.write",
+                "indexes.read",
+                "indexes.write",
+                "documents.read",
+                "documents.write",
+                "files.read",
+                "files.write",
+                "buckets.read",
+                "buckets.write",
+                "functions.read",
+                "functions.write",
+                "execution.read",
+                "execution.write",
+                "targets.read",
+                "targets.write",
+                "providers.read",
+                "providers.write",
+                "messages.read",
+                "messages.write",
+                "topics.read",
+                "topics.write",
+                "subscribers.read",
+                "subscribers.write",
+                "locale.read",
+                "avatars.read",
+                "health.read",
+                "migrations.read",
+                "migrations.write"
+            ],
+            "schedule": "",
+            "timeout": 90,
+            "enabled": true,
+            "logging": true,
+            "entrypoint": "src/main.py",
+            "commands": "pip install -r requirements.txt",
+            "path": "functions/bot"
+        }
+    ],
+    "databases": [
+        {
+            "$id": "main",
+            "name": "main",
+            "enabled": true
+        }
+    ],
+    "collections": [
+        {
+            "$id": "workspaces",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "Workspaces",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "owner_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "ai_persona",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "message_frequency",
+                    "type": "integer",
+                    "required": false,
+                    "array": false,
+                    "min": -9223372036854775808,
+                    "max": 9223372036854775807,
+                    "default": null
+                },
+                {
+                    "key": "members",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "channels",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "Channels",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "workspace_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "members",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "last_message_at",
+                    "type": "datetime",
+                    "required": false,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "description",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 5000,
+                    "default": null
+                },
+                {
+                    "key": "purpose",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 5000,
+                    "default": null
+                },
+                {
+                    "key": "topics",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "primary_personas",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "debate_topics",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 1000,
+                    "default": null
+                },
+                {
+                    "key": "expected_conflict_points",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "conversation_tone",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 100,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "messages",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "Messages",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "channel_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "workspace_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "sender_type",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "sender_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "content",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 65535,
+                    "default": null
+                },
+                {
+                    "key": "edited_at",
+                    "type": "datetime",
+                    "required": false,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "mentions",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "ai_context",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 65535,
+                    "default": null
+                },
+                {
+                    "key": "ai_prompt",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 65535,
+                    "default": null
+                },
+                {
+                    "key": "sender_name",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "thread_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "thread_count",
+                    "type": "integer",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 2000,
+                    "default": null
+                },
+                {
+                    "key": "attachments",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 1000,
+                    "default": null
+                },
+                {
+                    "key": "embedding_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "search",
+                    "type": "fulltext",
+                    "status": "available",
+                    "attributes": [
+                        "content"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                }
+            ]
+        },
+        {
+            "$id": "ai_personas",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "AI Personas",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "workspace_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "personality",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 65535,
+                    "default": null
+                },
+                {
+                    "key": "avatar_url",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "conversation_style",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "knowledge_base",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "greeting",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 500,
+                    "default": null
+                },
+                {
+                    "key": "role",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 400,
+                    "default": null
+                },
+                {
+                    "key": "opinions",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "ai_user_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "disagreements",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "debate_style",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 1000,
+                    "default": null
+                },
+                {
+                    "key": "triggers",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 100,
+                    "default": null
+                },
+                {
+                    "key": "catchphrases",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "communication_quirks",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "temperature",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 1,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "message_threads",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "Message Threads",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "parent_message_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "channel_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "workspace_id",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "last_reply_at",
+                    "type": "datetime",
+                    "required": true,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "participant_ids",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "ai_participants",
+                    "type": "string",
+                    "required": false,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "attachments",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "attachments",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "type",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "url",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "format": "url",
+                    "default": null
+                },
+                {
+                    "key": "name",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "size",
+                    "type": "double",
+                    "required": false,
+                    "array": false,
+                    "min": 0,
+                    "max": 300000,
+                    "default": null
+                },
+                {
+                    "key": "message_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "reactions",
+            "$permissions": [
+                "create(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "Reactions",
+            "enabled": true,
+            "documentSecurity": true,
+            "attributes": [
+                {
+                    "key": "emoji",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 10,
+                    "default": null
+                },
+                {
+                    "key": "message_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "user_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "user_name",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "channel_id",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "$id": "presence",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")"
+            ],
+            "databaseId": "main",
+            "name": "presence",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "userId",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "lastSeen",
+                    "type": "datetime",
+                    "required": false,
+                    "array": false,
+                    "format": "",
+                    "default": null
+                },
+                {
+                    "key": "workspaceId",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                },
+                {
+                    "key": "baseStatus",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "elements": [
+                        "online",
+                        "offline",
+                        "away"
+                    ],
+                    "format": "enum",
+                    "default": null
+                },
+                {
+                    "key": "customStatus",
+                    "type": "string",
+                    "required": false,
+                    "array": false,
+                    "size": 200,
+                    "default": null
+                }
+            ],
+            "indexes": [
+                {
+                    "key": "userId",
+                    "type": "unique",
+                    "status": "available",
+                    "attributes": [
+                        "userId"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
+                {
+                    "key": "workspace",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "workspaceId"
+                    ],
+                    "orders": [
+                        "ASC"
+                    ]
+                },
+                {
+                    "key": "lastSeen",
+                    "type": "key",
+                    "status": "available",
+                    "attributes": [
+                        "lastSeen"
+                    ],
+                    "orders": [
+                        "DESC"
+                    ]
+                }
+            ]
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "6785cb36001683e91053",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6785c90c003c64163c77\")"
+            ],
+            "fileSecurity": true,
+            "name": "Demo",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786e7dd0035b4d60594",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "cooking",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "ai-avatars",
+            "$permissions": [
+                "create(\"any\")",
+                "read(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "ai-avatars",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "default-avatars",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "read(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "default-avatars",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786ed7d002d5f0e7585",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "Healthcare",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786eebe000cae5177ff",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "healthcare",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786ef970003041c11e5",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "media",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f0d7003783d9ca20",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "ai development",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f191002caeef4633",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "education",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "avatars",
+            "$permissions": [
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "read(\"any\")"
+            ],
+            "fileSecurity": false,
+            "name": "avatars",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f5390000bba7a2d3",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "Science",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f55b000f2ebf282c",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "Science Research",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f7cc00156cceab3c",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786f4490016890156ed\")"
+            ],
+            "fileSecurity": true,
+            "name": "Urban Planning",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f7ee003b13f3f995",
+            "$permissions": [
+                "read(\"user:6786f4490016890156ed\")",
+                "create(\"user:6786f4490016890156ed\")",
+                "update(\"user:6786f4490016890156ed\")",
+                "delete(\"user:6786f4490016890156ed\")"
+            ],
+            "fileSecurity": true,
+            "name": "Urban Planning Discussion",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786f8bf0001b5b44b60",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786f4490016890156ed\")"
+            ],
+            "fileSecurity": true,
+            "name": "urban planning",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786fa23002f29488c65",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "Economic systems and policies",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6786feeb0032c7e4d627",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786f4490016890156ed\")"
+            ],
+            "fileSecurity": true,
+            "name": "For Gauntlet To Mess around in",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6787118600143d4d4d74",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "Food and GMO",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67871d1e0002e66c3a91",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "deep discussion about the meaning of life",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67871e61002bb0961ffa",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "democracy",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67871f8b0030d32a16f3",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "democracy2",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6787201700176e334eac",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "2",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "678723ce003e243127cb",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "impact of technology",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6787dac300170f3995ee",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:677dde83002cbe951800\")"
+            ],
+            "fileSecurity": true,
+            "name": "CA wildfires",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67880be7000786be98a5",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "talk about planes",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67880e930025bc67a87a",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "impact of planes on society",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67880f10003df6573518",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "impact of planes on society",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67880f2c00117d742960",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "impact of planes on society",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67880f670013b5bfd6ad",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "impact of planes on society",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67880f8900347856473d",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:67880bc9002647d15cea\")"
+            ],
+            "fileSecurity": true,
+            "name": "debate around celery",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "678814ae0010e4e7e2ae",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:67880bc9002647d15cea\")"
+            ],
+            "fileSecurity": true,
+            "name": "traffic",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6788155e0038b5ae6f5d",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:67880bc9002647d15cea\")"
+            ],
+            "fileSecurity": true,
+            "name": "talk about canned food",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "67881686001ff2216a71",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:67880bc9002647d15cea\")"
+            ],
+            "fileSecurity": true,
+            "name": "deep discussion on philosophy",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        },
+        {
+            "$id": "6789517a001d5e5e9ffe",
+            "$permissions": [
+                "read(\"users\")",
+                "create(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "delete(\"user:6786b0f90038710c7bcd\")"
+            ],
+            "fileSecurity": true,
+            "name": "No idea",
+            "enabled": true,
+            "maximumFileSize": 30000000,
+            "allowedFileExtensions": [],
+            "compression": "none",
+            "encryption": true,
+            "antivirus": true
+        }
+    ]
+}
