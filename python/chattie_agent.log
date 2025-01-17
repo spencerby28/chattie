@@ -15297,3 +15297,37 @@ Traceback (most recent call last):
     raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
 appwrite.exception.AppwriteException: Invalid document structure: Missing required attribute "name"
 2025-01-16 12:35:39,229 [INFO] ::1 [16/Jan/2025:12:35:39 -0600] "GET /?workspace_id=6789517a001d5e5e9ffe&description=is%20a%20hotdog%20a%20sandwich%3F%20Can%20everything%20be%20just%20a%20taco%2C%20sandwich%20or%20soup%3F%20Are%20soups%20actually%20tacos%3F%20 HTTP/1.1" 500 240 "-" "node"
+2025-01-16 17:38:34,970 [INFO] Environment loaded. Endpoint: https://appwrite.sb28.xyz/v1, Project: chattie
+2025-01-16 17:38:34,970 [INFO] Appwrite admin client initialized
+2025-01-16 17:38:34,972 [INFO] === Application Starting ===
+2025-01-16 17:38:34,972 [INFO] Starting server initialization
+2025-01-16 17:38:34,973 [INFO] Server starting at http://localhost:8080
+2025-01-16 17:38:34,981 [INFO] Server successfully started
+2025-01-16 17:38:47,669 [INFO] Received workspace creation request
+2025-01-16 17:38:47,670 [INFO] Creating workspace with ID: 6789988700152a2dab3d
+2025-01-16 17:38:47,670 [INFO] === Starting Workspace Creation ===
+2025-01-16 17:38:47,670 [INFO] Workspace ID: 6789988700152a2dab3d
+2025-01-16 17:38:47,670 [INFO] Description: sex in marriage
+2025-01-16 17:38:47,836 [ERROR] Error creating workspace 6789988700152a2dab3d: Invalid document structure: Missing required attribute "name"
+2025-01-16 17:38:47,836 [ERROR] Request handler error: Invalid document structure: Missing required attribute "name"
+2025-01-16 17:38:47,836 [ERROR] Invalid document structure: Missing required attribute "name"
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 114, in call
+    response.raise_for_status()
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/requests/models.py", line 1024, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://appwrite.sb28.xyz/v1/databases/main/collections/workspaces/documents
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 465, in handle_request
+    workspace = await create_workspace(description, workspace_id, OPENAI_API_KEY)
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/createAgent.py", line 293, in create_workspace
+    workspace = databases.create_document(
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/services/databases.py", line 956, in create_document
+    return self.client.call('post', api_path, {
+  File "/Users/spencer/Desktop/Guantlet/chattie/python/env/lib/python3.9/site-packages/appwrite/client.py", line 134, in call
+    raise AppwriteException(response.json()['message'], response.status_code, response.json().get('type'), response.json())
+appwrite.exception.AppwriteException: Invalid document structure: Missing required attribute "name"
+2025-01-16 17:38:47,840 [INFO] ::1 [16/Jan/2025:17:38:47 -0600] "GET /?workspace_id=6789988700152a2dab3d&description=sex%20in%20marriage HTTP/1.1" 500 240 "-" "node"

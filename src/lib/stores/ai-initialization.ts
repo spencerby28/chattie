@@ -4,60 +4,32 @@ import { writable } from 'svelte/store';
 interface AIInitState {
   isInitializing: boolean;
   currentStep: string;
-  workspaceId: string | null;
-  isComplete: boolean;
 }
 
 const createAIInitStore = () => {
-  const { subscribe, set, update } = writable<AIInitState>({
+  const { subscribe, set } = writable<AIInitState>({
     isInitializing: false,
-    currentStep: '',
-    workspaceId: null,
-    isComplete: false
+    currentStep: ''
   });
-
-  const steps = [
-    "Creating workspace...",
-    "Generating AI personas...",
-    "Creating avatars...",
-    "Initializing personalities...",
-    "Setting up channels..."
-  ];
-
-  let stepInterval: NodeJS.Timeout;
 
   return {
     subscribe,
-    startInitialization: (workspaceId: string) => {
+    startInitialization: () => {
       set({ 
         isInitializing: true, 
-        currentStep: steps[0], 
-        workspaceId,
-        isComplete: false 
+        currentStep: "Creating AI workspace... This may take up to a minute."
       });
-      let currentStepIndex = 0;
-      
-      stepInterval = setInterval(() => {
-        currentStepIndex = (currentStepIndex + 1) % steps.length;
-        update(state => ({ ...state, currentStep: steps[currentStepIndex] }));
-      }, 8000);
     },
-    complete: (workspaceId: string) => {
-      clearInterval(stepInterval);
+    complete: () => {
       set({ 
         isInitializing: false, 
-        currentStep: '', 
-        workspaceId, 
-        isComplete: true 
+        currentStep: ''
       });
     },
     reset: () => {
-      clearInterval(stepInterval);
       set({ 
         isInitializing: false, 
-        currentStep: '', 
-        workspaceId: null, 
-        isComplete: false 
+        currentStep: ''
       });
     }
   };

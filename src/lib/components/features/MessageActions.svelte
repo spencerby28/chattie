@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { MessageSquare, Smile, MoreVertical } from 'lucide-svelte';
+	import { MessageSquare, Smile, MoreVertical, Speaker, Loader2 } from 'lucide-svelte';
 	import type { Message, SimpleMember, Reaction } from '$lib/types';
 	
 	import { createEventDispatcher } from 'svelte';
@@ -23,6 +23,55 @@
 
 	// Subscribe to reactions for this message
 	$: messageReactions = $reactionsStore[message.$id] || [];
+
+	// Audio playback state
+	let loadingVoiceId: string | null = null;
+	let playingAudio: { element: HTMLAudioElement; voiceId: string } | null = null;
+
+	async function playTextToSpeech(voiceId: string, text: string) {
+		// If already playing this audio, stop it
+		if (playingAudio?.voiceId === voiceId) {
+			playingAudio.element.pause();
+			playingAudio.element.currentTime = 0;
+			playingAudio = null;
+			return;
+		}
+
+		// Stop any other playing audio
+		if (playingAudio) {
+			playingAudio.element.pause();
+			playingAudio.element.currentTime = 0;
+			playingAudio = null;
+		}
+
+		if (loadingVoiceId) return;
+		loadingVoiceId = voiceId;
+		
+		try {
+			const response = await fetch('/api/speech', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ voiceId, text })
+			});
+
+			if (!response.ok) throw new Error('Failed to convert text to speech');
+
+			const { audio } = await response.json();
+			const audioElement = new Audio(`data:audio/mp3;base64,${audio}`);
+			
+			audioElement.addEventListener('ended', () => {
+				playingAudio = null;
+			});
+
+			await audioElement.play();
+			playingAudio = { element: audioElement, voiceId };
+		} catch (error) {
+			console.error('Text-to-speech error:', error);
+			toast.error('Failed to play audio');
+		} finally {
+			loadingVoiceId = null;
+		}
+	}
 
 	async function handleEmojiSelect(messageId: string, emoji: string) {
 		const channelId = message.channel_id;
@@ -158,6 +207,23 @@
 	<button class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md" on:click={() => handleReply(message.$id)}>
 		<MessageSquare class="w-5 h-5" />
 	</button>
+
+	{#if message.voice_id}
+		<button 
+			class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+			on:click={() => playTextToSpeech(message.voice_id, message.content)}
+			disabled={loadingVoiceId !== null && loadingVoiceId !== message.voice_id}
+			title={playingAudio?.voiceId === message.voice_id ? "Stop audio" : "Play text-to-speech"}
+		>
+			{#if loadingVoiceId === message.voice_id}
+				<Loader2 class="w-5 h-5 animate-spin" />
+			{:else if playingAudio?.voiceId === message.voice_id}
+				<Speaker class="w-5 h-5 animate-pulse" />
+			{:else}
+				<Speaker class="w-5 h-5" />
+			{/if}
+		</button>
+	{/if}
 
 	<DropdownMenu.Root onOpenChange={onDropdownOpenChange}>
 		<DropdownMenu.Trigger>

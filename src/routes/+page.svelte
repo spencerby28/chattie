@@ -203,9 +203,6 @@
                             <span class="block text-sm text-muted-foreground">
                                 {workspace.members?.length || 0} members
                             </span>
-                            <span class="block text-xs text-muted-foreground">
-                                Owner ID: {workspace.owner_id}
-                            </span>
                         </Card.Description>
                     </Card.Header>
                     <Card.Footer class="flex justify-end">

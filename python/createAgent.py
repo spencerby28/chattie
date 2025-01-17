@@ -19,16 +19,22 @@ import string
 import logging
 import sys
 import random
-from openai import AsyncOpenAI
+from openai import OpenAI, AsyncOpenAI
 from appwrite.query import Query
-from titanGenerate import generate_images, OBJECTS, generate_profile_prompt
-from PIL import Image
-from io import BytesIO
-import langwatch
+
 import aiofiles
 import aiofiles.os
 from asyncio import Lock
 from datetime import datetime
+import requests
+from PIL import Image
+from io import BytesIO
+from elevenlabs import ElevenLabs
+
+from autonomous_conversation import populate_workspace_conversations
+
+import multiprocessing
+from functools import partial
 
 # Configure logging
 logging.basicConfig(
@@ -71,8 +77,7 @@ MESSAGES_COLLECTION = 'messages'
 
 
 # LangWatch
-langwatch.endpoint = "http://localhost:5560"
-langwatch.api_key = os.getenv('LANGWATCH_API_KEY')
+
 
 # Enhanced persona generation to include more chat-relevant details and conflicting viewpoints
 PERSONA_GENERATION_PROMPT = """Create {num_personas} unique and engaging AI personas for a workspace focused on: {description}
@@ -173,12 +178,11 @@ async def create_ai_user(persona_name: str, workspace_id: str):
             logger.error("Failed to get existing user: %s. Inner error: %s", username, str(inner_e))
             raise e
 
-@langwatch.trace()
+
 async def generate_with_openai(prompt: str, api_key: str) -> str:
     logger.info("Initiating OpenAI API request")
     client = AsyncOpenAI(api_key=api_key)
 
-    langwatch.get_current_trace().autotrack_openai_calls(client)
     try:
         logger.debug("Sending prompt to OpenAI API (first 100 chars): %s", prompt[:100])
         response = await client.chat.completions.create(
@@ -260,10 +264,6 @@ async def create_initial_message(channel_id: str, workspace_id: str, ai_user_id:
 
 async def create_workspace(description: str, workspace_id: str, api_key: str):
     """Create a new workspace. Each workspace_id is guaranteed to be unique."""
-    logger.info("=== Starting Workspace Creation ===")
-    logger.info("Workspace ID: %s", workspace_id)
-    logger.info("Description: %s", description)
-    
     try:
         # Create test_data directory if it doesn't exist
         await aiofiles.os.makedirs('test_data', exist_ok=True)
@@ -282,25 +282,6 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
             }
         }
         
-        # Create workspace document
-        workspace_data = {
-            'id': workspace_id,
-            'description': description,
-            'created_at': datetime.now().isoformat(),
-            'updated_at': datetime.now().isoformat()
-        }
-        
-        workspace = databases.create_document(
-            database_id=DATABASE_ID,
-            collection_id='workspaces',
-            document_id=workspace_id,
-            data=workspace_data,
-            permissions=[
-                Permission.read(Role.users()),
-                Permission.update(Role.user(workspace_id))
-            ]
-        )
-        
         # Generate personas
         logger.info("Generating personas with OpenAI for workspace: %s", workspace_id)
         personas_prompt = PERSONA_GENERATION_PROMPT.format(
@@ -312,32 +293,21 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
         personas = json.loads(personas_json)
         logger.info("Successfully generated %d personas", len(personas))
         
-        # Store each persona in Appwrite
+        # Store each persona and create AI users
         stored_personas = []
-        ai_user_ids = []  # Track all AI user IDs
+        ai_user_ids = []
         
-        for idx, persona in enumerate(personas, 1):
+        for persona in personas:
             try:
-                logger.info("Processing persona %d/%d: %s", idx, len(personas), persona['name'])
-                
-                # Create an AI user for this specific persona
+                # Create an AI user for this persona
                 ai_user_id = await create_ai_user(persona['name'], workspace_id)
                 ai_user_ids.append(ai_user_id)
-                
-                # Generate and store avatar
-                avatar_file_id = await generate_and_store_avatar(storage, persona, workspace_id)
-                if avatar_file_id:
-                    users.update_prefs(
-                        user_id=ai_user_id,
-                        prefs={'avatarId': avatar_file_id}
-                    )
                 
                 # Store persona data
                 persona_data = {
                     'workspace_id': workspace_id,
                     'name': persona['name'],
                     'personality': persona['personality'],
-                    'avatar_url': f"https://api.dicebear.com/7.x/avataaars/svg?seed={persona['name']}",
                     'conversation_style': persona['conversation_style'],
                     'knowledge_base': persona['knowledge_base'],
                     'greeting': persona['greeting'],
@@ -366,7 +336,6 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
                     ]
                 )
                 
-                # Update test data
                 test_data["mappings"]["ai_user_ids"][persona['name']] = ai_user_id
                 test_data["users"].append({
                     "name": persona['name'],
@@ -380,7 +349,6 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
                 continue
         
         # Generate and store channels
-        logger.info("Generating channels with OpenAI for workspace: %s", workspace_id)
         channels_prompt = CHANNEL_GENERATION_PROMPT.format(description=description)
         channels_json = await generate_with_openai(channels_prompt, api_key)
         channels = json.loads(channels_json)
@@ -426,17 +394,124 @@ async def create_workspace(description: str, workspace_id: str, api_key: str):
         async with aiofiles.open('test_data/responses.json', 'w') as f:
             await f.write(json.dumps(test_data, indent=4))
         
-        # Start autonomous conversations in background
-        asyncio.create_task(populate_workspace_conversations(workspace_id))
+        # Add AI users to workspace members
+        try:
+            workspace_data = {
+                'members': ai_user_ids + ['bot']
+            }
+            databases.update_document(
+                database_id=DATABASE_ID,
+                collection_id='workspaces',
+                document_id=workspace_id,
+                data=workspace_data
+            )
+            logger.info(f"Added {len(ai_user_ids)} AI users to workspace {workspace_id}")
+        except Exception as e:
+            logger.error(f"Failed to add AI users to workspace members: {str(e)}")
         
-        return {
+        # Prepare storage config for multiprocessing
+        storage_config = {
+            'endpoint': os.getenv('PUBLIC_APPWRITE_ENDPOINT'),
+            'project': os.getenv('APPWRITE_PROJECT_ID'),
+            'api_key': os.getenv('APPWRITE_API_KEY')
+        }
+
+        # Create process pool for avatar generation
+        num_cores = min(5, multiprocessing.cpu_count())
+        avatar_pool = multiprocessing.Pool(num_cores)
+
+        try:
+            # Run avatar generation in parallel
+            avatar_tasks = []
+            for stored_persona in stored_personas:
+                avatar_tasks.append(
+                    avatar_pool.apply_async(
+                        process_avatar_generation,
+                        args=(storage_config, stored_persona, workspace_id)
+                    )
+                )
+
+            # Run voice generation sequentially (to avoid rate limits)
+            voice_results = []
+            for stored_persona in stored_personas:
+                try:
+                    # Generate voice with retry logic
+                    max_retries = 3
+                    retry_delay = 5  # seconds
+                    
+                    for attempt in range(max_retries):
+                        try:
+                            voice_id = await generate_voice_for_persona(stored_persona, OpenAI(api_key=api_key))
+                            if voice_id:
+                                logger.info(f"Successfully generated voice for {stored_persona['name']}")
+                                # Update persona document with voice ID
+                                databases.update_document(
+                                    database_id=DATABASE_ID,
+                                    collection_id=AI_PERSONAS_COLLECTION,
+                                    document_id=stored_persona['$id'],
+                                    data={'voice_id': voice_id}
+                                )
+                                # Update user preferences with voice ID
+                                users.update_prefs(
+                                    user_id=stored_persona['$id'],
+                                    prefs={'voiceId': voice_id}
+                                )
+                                logger.info(f"Updated user preferences with voice ID for {stored_persona['name']}")
+                            break
+                        except Exception as e:
+                            if "502" in str(e) and attempt < max_retries - 1:
+                                logger.warning(f"Rate limited, retrying in {retry_delay} seconds...")
+                                await asyncio.sleep(retry_delay)
+                                retry_delay *= 2  # Exponential backoff
+                                continue
+                            logger.error(f"Failed to generate voice for {stored_persona['name']}: {str(e)}")
+                            break
+                    
+                    # Add delay between voice generations
+                    await asyncio.sleep(2)
+                    
+                except Exception as e:
+                    logger.error(f"Voice generation error for {stored_persona['name']}: {str(e)}")
+
+            # Wait for avatar generation to complete and process results
+            avatar_results = {}
+            for task in avatar_tasks:
+                try:
+                    user_id, avatar_id = task.get()
+                    if avatar_id:
+                        avatar_results[user_id] = avatar_id
+                        logger.info(f"Successfully processed avatar for user {user_id}")
+                except Exception as e:
+                    logger.error(f"Error getting avatar task result: {str(e)}")
+
+        finally:
+            avatar_pool.close()
+            avatar_pool.join()
+
+        # Prepare success response before starting autonomous conversations
+        response = {
             'workspace_id': workspace_id,
             'personas': stored_personas,
             'channels': stored_channels,
             'workspace_theme': description,
             'status': 'success',
-            'message': 'Workspace created successfully. Autonomous conversations starting in background.'
+            'message': 'Workspace created successfully. Autonomous conversations will be generated in the background.'
         }
+
+        # Start autonomous conversations in the background
+        async def run_conversations_background():
+            try:
+                logger.info("Starting autonomous conversations for workspace: %s", workspace_id)
+                await populate_workspace_conversations(workspace_id)
+                logger.info("Successfully completed autonomous conversations for workspace: %s", workspace_id)
+            except Exception as e:
+                logger.error(f"Error in autonomous conversations: {str(e)}")
+                logger.exception(e)  # Log full traceback for debugging
+
+        # Schedule the background task
+        asyncio.create_task(run_conversations_background())
+        
+        return response
         
     except Exception as e:
         logger.error(f"Error creating workspace {workspace_id}: {str(e)}")
@@ -517,16 +592,16 @@ async def generate_and_store_avatar(storage: Storage, persona: dict, workspace_i
         role = persona['role'].lower()
         conversation_style = persona['conversation_style'].lower()
         
-        # Map personality traits to safe, positive descriptors
+        # Map personality traits to creative, abstract descriptors with blue/purple focus
         style_mapping = {
-            'formal': 'business attire, confident pose',
-            'professional': 'polished appearance, warm expression',
-            'casual': 'relaxed style, approachable look',
-            'friendly': 'welcoming smile, bright eyes',
-            'analytical': 'thoughtful expression, smart attire',
-            'creative': 'artistic style, imaginative look',
-            'tech': 'modern style, innovative look',
-            'academic': 'scholarly appearance, wise expression'
+            'formal': 'geometric shapes in navy blue, crystalline structures',
+            'professional': 'flowing gradients of indigo and violet, clean lines',
+            'casual': 'playful swirls of periwinkle and lavender',
+            'friendly': 'soft clouds of powder blue and lilac',
+            'analytical': 'angular patterns in sapphire and amethyst',
+            'creative': 'abstract splashes of cobalt and purple',
+            'tech': 'digital waves of electric blue and ultraviolet',
+            'academic': 'constellation patterns in deep blue and royal purple'
         }
         
         # Find matching style descriptors
@@ -535,56 +610,63 @@ async def generate_and_store_avatar(storage: Storage, persona: dict, workspace_i
             if key in personality_traits or key in conversation_style or key in role:
                 style_elements.append(value)
         
-        # If no specific style matches, use default professional style
+        # If no specific style matches, use creative default style
         if not style_elements:
-            style_elements = ['professional appearance, friendly expression']
+            style_elements = ['ethereal blend of blue and purple hues, abstract forms']
             
-        # Create a safe but personalized prompt
+        # Create an artistic, abstract prompt
         prompt = (
-            f"Professional portrait in minimalist cartoon style, "
-            f"{', '.join(style_elements[:2])}, "  # Limit to 2 style elements
-            "clean background, high quality digital art"
+            f"Abstract artistic portrait incorporating {', '.join(style_elements[:2])}, "
+            f"minimalist face suggestion emerging from {persona['role'].lower()} themed elements, "
+            "predominantly blue and purple color palette, ethereal lighting, "
+            "modern digital art style with subtle sacred geometry patterns"
         )
         
         logger.debug(f"Generated prompt: {prompt}")
         logger.debug(f"Prompt length: {len(prompt)} characters")
         
         try:
+            # Initialize OpenAI client
+            client = OpenAI(api_key=OPENAI_API_KEY)
+            
             # First attempt with personalized prompt
-            generated_images = generate_images(
+            response = client.images.generate(
+                model="dall-e-3",
                 prompt=prompt,
-                num_images=1,
-                seed=random.randint(1000, 9999),
-                width=512,
-                height=512,
-                cfg_scale=8,
-                quality="standard"
+                size="1024x1024",
+                quality="standard",
+                n=1,
             )
+            
+            # Download the image from the URL
+            image_url = response.data[0].url
+            image_response = requests.get(image_url)
+            image_bytes = image_response.content
+            
         except Exception as img_error:
             logger.warning(f"Failed with personalized prompt: {str(img_error)}. Trying fallback prompt...")
-            # Fallback to a very safe, generic prompt
-            fallback_prompt = "Simple professional headshot avatar, minimalist cartoon style, neutral background"
-            generated_images = generate_images(
+            # Fallback to a creative but safe prompt
+            fallback_prompt = "Abstract portrait, flowing blue and purple gradients, minimal geometric patterns, ethereal lighting"
+            response = client.images.generate(
+                model="dall-e-3",
                 prompt=fallback_prompt,
-                num_images=1,
-                seed=random.randint(1000, 9999),
-                width=512,
-                height=512,
-                cfg_scale=8,
-                quality="standard"
+                size="1024x1024",
+                quality="standard",
+                n=1,
             )
-        
-        if not generated_images:
-            raise Exception("No image generated")
+            
+            # Download the image from the URL
+            image_url = response.data[0].url
+            image_response = requests.get(image_url)
+            image_bytes = image_response.content
             
         # Convert PNG bytes to WebP
-        image_bytes = generated_images[0]
         image = Image.open(BytesIO(image_bytes))
         
         # Create a BytesIO object to store the WebP image
         webp_buffer = BytesIO()
         # Convert to WebP with high quality
-        image.save(webp_buffer, format="WebP", quality=90, method=6)
+        image.save(webp_buffer, format="WebP", quality=95, method=6)
         webp_bytes = webp_buffer.getvalue()
         
         # 3. Create a unique filename
@@ -608,12 +690,164 @@ async def generate_and_store_avatar(storage: Storage, persona: dict, workspace_i
         )
         
         logger.info(f"Successfully stored avatar with ID: {file_id}")
+
+        # Immediately update user preferences with avatar ID
+        try:
+            # Create new Appwrite client for user operations
+            appwrite_client = Client()
+            appwrite_client.set_endpoint(os.getenv('PUBLIC_APPWRITE_ENDPOINT'))
+            appwrite_client.set_project(os.getenv('APPWRITE_PROJECT_ID'))
+            appwrite_client.set_key(os.getenv('APPWRITE_API_KEY'))
+            
+            users = Users(appwrite_client)
+            logger.info(f"Setting avatar ID {file_id} for user {persona['ai_user_id']}")
+            users.update_prefs(
+                user_id=persona['ai_user_id'],
+                prefs={'avatarId': file_id}
+            )
+            logger.info(f"Successfully set avatar ID for user {persona['ai_user_id']}")
+        except Exception as e:
+            logger.error(f"Failed to update user prefs with avatar ID for {persona['name']}: {str(e)}")
+            logger.exception(e)
+        
         return file_id
         
     except Exception as e:
         logger.error(f"Failed to generate/store avatar for {persona['name']}: {str(e)}")
         logger.exception(e)
         return None
+
+async def generate_voice_for_persona(persona: dict, openai_client: OpenAI) -> str:
+    """
+    Generate a voice for an AI persona using OpenAI for the prompt and ElevenLabs for synthesis.
+    
+    Args:
+        persona: Dictionary containing persona attributes
+        openai_client: OpenAI client instance
+        
+    Returns:
+        str: Voice ID from ElevenLabs
+    """
+    async def get_voice_description(persona: dict, previous_error: str = None) -> str:
+        base_prompt = """Create an extremely concise voice synthesis prompt (MAXIMUM 300 characters) for an AI character with these traits:
+
+{persona_json}
+
+Focus ONLY on basic voice characteristics: tone, pitch, pace, and accent if any.
+BE EXTREMELY BRIEF AND PROFESSIONAL. NO CONTROVERSIAL OR EMOTIONAL CONTENT.
+KEEP YOUR RESPONSE UNDER 300 CHARACTERS."""
+
+        if previous_error:
+            base_prompt += f"\n\nPREVIOUS ATTEMPT WAS BLOCKED. Error: {previous_error}\nEnsure the description is completely neutral and professional."
+
+        prompt = base_prompt.format(persona_json=json.dumps(persona, indent=2))
+
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+        
+        description = response.choices[0].message.content.strip()
+        # Ensure we're well under the 500 char limit
+        if len(description) > 400:
+            description = description[:397] + "..."
+        return description
+
+    try:
+        # Get initial voice description
+        voice_description = await get_voice_description(persona)
+        
+        # Generate example text based on persona's style (at least 100 chars)
+        example_text = f"Hello everyone, I am {persona['name']}. {persona.get('greeting', '')} " + \
+                      f"As a {persona.get('role', '')}, I bring unique perspectives shaped by my background in " + \
+                      f"{', '.join(persona.get('knowledge_base', []))}. " + \
+                      f"{persona.get('catchphrases', [''])[0]}"
+        
+        max_retries = 3
+        current_retry = 0
+        
+        while current_retry < max_retries:
+            try:
+                # Initialize ElevenLabs client
+                eleven_client = ElevenLabs(api_key=os.getenv('ELEVENLABS_API_KEY'))
+                
+                # Create voice previews
+                preview_response = eleven_client.text_to_voice.create_previews(
+                    voice_description=voice_description,
+                    text=example_text
+                )
+                
+                # Get the first preview's generated voice ID
+                generated_voice_id = preview_response.previews[0].generated_voice_id
+                logger.info(f"Generated preview voice ID for {persona['name']}: {generated_voice_id}")
+                
+                # Create the final voice
+                voice_response = eleven_client.text_to_voice.create_voice_from_preview(
+                    voice_name=persona['name'],
+                    voice_description=voice_description,
+                    generated_voice_id=generated_voice_id
+                )
+                
+                logger.info(f"Created final voice for {persona['name']} with ID: {voice_response.voice_id}")
+                return voice_response.voice_id
+                
+            except Exception as e:
+                error_str = str(e)
+                if "blocked_generation" in error_str:
+                    current_retry += 1
+                    if current_retry < max_retries:
+                        logger.warning(f"Voice generation blocked for {persona['name']}, attempt {current_retry + 1}")
+                        # Get new description with error context
+                        voice_description = await get_voice_description(persona, error_str)
+                        continue
+                raise
+        
+        logger.error(f"Failed to generate voice for {persona['name']} after {max_retries} attempts")
+        return None
+        
+    except Exception as e:
+        logger.error(f"Failed to generate voice for {persona['name']}: {str(e)}")
+        logger.exception(e)
+        return None
+
+def process_avatar_generation(storage_config: dict, persona: dict, workspace_id: str) -> tuple:
+    """Wrapper for parallel avatar generation"""
+    try:
+        # Recreate storage client in the new process
+        client = Client()
+        client.set_endpoint(storage_config['endpoint'])
+        client.set_project(storage_config['project'])
+        client.set_key(storage_config['api_key'])
+        
+        storage = Storage(client)
+        
+        # Run the avatar generation
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        avatar_id = loop.run_until_complete(generate_and_store_avatar(storage, persona, workspace_id))
+        loop.close()
+        
+        return persona['ai_user_id'], avatar_id
+    except Exception as e:
+        logger.error(f"Avatar generation process error for {persona['name']}: {str(e)}")
+        return persona['ai_user_id'], None
+
+def process_voice_generation(openai_key: str, persona: dict) -> tuple:
+    """Wrapper for parallel voice generation"""
+    try:
+        # Create new OpenAI client in the new process
+        openai_client = OpenAI(api_key=openai_key)
+        
+        # Run the voice generation
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(generate_voice_for_persona(persona, openai_client))
+        loop.close()
+        return persona['ai_user_id'], result
+    except Exception as e:
+        logger.error(f"Voice generation process error for {persona['name']}: {str(e)}")
+        return persona['ai_user_id'], None
 
 if __name__ == "__main__":
     logger.info("=== Application Starting ===")

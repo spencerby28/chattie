@@ -302,7 +302,7 @@ def convert_context_to_json(context_list):
                 'content': doc.page_content,
                 'metadata': doc.metadata
             } for doc in context['recent_messages']]
-            context['recent_messages'] = messages
+            context['recent_messages'] = messages  
         json_contexts.append(context)
     return json_contexts
 

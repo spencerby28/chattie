@@ -19,6 +19,36 @@ export const load: PageLoad = async ({ params }) => {
 			]
 		);
 
+		// Get all AI messages and fetch their voice_ids
+		const aiMessages = messages.documents.filter(msg => msg.sender_type === 'ai_persona');
+		if (aiMessages.length > 0) {
+			// Get all unique AI persona IDs
+			const aiPersonaIds = [...new Set(aiMessages.map(msg => msg.sender_id))];
+			
+			// Fetch AI personas in a single query
+			const aiPersonasResponse = await databases.listDocuments(
+				'main',
+				'ai_personas',
+				[Query.equal('$id', aiPersonaIds)]
+			);
+
+			// Create a map of AI persona ID to voice_id
+			const aiPersonaVoiceMap = new Map(
+				aiPersonasResponse.documents.map(persona => [persona.$id, persona.voice_id])
+			);
+
+			// Attach voice_ids to messages
+			messages.documents = messages.documents.map(msg => {
+				if (msg.sender_type === 'ai_persona') {
+					return {
+						...msg,
+						voice_id: aiPersonaVoiceMap.get(msg.sender_id)
+					};
+				}
+				return msg;
+			});
+		}
+
 		// Fetch reactions for all messages
 		const reactions = await databases.listDocuments(
 			'main',

@@ -47,6 +47,7 @@
     "@types/dompurify": "^3.0.5",
     "appwrite": "^16.0.2",
     "dompurify": "^3.2.3",
+    "elevenlabs": "^1.50.2",
     "lodash-es": "^4.17.21",
     "markdown-it": "^14.1.0",
     "marked": "^15.0.6",

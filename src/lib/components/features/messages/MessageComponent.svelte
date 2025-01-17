@@ -18,7 +18,9 @@
 	import markdownit from 'markdown-it';
 
 	export let message: Message;
+	console.log(message);
 	export let user: SimpleMember;
+
 	export let memberData: SimpleMember[] = [];
 	export let reactions: StandardizedReaction[] = [];
 	

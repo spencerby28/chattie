@@ -35,6 +35,7 @@ export interface Message extends Models.Document {
     thread_id?: string;
     thread_count?: number;
     attachments?: string[];
+    voice_id?: string;
 }
 
 export interface SimpleMember {

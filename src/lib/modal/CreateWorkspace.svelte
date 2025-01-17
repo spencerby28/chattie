@@ -5,7 +5,6 @@
     import { Button } from "$lib/components/ui/button";
     import { goto } from '$app/navigation';
     import { dev } from '$app/environment';
-    import { RealtimeService } from '$lib/services/realtime';
     import { aiInitStore } from '$lib/stores/ai-initialization';
     import { toast } from "svelte-sonner";
 
@@ -14,9 +13,6 @@
 
     let loading = false;
     let useAI = false;
-
-    // Get realtime service instance
-    const realtime = RealtimeService.getInstance();
 
     async function handleCreateWorkspace(event: SubmitEvent) {
         event.preventDefault();
@@ -28,6 +24,10 @@
         const visibility = formData.get('visibility') as string;
 
         try {
+            if (useAI) {
+                aiInitStore.startInitialization();
+            }
+
             const response = await fetch('/api/workspaces/create' + (useAI ? '?ai=true' : ''), {
                 method: 'POST',
                 headers: {
@@ -46,47 +46,24 @@
 
             const { workspaceId } = await response.json();
             
-            toast.success("Workspace Creation Started", {
-                description: "See header for updates on the creation progress"
-            });
-
             if (useAI) {
-                // Start the initialization animation first
-                aiInitStore.startInitialization(workspaceId);
-                // Then close the modal
-                onOpenChange(false);
-                
-                // Poll for completion
-                const checkCompletion = async () => {
-                    try {
-                        const statusResponse = await fetch(`/api/workspaces/${workspaceId}/status`);
-                        const status = await statusResponse.json();
-                        
-                        if (status.isComplete) {
-                            aiInitStore.complete(workspaceId);
-                            // Only navigate when complete
-                            await goto(`/workspaces/${workspaceId}?reinitialize=true`);
-                        } else {
-                            // Check again in 5 seconds
-                            setTimeout(checkCompletion, 5000);
-                        }
-                    } catch (error) {
-                        console.error('Error checking workspace status:', error);
-                    }
-                };
-                
-                // Start polling
-                setTimeout(checkCompletion, 5000);
-            } else {
-                // For non-AI workspaces, navigate immediately
-                onOpenChange(false);
-                await goto(`/workspaces/${workspaceId}?reinitialize=true`);
+                aiInitStore.complete();
+                toast.success("AI Workspace Created", {
+                    description: "Your AI-powered workspace is ready!"
+                });
             }
+
+            // Close modal and navigate
+            onOpenChange(false);
+            await goto(`/workspaces/${workspaceId}?reinitialize=true`);
         } catch (error) {
             console.error('Error creating workspace:', error);
             if (useAI) {
                 aiInitStore.reset();
             }
+            toast.error("Failed to create workspace", {
+                description: error instanceof Error ? error.message : "An unexpected error occurred"
+            });
         } finally {
             loading = false;
         }
@@ -99,6 +76,11 @@
             <AlertDialog.Title>Create New Workspace</AlertDialog.Title>
             <AlertDialog.Description>
                 Fill in the details below to create a new workspace.
+                {#if useAI}
+                <div class="mt-2 text-sm text-muted-foreground">
+                    Note: AI workspace creation may take up to a minute to complete.
+                </div>
+                {/if}
             </AlertDialog.Description>
         </AlertDialog.Header>
 

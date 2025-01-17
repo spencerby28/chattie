@@ -1,12 +1,11 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createAdminClient } from '$lib/appwrite/appwrite-server';
-import { ID, Permission, Role } from 'appwrite';
+import { ID, Permission, Role, Query } from 'appwrite';
 import type { Channel } from '$lib/types';
 import { dev } from '$app/environment';
 
 export const POST: RequestHandler = async ({ request, locals, url }) => {
-    let workspaceId: any;
     if (!locals.user) {
         throw error(401, 'Unauthorized');
     }
@@ -45,10 +44,9 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
                 Permission.delete(Role.user(locals.user.$id))
             ]
         );
-        workspaceId = workspace.$id;
 
         await appwrite.storage.createBucket(
-            workspaceId,
+            genId,
             name,
             visibility === 'private' ? [
                 Permission.read(Role.user(locals.user.$id)),
@@ -62,16 +60,31 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
             true // Enable file security
         );
 
-        if (dev && useAI) {
-            // Don't await the AI initialization
-            fetch(`http://localhost:8080/?workspace_id=${workspaceId}&description=${encodeURIComponent(description)}`)
-                .catch(e => console.error('Failed to connect to Python server:', e));
-        }
+        let channelIds: string[] = [];
 
-        // Create default channels only if not using AI
-        if (!useAI) {
+        if (dev && useAI) {
+            try {
+                // Wait for AI initialization to complete
+                const response = await fetch(`http://localhost:8080/?workspace_id=${genId}&description=${encodeURIComponent(description)}`);
+                if (!response.ok) {
+                    throw new Error('AI initialization failed');
+                }
+                const result = await response.json();
+                
+                // Get all channels created by the AI
+                const channelsResponse = await appwrite.databases.listDocuments(
+                    'main',
+                    'channels',
+                    [Query.equal('workspace_id', genId)]
+                );
+                channelIds = channelsResponse.documents.map(channel => channel.$id);
+            } catch (e) {
+                console.error('Failed to initialize AI:', e);
+                throw error(500, 'Failed to initialize AI workspace');
+            }
+        } else {
+            // Create default channels only if not using AI
             const defaultChannels = ['general', 'announcements', 'random', 'help'];
-            const channelIds = [];
             for (const channelName of defaultChannels) {
                 const channel = await appwrite.databases.createDocument(
                     'main',
@@ -79,7 +92,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
                     ID.unique(),
                     {
                         name: channelName,
-                        workspace_id: workspaceId,
+                        workspace_id: genId,
                         type: 'public',
                         members: [locals.user.$id]
                     },
@@ -88,25 +101,23 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
                         Permission.write(Role.user(locals.user.$id)),
                         Permission.delete(Role.user(locals.user.$id))
                     ] : [
-                        Permission.read(Role.label(workspaceId)),
-                        Permission.write(Role.label(workspaceId)), 
+                        Permission.read(Role.label(genId)),
+                        Permission.write(Role.label(genId)), 
                         Permission.delete(Role.user(locals.user.$id))
                     ]
                 );
                 channelIds.push(channel.$id);
             }
-            
-            const account = await appwrite.users.get(locals.user.$id);
-
-            console.log('updating labels with channels:', channelIds);
-            await appwrite.users.updateLabels(
-                account.$id,
-                [...(account.labels || []), ...channelIds, workspaceId]
-            );
         }
 
-        // Return immediately with the workspace ID
-        return new Response(JSON.stringify({ workspaceId }), {
+        // Update user's labels with workspace ID and channel IDs
+        const account = await appwrite.users.get(locals.user.$id);
+        await appwrite.users.updateLabels(
+            account.$id,
+            [...(account.labels || []), ...channelIds, genId]
+        );
+
+        return new Response(JSON.stringify({ workspaceId: genId }), {
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (e) {
